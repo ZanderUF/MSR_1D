@@ -45,14 +45,20 @@ subroutine rk4vec_test ( )
   implicit none
 
   external rk4vec_test_f
-  
+ 
+  integer ( kind = 4) :: i ! counter 
   integer ( kind = 4 ), parameter :: ndg = 2
   real ( kind = 8 ), parameter :: dt = 0.1D+00
-  real ( kind = 8 ) t0
-  real ( kind = 8 ) t1
+  real ( kind = 8 ) t0 ! starting time
+  real ( kind = 8 ) t1 
   real ( kind = 8 ), parameter :: tmax = 10.0D+00 
-  real ( kind = 8 ) u0(ndg+1)
-  real ( kind = 8 ) u1(ndg+1)
+  
+  real ( kind = 8 ) u0(ndg+1) ! initial condition
+  real ( kind = 8 ) u1(ndg+1) ! solution vector
+  real ( kind = 8 ) beta_i(ndg)
+  real ( kind = 8 ) lambda_i(ndg)
+  real ( kind = 8 ) gen_time
+  real ( kind = 8 ) beta_tot
 
   write ( *, '(a)' ) ' '
   write ( *, '(a)' ) 'RK4VEC_TEST'
@@ -60,16 +66,23 @@ subroutine rk4vec_test ( )
   write ( *, '(a)' ) ' '
 
 ! Problem parameters - eventually have read in from file
-
+  beta_i(1) = 0.0003
+  beta_i(2) = 0.001
+  lamda_i(1) = 0.0127
+  lambda_i(2) = 0.0317
+  gen_time = 0.00002
+! Calculate beta total
+  do i = 1, ndg
+    beta_tot = beta_tot + beta_i(i)
+  end do  
 
 ! Specify initial conditions
   t0 = 0.0D+00    ! Starting time
   u0(1) = 1.0D+00 ! Value of P(t) initially
-  do i = 1, ndg+1
-	 u0 = beta_i(i)/(lamda_i(i)*gen_time)
+! Set precursor density initial conditions  
+  do i = 2, ndg+1
+      u0(i) = ( beta_i(i-1)*u0(1) ) / ( lamda_i(i-1)*gen_time )
   end do 
-  u0(2) = 1.0D+00 
-
 
 ! Loop over time steps until we reach tmax
   do
@@ -88,7 +101,7 @@ subroutine rk4vec_test ( )
 !  the solution U1 there.
 !
     t1 = t0 + dt
-    call rk4vec ( t0, ndg, u0, dt, rk4vec_test_f, u1 )
+    call rk4vec ( t0, ndg, u0, dt, rk4vec_test_f, u1)
 !
 !  Shift the data to prepare for another step.
 !
@@ -118,14 +131,26 @@ end
 subroutine rk4vec_test_f ( t, ndg, u, uprime )
   implicit none
 
+  integer ( kind = 4 ) i 
   integer ( kind = 4 ) ndg 
 
   real ( kind = 8 ) t
-  real ( kind = 8 ) u(ndg)
-  real ( kind = 8 ) uprime(ndg)
+  real ( kind = 8 ) u(ndg + 1)
+  real ( kind = 8 ) uprime(ndg +1)
+  real ( kind = 8 ) sum_lambda
+  real ( kind = 8 ) rho
+ 
+! sum over delayed groups, SUM [lambda*precursor] 
+  do i=1, ndg
+     sum_lamda = sum_lambda + lamda_i(i)*u(i+1)
+  end do
   
-  uprime(1) = u(2)
-  uprime(2) = - u(1)
+! Amplitude
+! How do we want to represent rho?
+  uprime(1) = (rho - beta_tot)/gen_time + sum_lambda 
+
+! Precursors
+  uprime(2:ndg+1) = ( beta_i(1:ndg)*u(1) )/gen_time - lambda(1:ndg)*u(2:ndg+1)   
  
   return
 end
