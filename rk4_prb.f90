@@ -1,6 +1,6 @@
-program main
+	program main
 
-!*****************************************************************************80
+	!*****************************************************************************80
 !
 !! MAIN is the main program for RK4_PRB.
 !
@@ -15,6 +15,9 @@ program main
 !
 !   Starting 5/15/2018 
 !
+  
+  USE parameters
+  
   implicit none
 
   call timestamp ( )
@@ -42,39 +45,39 @@ end
 !
 
 subroutine rk4vec_test ( )
+  USE parameters
+
   implicit none
 
   external rk4vec_test_f
- 
+  
   integer ( kind = 4) :: i ! counter 
-  integer ( kind = 4 ), parameter :: ndg = 2
-  real ( kind = 8 ), parameter :: dt = 0.1D+00
+  real ( kind = 8 ), parameter :: dt = 0.01D+00
   real ( kind = 8 ) t0 ! starting time
   real ( kind = 8 ) t1 
-  real ( kind = 8 ), parameter :: tmax = 10.0D+00 
+  real ( kind = 8 ), parameter :: tmax = 1.0D+00 
   
   real ( kind = 8 ) u0(ndg+1) ! initial condition
   real ( kind = 8 ) u1(ndg+1) ! solution vector
-  real ( kind = 8 ) beta_i(ndg)
-  real ( kind = 8 ) lambda_i(ndg)
-  real ( kind = 8 ) gen_time
-  real ( kind = 8 ) beta_tot
+  
 
   write ( *, '(a)' ) ' '
   write ( *, '(a)' ) 'RK4VEC_TEST'
   write ( *, '(a)' ) 'RK4VEC takes a Runge Kutta step for a vector ODE.'
   write ( *, '(a)' ) ' '
-
+ 
+  ndg = 1 
+  allocate(beta_i(ndg)) 
+  allocate(lamda_i(ndg))
 ! Problem parameters - eventually have read in from file
-  beta_i(1) = 0.0003
-  beta_i(2) = 0.001
-  lamda_i(1) = 0.0127
-  lambda_i(2) = 0.0317
-  gen_time = 0.00002
+  beta_i(1) = 0.0075
+  lamda_i(1) = 0.08
+  gen_time = 0.000004
 ! Calculate beta total
   do i = 1, ndg
     beta_tot = beta_tot + beta_i(i)
   end do  
+  rho =0.000
 
 ! Specify initial conditions
   t0 = 0.0D+00    ! Starting time
@@ -83,12 +86,15 @@ subroutine rk4vec_test ( )
   do i = 2, ndg+1
       u0(i) = ( beta_i(i-1)*u0(1) ) / ( lamda_i(i-1)*gen_time )
   end do 
-
 ! Loop over time steps until we reach tmax
   do
 !
 !  Print (T0,U0).
 !
+	if (t0 > 0.05) then
+		rho = 0.008
+ 	end if
+    
     write ( *, '(2x,g14.6,2x,g14.6,2x,g14.6)' ) t0, u0(1), u0(2)
 !
 !  Stop if we've exceeded TMAX.
@@ -128,29 +134,30 @@ end
 !    Output, real ( kind = 8 ) UPRIME(N), the value of the derivative, dU/dT.
 !
 
-subroutine rk4vec_test_f ( t, ndg, u, uprime )
+subroutine rk4vec_test_f ( t, u, uprime )
+  
+  USE parameters
+
   implicit none
 
   integer ( kind = 4 ) i 
-  integer ( kind = 4 ) ndg 
 
   real ( kind = 8 ) t
   real ( kind = 8 ) u(ndg + 1)
   real ( kind = 8 ) uprime(ndg +1)
-  real ( kind = 8 ) sum_lambda
-  real ( kind = 8 ) rho
- 
-! sum over delayed groups, SUM [lambda*precursor] 
+  real ( kind = 8 )  sum_lamda
+
+! sum over delayed groups, SUM [lamda*precursor] 
   do i=1, ndg
-     sum_lamda = sum_lambda + lamda_i(i)*u(i+1)
+     sum_lamda = sum_lamda + lamda_i(i)*u(i+1)
   end do
   
 ! Amplitude
 ! How do we want to represent rho?
-  uprime(1) = (rho - beta_tot)/gen_time + sum_lambda 
+  uprime(1) = (rho - beta_tot)/gen_time + sum_lamda 
 
 ! Precursors
-  uprime(2:ndg+1) = ( beta_i(1:ndg)*u(1) )/gen_time - lambda(1:ndg)*u(2:ndg+1)   
- 
+  uprime(2:ndg+1) = (beta_i(1:ndg)*u(1))/gen_time - lamda_i(1:ndg)*u(2:ndg+1)   
+  print *,'beta/gen_time', beta_i(1:ndg)/gen_time 
   return
 end

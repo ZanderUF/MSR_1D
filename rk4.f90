@@ -85,7 +85,6 @@ subroutine rk4 ( t0, u0, dt, f, u )
 
   return
 end
-subroutine rk4vec ( t0, m, u0, dt, f, u )
 
 !*****************************************************************************80
 !
@@ -127,6 +126,8 @@ subroutine rk4vec ( t0, m, u0, dt, f, u )
 !    Output, real ( kind = 8 ) U(M), the fourth-order Runge-Kutta solution 
 !    estimate at time T0+DT.
 !
+  
+subroutine rk4vec ( t0, m, u0, dt, f, u )
   implicit none
 
   integer ( kind = 4 ) m
@@ -173,7 +174,6 @@ subroutine rk4vec ( t0, m, u0, dt, f, u )
 
   return
 end
-subroutine timestamp ( )
 
 !*****************************************************************************80
 !
@@ -199,6 +199,8 @@ subroutine timestamp ( )
 !
 !    None
 !
+  
+  subroutine timestamp ( )
   implicit none
 
   character ( len = 8 ) ampm
