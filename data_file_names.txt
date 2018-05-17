@@ -1,0 +1,3 @@
+out_ramp_t_.0000_to_.1000
+out_ramp_t_.0000_to_.2500
+out_ramp_t_.0000_to_.5000

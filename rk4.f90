@@ -150,19 +150,19 @@ subroutine rk4vec ( t0, m, u0, dt, f, u )
 !
 !  Get four sample values of the derivative.
 !
-  call f ( t0, m, u0, f0 )
-
+  call f ( t0, u0, f0 )
+  
   t1 = t0 + dt / 2.0D+00
   u1(1:m) = u0(1:m) + dt * f0(1:m) / 2.0D+00
-  call f ( t1, m, u1, f1 )
-
+  call f ( t1,  u1, f1 )
+  
   t2 = t0 + dt / 2.0D+00
   u2(1:m) = u0(1:m) + dt * f1(1:m) / 2.0D+00
-  call f ( t2, m, u2, f2 )
+  call f ( t2,  u2, f2 )
 
   t3 = t0 + dt
   u3(1:m) = u0(1:m) + dt * f2(1:m)
-  call f ( t3, m, u3, f3 )
+  call f ( t3, u3, f3 )
 !
 !  Combine them to estimate the solution U at time T1.
 !
