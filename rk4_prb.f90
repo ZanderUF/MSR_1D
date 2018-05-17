@@ -52,7 +52,7 @@ subroutine rk4vec_test ( )
   
   real ( kind = 8 ) u0(ndg+1) ! initial condition
   real ( kind = 8 ) u1(ndg+1) ! solution vector
-  character(30) :: file_name
+  character(50) :: file_name
 
   write ( *, '(a)' ) ' '
   write ( *, '(a)' ) 'RK4VEC_TEST'
@@ -66,9 +66,9 @@ subroutine rk4vec_test ( )
   rho_initial = rho
   rho_final = 0.005
   ramp = .TRUE. 
-  step = .FALSE.
+  !step = .TRUE.
 ! Time parameters
-  dt   = 0.00001D+00 
+  dt   = 0.000001D+00 
   tmax = 1.0D+00  
 
 ! Read data from file
@@ -84,11 +84,11 @@ subroutine rk4vec_test ( )
 
 ! Write out files depending on problem type
   if(ramp .eqv. .TRUE.) then
-     write(file_name,'(a,f5.4,a,f5.4)'),"out_ramp_t_",t_initial,"_to_",t_final
+     write(file_name,'(a,f5.4,a,f5.4,a,f8.6)'),"out_ramp_t_",t_initial,"_to_",t_final,"tstep_",dt
   end if 
   
   if(step .eqv. .TRUE.) then
-     write(file_name,'(a,f5.4)'),"out_ramp_t_",t_initial,"_to_",t_final
+     write(file_name,'(a,f5.4,a,f5.4)'),"out_step_t_",t_final
   end if 
 ! Open file for writing out solution
   open (unit=99, file=file_name,status='unknown',form='formatted',position='asis')
@@ -105,12 +105,13 @@ subroutine rk4vec_test ( )
   do i = 2, ndg+1
       u0(i) = ( beta_i(i-1)*u0(1) ) / ( lamda_i(i-1)*gen_time )
   end do 
+! Write data to output file
  
 ! Loop over time steps until we reach tmax
   do
      ! Step perturbation
      if ( step .eqv. .TRUE.) then
-         if (t0 > 0.5) then
+         if (t0 > t_final) then
              rho = -0.005
          end if
      end if     
