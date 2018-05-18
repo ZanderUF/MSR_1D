@@ -1,0 +1,12 @@
+Sample problem 
+read parm
+ ramp=no step=yes del=1E-4 tmax=1.0 tin=0.0 tfi=0.5
+ rhostart=0.0
+ rhoinitial=0.0
+ rhofinal=5E-3
+ ndg=1 gen=5E-5
+end parm
+read delay
+    beta=7.5E-3  end
+    alam=1.2E-2  end
+end delay

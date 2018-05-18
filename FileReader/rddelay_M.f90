@@ -28,32 +28,31 @@
      i3      = 3
      itp     = 1
 !
-	 
      allocate (ialamda(ndg), ibeta(ndg))
      do while (iret == 0)
-        pn = cread (i2, iret)
-        select case (pn)
-        case default
-          !write(unit = ioutf, fmt = 100) pn, num, delay
-          stop
-        case ('alam')
-          call yread(lamda_i, ialamda, ndg, itp, lerr)
-          dum = aread(i3, iret)
-          if ( lerr )  then
-            !write(unit = ioutf, fmt = 110)
+         pn = cread (i2, iret)
+         select case (pn)
+         case default
+            !write(unit = ioutf, fmt = 100) pn, num, delay
             stop
-          end if
-        case ('beta')
-          call yread(beta_i, ibeta, ndg, itp, lerr)
-          dum = aread(i3, iret)
-          if ( lerr ) then
-            !write(unit = ioutf, fmt = 120)
-            stop
-          end if
-        end select 
+         case ('alam')
+            call yread(lamda_i, ialamda, ndg, itp, lerr)
+            print *,'lambda_i',lamda_i
+            dum = aread(i3, iret)
+            if ( lerr )  then
+              !write(unit = ioutf, fmt = 110)
+              stop
+            end if
+         case ('beta')
+             call yread(beta_i, ibeta, ndg, itp, lerr)
+             dum = aread(i3, iret)
+             if ( lerr ) then
+               !write(unit = ioutf, fmt = 120)
+               stop
+             end if
+         end select 
      end do
      deallocate(ialamda, ibeta)
-!
 !
      return
 !
