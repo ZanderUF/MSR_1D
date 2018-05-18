@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import re
+from matplotlib.font_manager import FontProperties
 
 ##-------Change font to 'Palatino' throughout the plot---##
 ##-------This will match latex documents exactly---------##
@@ -44,7 +45,7 @@ if re.search(r'\bf\b',arglist[1:]):
 
 	i=0
 	while i < len(file_names):
-		data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=2)
+		data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=1)
 		time1 = data1[:,0]
 		if re.search(r'\br\b',arglist[1:]):
 			reactivity1 = data1[:,5]
@@ -71,27 +72,49 @@ if re.search(r'\bf\b',arglist[1:]):
 		if re.search(r'\by\b',arglist[1:]):
 			plt.ylabel('Precursor Concentration')
 			plt.xlabel('Time [s]',fontsize=14)
+
 			name="precursor_conc"
 			precursor1 = data1[:,2]
-			plt.plot(time1,precursor1,label='RK4 solver')
+			precursor2 = data1[:,3]
+			precursor3 = data1[:,4]
+			precursor4 = data1[:,5]
+			precursor5 = data1[:,6]
+			precursor6 = data1[:,7]
+			precursor7 = data1[:,8]
+			precursor8 = data1[:,9]
+
+			plt.plot(time1,precursor1,label='precursor 1')
+			plt.plot(time1,precursor2,label='precursor 2')
+			plt.plot(time1,precursor3,label='precursor 3')
+			plt.plot(time1,precursor4,label='precursor 4')
+			plt.plot(time1,precursor5,label='precursor 5')
+			plt.plot(time1,precursor6,label='precursor 6')
+			plt.plot(time1,precursor7,label='precursor 7')
+			plt.plot(time1,precursor8,label='precursor 8')
+
 		i=i+1
 else:
 	print "You are not reading file names from a text file, you must manually edit this python file"
-	##------Evaluate command line
+##------Evaluate command line
+
 length = len(str(arglist[1]))
 print 'Argument List:', arglist[length:]
+
+fontP = FontProperties()
+fontP.set_size('small')
 
 
 ##------Plot benchmark data
 
 ##------Configure the legend --- ##
-plt.legend(loc='lower right',prop={'size':14},numpoints=1)
+#plt.legend(loc='lower right',prop={'size':14},numpoints=1)
+lgd = plt.legend(loc='upper center',bbox_to_anchor=(0.5, -0.2),  shadow=True, ncol=2)
 
 if re.search(r'\bpng\b',arglist[1:]):
-	f.savefig("./" + name + ".png")
+	f.savefig("./" + name + ".png",bbox_extra_artists=(lgd,), bbox_inches='tight')
 
 if re.search(r'\bpdf\b',arglist[1:]):
-        f.savefig("./" + name + ".pdf")
+        f.savefig("./" + name + ".pdf",bbox_extra_artists=(lgd,), bbox_inches='tight')
 
 if re.search(r'\bs\b',arglist[1:]):
 	plt.show()

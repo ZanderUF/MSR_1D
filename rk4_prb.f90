@@ -49,6 +49,7 @@ subroutine rk4vec_test ( )
   real, allocatable :: u1(:) ! solution vector
   character(50) :: file_name
   character, dimension(:), allocatable :: precursor_txt*10
+  
   write ( *, '(a)' ) ' '
   write ( *, '(a)' ) 'RK4VEC_TEST'
   write ( *, '(a)' ) 'RK4VEC takes a Runge Kutta step for a vector ODE.'
@@ -57,8 +58,7 @@ subroutine rk4vec_test ( )
 ! Read in problem parameters here
   call datainput 
   
-  allocate(u0(ndg+1), u1(ndg+1))
-  allocate(precursor_txt(ndg))
+  allocate(u0(ndg+1), u1(ndg+1), precursor_txt(ndg))
   u0(:)=0.0
   u1(:)=0.0 
 ! Write out files depending on problem type
@@ -74,7 +74,7 @@ subroutine rk4vec_test ( )
   do i=1,ndg
      write(unit=precursor_txt(i), fmt='(A9,I1)') 'precursor', i  
   end do  
-  write(99, fmt='(A,A,A,10(A10,4X))'),'     Time(s)   ','     Amplitude     ',(precursor_txt(i), i=1,ndg) 
+  write(99, fmt='(A,A,A,10(A12,3X))'),'    Time(s)    ','    Amplitude    ',(precursor_txt(i), i=1,ndg) 
 
 ! Calculate beta total
   do i = 1, ndg
@@ -94,7 +94,7 @@ subroutine rk4vec_test ( )
      ! Step perturbation
      if ( step .eqv. .TRUE.) then
          if (t0 > t_final) then
-             rho = -0.005
+             rho = rho_final 
          end if
      end if     
      ! Ramp perturbation
@@ -103,7 +103,7 @@ subroutine rk4vec_test ( )
              rho = rho_initial + ((rho_final - rho_initial)*(t0-t_initial))/(t_final - t_initial)  
          end if
      end if
-     write (99, '(2x,g14.6,2x,g14.6,2x,g14.7)' ) t0, u0(1), u0(2)
+     write (99, '(2x,es14.6,12es14.6)' ) t0, u0(1), (u0(i),i=2,ndg+1) 
 !
 !    Stop if we've exceeded TMAX.
 !
