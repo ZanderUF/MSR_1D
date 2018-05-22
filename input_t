@@ -1,6 +1,6 @@
 Sample problem 
 read parm
- ramp=no step=yes del=1E-4 tmax=1.0 tin=0.0 tfi=0.5
+ ramp=no step=yes del=1E-2 tmax=1.0 tin=0.0 tfi=0.5
  rhostart=0.0
  rhoinitial=0.0
  rhofinal=5E-3

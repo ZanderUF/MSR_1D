@@ -47,7 +47,7 @@ subroutine rk4vec_test ( )
   real ( kind = 8 ) t1 
   real, allocatable :: u0(:) ! initial condition
   real, allocatable :: u1(:) ! solution vector
-  character(50) :: file_name
+  character(60) :: file_name
   character, dimension(:), allocatable :: precursor_txt*10
   
   write ( *, '(a)' ) ' '
@@ -63,9 +63,9 @@ subroutine rk4vec_test ( )
   u1(:)=0.0 
 ! Write out files depending on problem type
   if(ramp .eqv. .TRUE.) then
-      write(file_name,'(a,f5.4,a,f5.4,a,f8.6)'),"out_ramp_t_",t_initial,"_to_",t_final,"tstep_",dt
+      write(file_name,'(a,f5.4,a,f5.4,a,f2.8)'),"out_ramp_t_",t_initial,"_to_",t_final,"tstep_",dt
   else if(step .eqv. .TRUE.) then
-      write(file_name,'(a,f5.4,a,f5.4)'),"out_step_t_",t_final
+      write(file_name,'(a, f6.4, a,f8.6)'),"out_step_t_at_",t_final,"_tstp_", dt
   else 
       write(file_name, '(a)'),"output.txt"
   end if 
@@ -88,7 +88,6 @@ subroutine rk4vec_test ( )
   do i = 2, ndg+1
       u0(i) = ( beta_i(i-1)*u0(1) ) / ( lamda_i(i-1)*gen_time )
   end do 
-  print *,'step',step 
 ! Loop over time steps until we reach tmax
   do
      ! Step perturbation
