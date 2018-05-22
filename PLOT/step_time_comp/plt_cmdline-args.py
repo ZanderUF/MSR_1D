@@ -68,7 +68,8 @@ if re.search(r'\bf\b',arglist[1:]):
 			power1 = data1[:,1]
 			pow_first=power1[0]
 			norm_power=power1/pow_first
-			plt.plot(time1,power1,label=file_names[i][25:len(file_names[i])])
+			plt.plot(time1,power1,label=file_names[i])
+			#plt.plot(time1,power1,label=file_names[i][25:len(file_names[i])])
 		if re.search(r'\by\b',arglist[1:]):
 			plt.ylabel('Precursor Concentration')
 			plt.xlabel('Time [s]',fontsize=14)
@@ -114,7 +115,7 @@ if re.search(r'\bpng\b',arglist[1:]):
 	f.savefig("./" + name + ".png",bbox_extra_artists=(lgd,), bbox_inches='tight')
 
 if re.search(r'\bpdf\b',arglist[1:]):
-        #f.savefig("./" + name + ".pdf",bbox_extra_artists=(lgd,), bbox_inches='tight')
-	f.savefig("./" + name + ".pdf")
+        f.savefig("./" + name + ".pdf",bbox_extra_artists=(lgd,), bbox_inches='tight')
+	#f.savefig("./" + name + ".pdf")
 if re.search(r'\bs\b',arglist[1:]):
 	plt.show()

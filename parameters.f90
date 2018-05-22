@@ -19,4 +19,5 @@
     real ( kind = 8 ) t_initial
     real ( kind = 8 ) t_final 
 
+    character(60) :: file_name
 end module parameters 

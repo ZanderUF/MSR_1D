@@ -36,6 +36,7 @@ end
 !! RK4VEC_TEST tests RK4VEC for a vector ODE.
 
 subroutine rk4vec_test ( )
+  
   USE parameters
   USE datainput_M
 
@@ -43,11 +44,10 @@ subroutine rk4vec_test ( )
 
   external rk4vec_test_f
   
-  integer ( kind = 4) :: i ! counter 
-  real ( kind = 8 ) t1 
+  integer ( kind = 4) :: i   ! counter 
+  real ( kind = 8 )   :: t1  ! next time step  
   real, allocatable :: u0(:) ! initial condition
   real, allocatable :: u1(:) ! solution vector
-  character(60) :: file_name
   character, dimension(:), allocatable :: precursor_txt*10
   
   write ( *, '(a)' ) ' '
@@ -61,18 +61,15 @@ subroutine rk4vec_test ( )
   allocate(u0(ndg+1), u1(ndg+1), precursor_txt(ndg))
   u0(:)=0.0
   u1(:)=0.0 
-! Write out files depending on problem type
-  if(ramp .eqv. .TRUE.) then
-      write(file_name,'(a,f5.4,a,f5.4,a,f2.8)'),"out_ramp_t_",t_initial,"_to_",t_final,"tstep_",dt
-  else if(step .eqv. .TRUE.) then
-      write(file_name,'(a, f6.4, a,f8.6)'),"out_step_t_at_",t_final,"_tstp_", dt
-  else 
-      write(file_name, '(a)'),"output.txt"
-  end if 
+
+! Name the output files something useful 
+  call proper_file_namer
+
 ! Open file for writing out solution
   open (unit=99, file=file_name,status='unknown',form='formatted',position='asis')
+! Write out file header depending on number of precursor groups
   do i=1,ndg
-     write(unit=precursor_txt(i), fmt='(A9,I1)') 'precursor', i  
+      write(unit=precursor_txt(i), fmt='(A9,I1)') 'precursor', i  
   end do  
   write(99, fmt='(A,A,A,10(A12,3X))'),'    Time(s)    ','    Amplitude    ',(precursor_txt(i), i=1,ndg) 
 
@@ -83,7 +80,7 @@ subroutine rk4vec_test ( )
 
 ! Specify initial conditions
   t0    = 0.0D+00    ! Starting time
-  u0(1) = 10.0D+00 ! Value of P(t) initially
+  u0(1) = 10.0D+00   ! Value of P(t) initially
 ! Set precursor density initial conditions  
   do i = 2, ndg+1
       u0(i) = ( beta_i(i-1)*u0(1) ) / ( lamda_i(i-1)*gen_time )
@@ -107,7 +104,7 @@ subroutine rk4vec_test ( )
 !    Stop if we've exceeded TMAX.
 !
      if ( tmax <= t0 ) then
-       exit
+         exit
      end if
 !
 !    Otherwise, advance to time T1, and have RK4 estimate 
@@ -115,15 +112,14 @@ subroutine rk4vec_test ( )
 !
       t1 = t0 + dt
       call rk4vec ( t0, ndg+1, u0, dt, rk4vec_test_f, u1)
+
 !    Shift the data to prepare for another step.
-!
       t0 = t1
       u0(1:ndg+1) = u1(1:ndg+1)
  end do
 
- deallocate(lamda_i,beta_i)
- deallocate(u0,u1)
- deallocate(precursor_txt)
+deallocate(precursor_txt, lamda_i,beta_i,u0,u1)
+
 return
 end
 
@@ -140,7 +136,6 @@ end
 !    Input, real ( kind = 8 ) U(N), the current solution value.
 !
 !    Output, real ( kind = 8 ) UPRIME(N), the value of the derivative, dU/dT.
-!
 
 subroutine rk4vec_test_f ( t, u, uprime )
   
@@ -168,3 +163,27 @@ subroutine rk4vec_test_f ( t, u, uprime )
 
 return
 end
+
+!*****************************************************************************80
+!
+! proper_file_namer names the output data file based on the problem type
+! 
+! No input parameters.  Uses file_name and ramp from parameters module
+!
+ 
+subroutine proper_file_namer()
+
+USE parameters
+
+! Write out files depending on problem type
+  if(ramp .eqv. .TRUE.) then
+      write(file_name,'(a,f5.4,a,f5.4,a,f2.8)'),"out_ramp_t_",t_initial,"_to_",t_final,"tstep_",dt
+  else if(step .eqv. .TRUE.) then
+      write(file_name,'(a, f6.4, a,f8.6)'),"out_step_t_at_",t_final,"_tstp_", dt
+  else 
+      write(file_name, '(a)'),"output.txt"
+  end if
+
+return
+
+end 
