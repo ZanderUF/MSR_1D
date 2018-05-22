@@ -7,7 +7,7 @@
     real, allocatable :: lamda_i(:)
     real ( kind = 8 ) gen_time
     real ( kind = 8 ) beta_tot
-    real ( kind = 8 ) rho ! starting value
+    real ( kind = 8 ) rho         ! starting value
     real ( kind = 8 ) rho_initial ! initial value for ramp
     real ( kind = 8 ) rho_final   ! final value for rho ramp
     logical :: step = .FALSE.
@@ -20,4 +20,9 @@
     real ( kind = 8 ) t_final 
 
     character(60) :: file_name
+    
+    real ( kind = 8 ) conductivity
+    real ( kind = 8 ) spec_heat
+    real ( kind = 8 ) density
+
 end module parameters 

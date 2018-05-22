@@ -1,8 +1,10 @@
    module datainput_M
 
       USE free_form
-      USE rddelay_M
+      
       USE rdparm_M
+      USE rdtemp_M
+      USE rddelay_M
       USE parameters
 
    implicit none
@@ -31,7 +33,9 @@
           read_key = aread(4,iret)
           if (read_key == 'read' ) then
               block_key = cread(4,iret)
-              if( block_key == "parm" ) then
+              if( block_key == "temp" ) then
+                   call rdtemp 
+              elseif( block_key == "parm" ) then
                    call rdparm 
               elseif( block_key == 'dela' ) then
                    allocate(lamda_i(ndg))
