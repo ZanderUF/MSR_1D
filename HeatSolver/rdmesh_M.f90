@@ -32,7 +32,9 @@
          case default
             stop
          case ('len=')
-            call yread(elem_lengths, ielem_lengths, num_elem, itp, lerr)
+            max_num_nodes = 2*num_elem + 1
+            ! the first value of elem lengths is the starting x point   
+            call yread(elem_lengths, ielem_lengths, num_elem + 1, itp, lerr)
             dum = aread(i3, iret)
             if ( lerr )  then
               !write(unit = ioutf, fmt = 110)

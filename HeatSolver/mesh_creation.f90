@@ -1,23 +1,54 @@
 !*****************************************************************************80
 !
-!! RK4VEC takes one Runge-Kutta step for a vector ODE.
+!! Sets up 1D mesh assuming quadratic functions  
 !
 !  Discussion:
-!
-!    Thanks  to Dante Bolatti for correcting the final function call to:
-!      call f ( t3, m, u3, f3 )
-!    18 August 2016.
-!
-
+!             Creates connectivity mesh assuming 1D and elements in a line
+!     	       
 !  Parameters:
-!
-!
-  
-!subroutine mesh_creation ( t0, m, u0, dt, f, u )
-!  
-!
-!  implicit none
-!
-!end
+!  	      conn_matrix(max # elements, nodes per element) 
+! 	      global_coord(max # elements)
 
+subroutine mesh_creation ( )
+!
+USE parameters_fe  
 
+implicit none
+
+    integer :: i,j,ii
+
+    ! allocate arrays
+    allocate( conn_matrix(num_elem,nodes_per_elem) , global_coord(max_num_nodes) )  
+    
+    ! setup connectivity matrix
+    do i=1, nodes_per_elem
+       conn_matrix(1,i) = i  
+    end do
+    do j=2, num_elem
+        do i=1,nodes_per_elem
+            conn_matrix(j,i) = conn_matrix(j-1,i) + nodes_per_elem-1
+        end do 
+    end do
+     
+    ! setup global coordinate array 
+    global_coord(1) = elem_lengths(1)
+    do i=1, num_elem
+        ii=2*i
+        global_coord(ii)   = global_coord(ii-1) + 0.5*elem_lengths(i+1)
+        global_coord(ii+1) = global_coord(ii-1) + elem_lengths(i+1) 
+    end do
+   
+    ! Write to outfile
+    write(outfile_unit,fmt='(a19)'),'Connectivity Matrix'
+    do j=1, num_elem
+           write(outfile_unit,fmt='(a8,1I2,a4,3I5)') 'Element:',j,' -->', &
+                (conn_matrix(j,i),i=1,nodes_per_elem)             
+    end do
+    write(outfile_unit,fmt='(a)'),' ' 
+    write(outfile_unit,fmt='(a24)'),'Global Coordinate Matrix'
+    do j=1, max_num_nodes 
+           write(outfile_unit,fmt='(a5,1I2,a4,f8.3)') 'Node:',j,' -->', &
+                global_coord(j)             
+    end do
+
+end

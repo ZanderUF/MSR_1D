@@ -1,0 +1,19 @@
+Connectivity Matri
+Element: 1 -->    1    2    3
+Element: 2 -->    3    4    5
+Element: 3 -->    5    6    7
+Element: 4 -->    7    8    9
+Element: 5 -->    9   10   11
+ 
+Global Coordinate Matrix
+Node: 1 -->   1.000
+Node: 2 -->   1.250
+Node: 3 -->   1.500
+Node: 4 -->   2.250
+Node: 5 -->   3.000
+Node: 6 -->   4.000
+Node: 7 -->   5.000
+Node: 8 -->   5.500
+Node: 9 -->   6.000
+Node:10 -->   6.000
+Node:11 -->   6.000
