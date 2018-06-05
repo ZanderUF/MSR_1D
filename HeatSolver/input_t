@@ -1,0 +1,12 @@
+heat solve sample
+read parm
+  time=yes
+  del=1E-2 
+  tmax=1.0 
+  tin=0.0 
+  nem=5
+  npe=2 
+end parm
+read mesh 
+ len= 1.0 0.5 1.5 2.0 1.0 end
+end delay
