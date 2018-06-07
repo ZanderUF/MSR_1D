@@ -29,6 +29,7 @@ subroutine element_matrix ( )
             elem_coord(i) = global_coord(ni) 
         ! Include some TD stuff here
             li = (ni - 1)*ndf
+            ! Apply initial conditions for TD problems
             do j=1,ndf
                 li = li+1
                 l  = l+1
