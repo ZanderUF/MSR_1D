@@ -44,7 +44,7 @@ USE parameters_fe
 
 ! Write out files depending on problem type
   if(time_solve .eqv. .TRUE.) then
-      write(file_name, ('a)'),'time_dep_output.txt'
+      write(file_name, '(a)'),'time_dep_output.txt'
       !write(file_name,'(a,f5.4,a,f5.4,a,f2.10)'),"out_t_",t_initial,"_to_",tmax,"tstep_",dt
   else 
       write(file_name, '(a)'),"stationary_output.txt"

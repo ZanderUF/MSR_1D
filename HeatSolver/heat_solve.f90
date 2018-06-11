@@ -6,7 +6,7 @@ subroutine heat_solve ( )
   
 USE parameters_fe
 USE datainput_fe_M
-  
+ 
 implicit none
 
   integer ( kind = 4) :: i   ! counter 
@@ -28,7 +28,7 @@ implicit none
   call mesh_creation
 
 ! General elemental matrices
- 
+  call element_matrix_heat 
 
 ! Loop over time steps until we reach tmax
 !  do

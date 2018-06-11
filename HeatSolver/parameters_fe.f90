@@ -8,17 +8,20 @@ module parameters_fe
     real, allocatable    :: elem_lengths(:) ! length of elements
     integer ( kind = 4 ) :: max_num_nodes
     integer ( kind = 4 ) :: ndf ! ndf
+    real ( kind = 8)     :: h ! length of element
 !---Mesh arrays
     integer, allocatable :: conn_matrix(:,:)
     real, allocatable    :: global_coord(:)
 !---Elemental matrices
-    real, allocatable :: elem_matrix_K(:,:)
-    real, allocatable :: elem_matrix_M(:,:)
-    real, allocatable :: elem_matrix_src(:)
-    real, allocatable :: cur_elem_soln_vec(:) ! current solution vector
-    real, allocatable :: previous_elem_soln_vec   ! previous solution vector
+    real, allocatable :: heat_elem_matrix_K(:,:)
+    real, allocatable :: heat_elem_matrix_M(:,:)
+    real, allocatable :: heat_elem_vector_F(:)
+    
 !---Global matrices
-
+    real, allocatable :: global_heat_matrix_K(:,:)
+    real, allocatable :: global_heat_matrix_M(:,:)
+    real, allocatable :: cur_elem_soln_vec(:)     ! current solution vector
+    real, allocatable :: previous_elem_soln_vec(:)   ! previous solution vector
 !---Time information 
     logical :: time_solve       ! decide if we are doing time solve or not  
     real ( kind = 8 ) alpha     ! time solve 
