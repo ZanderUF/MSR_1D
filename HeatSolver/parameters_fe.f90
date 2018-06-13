@@ -3,20 +3,26 @@ module parameters_fe
     implicit none
  
 !---Mesh information
-    integer ( kind = 4 ) :: nodes_per_elem ! Nodes per element
-    integer ( kind = 4 ) :: num_elem ! Number of elements in the mesh
-    real, allocatable    :: elem_lengths(:) ! length of elements
-    integer ( kind = 4 ) :: max_num_nodes
-    integer ( kind = 4 ) :: ndf ! ndf
-    real ( kind = 8)     :: h ! length of element
+    real, allocatable :: elem_lengths(:) ! length of elements
+    integer :: nodes_per_elem ! Nodes per element
+    integer :: num_elem ! Number of elements in the mesh
+    integer :: max_num_nodes
+    integer :: ndf ! ndf
 !---Mesh arrays
     integer, allocatable :: conn_matrix(:,:)
     real, allocatable    :: global_coord(:)
 !---Elemental matrices
-    real, allocatable :: heat_elem_matrix_K(:,:)
-    real, allocatable :: heat_elem_matrix_M(:,:)
-    real, allocatable :: heat_elem_vector_F(:)
-    
+    real, dimension(3,3) :: analytic_heat_elem_matrix_M
+    real, dimension(3,3) :: heat_elem_matrix_K
+    real, dimension(3,3) :: heat_elem_matrix_M
+    real, dimension(3)   :: heat_elem_vector_F
+!---Gauss integration 
+    integer  :: num_gaus_pts = 4
+!---Shape functions, Lagrange, quadratic order
+    real, dimension(3) :: shape_fcn
+    real, dimension(3) :: der_shape_fcn
+    real, dimension(3) :: global_der_shape_fcn 
+    real               :: g_jacobian
 !---Global matrices
     real, allocatable :: global_heat_matrix_K(:,:)
     real, allocatable :: global_heat_matrix_M(:,:)
@@ -24,11 +30,11 @@ module parameters_fe
     real, allocatable :: previous_elem_soln_vec(:)   ! previous solution vector
 !---Time information 
     logical :: time_solve       ! decide if we are doing time solve or not  
-    real ( kind = 8 ) alpha     ! time solve 
-    real ( kind = 8 ) t0        ! starting time
-    real ( kind = 8 ) dt        ! time step 
-    real ( kind = 8 ) tmax      ! max time 
-    real ( kind = 8 ) t_initial ! starting time
+    real  alpha     ! time solve 
+    real  t0        ! starting time
+    real  dt        ! time step 
+    real  tmax      ! max time 
+    real  t_initial ! starting time
 
 !---Initial conditions
     real, allocatable :: initial_conditions(:)
@@ -42,7 +48,14 @@ module parameters_fe
 
 !---File names
     character(60) :: file_name
-
     integer :: outfile_unit 
+    integer :: soln_outfile_unit
+!---Nonlinear variables
+    integer :: max_iter = 1        ! max num of nonlinear iterations to do
+    real :: residual
+    real :: tolerance = 0.001 ! prescribed tolerance
+    
+!---Flags
+    logical :: DEBUG = .TRUE.
     
 end module parameters_fe 
