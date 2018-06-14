@@ -9,23 +9,25 @@ USE datainput_fe_M
  
 implicit none
 
-    integer  :: i, n, nl_iter   ! counter 
+    integer  :: i, n, nl_iter,dist_num   ! counter 
     real     :: t1  ! next time step  
-    real     :: T_initial
+    real     :: ii 
+    logical :: transient
 
-    T_initial = 300
 !   Read in problem parameters here
     call datainput_fe
  
 !   Allocate solution vector and global matrices
-    allocate(cur_elem_soln_vec(num_elem*nodes_per_elem)&
-             previous_elem_soln_vec(num_elem*nodes_per_elem))
+    allocate(cur_elem_soln_vec(num_elem*nodes_per_elem), &
+             previous_elem_soln_vec(num_elem*nodes_per_elem), &
+             global_matrix_K(num_elem*nodes_per_elem, num_elem*nodes_per_elem), &
+             global_matrix_M(num_elem*nodes_per_elem, num_elem*nodes_per_elem), &
+             global_vec_f(num_elem*nodes_per_elem),&
+             global_vec_q(num_elem*nodes_per_elem) )
       
 !   Name the output files something useful 
     call proper_file_namer
 
-    outfile_unit = 11
-    soln_outfile_unit = 99
 !   Open file for writing out debug information
     open (unit=outfile_unit, file="outfile.txt",status='unknown',form='formatted',position='asis')
 !   Open file for writing out solution
@@ -33,9 +35,11 @@ implicit none
 
 !   Create 1D mesh
     call mesh_creation
-!   Apply initial conditions to solution vector
-    previous_elem_soln_vec = T_initial
 
+!   Steady state solve for temperature 
+    call steady_state
+    transient = .FALSE.
+if ( transient .eqv. .TRUE.) then
 !   Loop over time steps until end of transient
     do 
         nl_iter = 0 
@@ -81,8 +85,11 @@ implicit none
        t0 = t1
        ! u0(1:ndg+1) = u1(1:ndg+1)
    end do ! end time loop
-   
-!   Loop over time steps until we reach tmax
+
+end if
+
+    deallocate(cur_elem_soln_vec, previous_elem_soln_vec, global_matrix_M, &
+               global_matrix_K, global_vec_f, global_vec_q)      
 return
 end
 

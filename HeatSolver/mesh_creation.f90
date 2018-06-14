@@ -30,7 +30,7 @@ implicit none
         end do 
     end do
     ! Account for periodic boundary condition, get mesh value and assign to front
-    conn_matrix(1,1) = conn_matrix(num_elem,nodes_per_elem)   
+    conn_matrix(num_elem,nodes_per_elem) = 1   
  
     ! setup global coordinate array 
     global_coord(1) = elem_lengths(1)

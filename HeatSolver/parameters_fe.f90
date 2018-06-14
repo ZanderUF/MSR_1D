@@ -8,6 +8,7 @@ module parameters_fe
     integer :: num_elem ! Number of elements in the mesh
     integer :: max_num_nodes
     integer :: ndf ! ndf
+    real    :: A   ! cross sectional area 
 !---Mesh arrays
     integer, allocatable :: conn_matrix(:,:)
     real, allocatable    :: global_coord(:)
@@ -15,7 +16,11 @@ module parameters_fe
     real, dimension(3,3) :: analytic_heat_elem_matrix_M
     real, dimension(3,3) :: heat_elem_matrix_K
     real, dimension(3,3) :: heat_elem_matrix_M
-    real, dimension(3)   :: heat_elem_vector_F
+    real, dimension(3,3) :: heat_elem_matrix_F
+    real, dimension(3)   :: heat_elem_vec_f 
+    real, dimension(3)   :: heat_elem_vec_q
+    real, allocatable    :: power_initial(:)
+
 !---Gauss integration 
     integer  :: num_gaus_pts = 4
 !---Shape functions, Lagrange, quadratic order
@@ -24,8 +29,10 @@ module parameters_fe
     real, dimension(3) :: global_der_shape_fcn 
     real               :: g_jacobian
 !---Global matrices
-    real, allocatable :: global_heat_matrix_K(:,:)
-    real, allocatable :: global_heat_matrix_M(:,:)
+    real, allocatable :: global_matrix_M(:,:) ! Matrix in front of time derivative
+    real, allocatable :: global_matrix_K(:,:) ! Matrix in front of primary var 
+    real, allocatable :: global_vec_f(:)      ! Source terms
+    real, allocatable :: global_vec_q(:)      ! Boundary terms
     real, allocatable :: cur_elem_soln_vec(:)     ! current solution vector
     real, allocatable :: previous_elem_soln_vec(:)   ! previous solution vector
 !---Time information 
@@ -48,8 +55,8 @@ module parameters_fe
 
 !---File names
     character(60) :: file_name
-    integer :: outfile_unit 
-    integer :: soln_outfile_unit
+    integer :: outfile_unit = 11 
+    integer :: soln_outfile_unit = 99
 !---Nonlinear variables
     integer :: max_iter = 1        ! max num of nonlinear iterations to do
     real :: residual
@@ -57,5 +64,5 @@ module parameters_fe
     
 !---Flags
     logical :: DEBUG = .TRUE.
-    
+    logical :: steady_state_flag = .TRUE.    
 end module parameters_fe 

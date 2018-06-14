@@ -25,9 +25,8 @@ subroutine inter_shape_fcns (xi,elem_coord, h)
 
     ! Derivative of shape function @ gauss pt
     der_shape_fcn(1) = xi - 0.5 
-    der_shape_fcn(1) = -2.0*xi
-    der_shape_fcn(1) = xi + 0.5
-
+    der_shape_fcn(2) = -2.0*xi
+    der_shape_fcn(3) = xi + 0.5
     g_jacobian = h*0.5 
     !! Compute jacobian
     !do i = 1, nodes_per_elem
@@ -38,10 +37,5 @@ subroutine inter_shape_fcns (xi,elem_coord, h)
     do i = 1, nodes_per_elem
         global_der_shape_fcn(i) = der_shape_fcn(i)/g_jacobian 
     end do
-
-    print *,'shape 1  ', shape_fcn(1)
-    print *,'shape 2 ', shape_fcn(2)
-    print *,'shape 3 ', shape_fcn(3)
-    print *,'g_jacobian',g_jacobian
 
 end  
