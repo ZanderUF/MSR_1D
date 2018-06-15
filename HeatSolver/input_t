@@ -4,9 +4,9 @@ read parm
   del=0.5 
   tmax=1.0 
   tin=0.0 
-  nem=3
+  nem=2
   npe=3 
 end parm
 read mesh 
- len= 1.0 0.5 1.5 end
+ len= 1.0 0.5 end
 end delay

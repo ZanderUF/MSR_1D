@@ -1,25 +1,28 @@
 module parameters_fe 
 
     implicit none
- 
+
+    integer, parameter :: dp = selected_real_kind(14)
 !---Mesh information
     real, allocatable :: elem_lengths(:) ! length of elements
+    real, allocatable :: elem_node_lengths(:)
     integer :: nodes_per_elem ! Nodes per element
     integer :: num_elem ! Number of elements in the mesh
     integer :: max_num_nodes
     integer :: ndf ! ndf
-    real    :: A   ! cross sectional area 
+    real    :: area   ! cross sectional area 
 !---Mesh arrays
     integer, allocatable :: conn_matrix(:,:)
     real, allocatable    :: global_coord(:)
 !---Elemental matrices
-    real, dimension(3,3) :: analytic_heat_elem_matrix_M
-    real, dimension(3,3) :: heat_elem_matrix_K
-    real, dimension(3,3) :: heat_elem_matrix_M
-    real, dimension(3,3) :: heat_elem_matrix_F
-    real, dimension(3)   :: heat_elem_vec_f 
-    real, dimension(3)   :: heat_elem_vec_q
-    real, allocatable    :: power_initial(:)
+    real (kind=dp), dimension(3,3) :: analytic_heat_elem_matrix_K_ss
+    real (kind=dp), dimension(3,3) :: analytic_heat_elem_matrix_M
+    real (kind=dp), dimension(3,3) :: heat_elem_matrix_K
+    real (kind=dp), dimension(3,3) :: heat_elem_matrix_M
+    real (kind=dp), dimension(3,3) :: heat_elem_matrix_F
+    real (kind=dp), dimension(3)   :: heat_elem_vec_f 
+    real (kind=dp), dimension(3)   :: heat_elem_vec_q
+    real (kind=dp), allocatable    :: power_initial(:)
 
 !---Gauss integration 
     integer  :: num_gaus_pts = 4
@@ -29,12 +32,15 @@ module parameters_fe
     real, dimension(3) :: global_der_shape_fcn 
     real               :: g_jacobian
 !---Global matrices
-    real, allocatable :: global_matrix_M(:,:) ! Matrix in front of time derivative
-    real, allocatable :: global_matrix_K(:,:) ! Matrix in front of primary var 
-    real, allocatable :: global_vec_f(:)      ! Source terms
-    real, allocatable :: global_vec_q(:)      ! Boundary terms
-    real, allocatable :: cur_elem_soln_vec(:)     ! current solution vector
-    real, allocatable :: previous_elem_soln_vec(:)   ! previous solution vector
+    real (kind=dp) , allocatable :: inverse_matrix_K(:,:)
+    real (kind=dp) , allocatable :: final_global_matrix_K(:,:) 
+    real (kind=dp) , allocatable :: final_global_vec_f(:)
+    real (kind=dp) , allocatable :: global_matrix_M(:,:) ! Matrix in front of time derivative
+    real (kind=dp) , allocatable :: global_matrix_K(:,:) ! Matrix in front of primary var 
+    real (kind=dp) , allocatable :: global_vec_f(:)      ! Source terms
+    real (kind=dp) , allocatable :: global_vec_q(:)      ! Boundary terms
+    real (kind=dp) , allocatable :: cur_elem_soln_vec(:)     ! current solution vector
+    real (kind=dp) , allocatable :: previous_elem_soln_vec(:)   ! previous solution vector
 !---Time information 
     logical :: time_solve       ! decide if we are doing time solve or not  
     real  alpha     ! time solve 
@@ -45,9 +51,9 @@ module parameters_fe
 
 !---Initial conditions
     real, allocatable :: initial_conditions(:)
-    real ( kind = 8 ) :: T_ic
+    real :: T_ic
 !---Boundary conditions
-    real ( kind = 8 ) :: T_bc
+    real :: T_bc
 !---Material properties 
     !real, dimension(:)  ( kind = 8 ) conductivity
     !real, dimension(:)  ( kind = 8 ) spec_heat

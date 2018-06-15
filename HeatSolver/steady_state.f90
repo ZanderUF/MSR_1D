@@ -15,33 +15,52 @@ implicit none
 !   Dummy
 
 !   Local
-    integer :: i,ii,jj,j,n, nl_iter, max_nl_iter
-    real :: elem_length
+    
+    integer :: i,jj,j,n, nl_iter, max_nl_iter
+    real :: ii, elem_length
     real :: center_temp_initial, center_power_initial
     integer :: dist_num
-    real :: pi
+    real :: pi, cosine_term
     parameter (pi = 3.1415926535897932)
 
     !
-    allocate( power_initial(num_elem*nodes_per_elem) )
+    allocate( power_initial(2*num_elem + 1) )
+    allocate( elem_node_lengths(2*num_elem + 1) )
+
     !   Initial conditions 
     center_temp_initial = 900
     center_power_initial = 10 
-    max_nl_iter = 10
-
+    max_nl_iter = 1
+    Area = 5.0
 !   Apply initial guess to solution vector
-    dist_num = (num_elem*nodes_per_elem)/2 +1
-    do i = -dist_num , dist_num 
-        ii = (real(i)/real(dist_num))
-        previous_elem_soln_vec(i+dist_num) = center_temp_initial*cos( ii*(-pi/2.0) )
-        ! Test as we are not solving the power equation yet
-        elem_length = elem_lengths(i + dist_num + 1) - elem_lengths(i + dist_num)
-        ! Power/Volume
-        power_initial(i+dist_num) = (center_power_initial*cos(ii*(pi/2.0) ) )/(A*elem_length)
+    do i = 1, num_elem
+        do j =1,  nodes_per_elem
+            elem_node_lengths( (i-1)*nodes_per_elem + j) = elem_lengths(i)
+        end do
     end do
 
-    nl_iter = 0
+    dist_num = (2*num_elem + 1)/2 +1
+!   Apply to every node point within an element
+    do i = -dist_num , dist_num 
+        ii = (real(i)/real(dist_num))
+        cosine_term = cos(ii*(pi/2.0))
+        previous_elem_soln_vec(i+dist_num) = center_temp_initial*cosine_term
+        ! Power/Volume
+        power_initial(i+dist_num) = (center_power_initial*cosine_term )/(area*elem_node_lengths(i+dist_num))
+        
+        if(cosine_term < 0.0) then
+            cosine_term = 0.0
+            previous_elem_soln_vec(i+dist_num) = 0.0
+            power_initial(i+dist_num) = 0.0
+        end if
+
+    end do
+
+    nl_iter = 1 
     steady_state_flag = .TRUE.
+    
+    write(outfile_unit, fmt='(a)'), ' ' 
+    write(outfile_unit, fmt='(a)'), 'Start steady state calculation'
 
 !  Nonlinear loop
     do 
@@ -53,7 +72,11 @@ implicit none
             call assemble_matrix(n)
         end do 
 
+        ! Apply boundary conditions
+        call boundary_cond 
+
         ! Solve T^r = [K(T^(r-1)]^-1 F^(r-1) 
+        call solve_soln(nl_iter)
 
         ! Calculate residual
 
@@ -73,6 +96,21 @@ implicit none
     
     end do 
     
+!---No need for elemental matrices after they have been placed in the global one
+   !if (DEBUG .eqv. .TRUE. ) then
+   !     write(outfile_unit,fmt='(a)'), ' ' 
+   !     write(outfile_unit,fmt='(a)'),'Global Matrix - steady state: '
+   !     do j=1,2*num_elem+1 
+   !            write(outfile_unit,fmt='(12es14.6)') &
+   !                 (global_matrix_K(j,i) ,i=1,2*num_elem+1)             
+   !     end do
+
+   !     write(outfile_unit,fmt='(a)'), ' '        
+   !     write(outfile_unit,fmt='(a)'), 'Global vector source f - steady state:  '
+   !     write(outfile_unit,fmt='(12es14.6)') &
+   !                 (global_vec_f(i) ,i=1,2*num_elem+1)
+   !end if
+
     steady_state_flag = .FALSE.
 
 end

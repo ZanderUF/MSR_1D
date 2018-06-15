@@ -9,22 +9,26 @@ USE datainput_fe_M
  
 implicit none
 
-    integer  :: i, n, nl_iter,dist_num   ! counter 
+    integer  :: vec_length, i, n, nl_iter,dist_num   ! counter 
     real     :: t1  ! next time step  
     real     :: ii 
     logical :: transient
 
 !   Read in problem parameters here
     call datainput_fe
- 
+    
+    vec_length = 2*num_elem + 1
 !   Allocate solution vector and global matrices
-    allocate(cur_elem_soln_vec(num_elem*nodes_per_elem), &
-             previous_elem_soln_vec(num_elem*nodes_per_elem), &
-             global_matrix_K(num_elem*nodes_per_elem, num_elem*nodes_per_elem), &
-             global_matrix_M(num_elem*nodes_per_elem, num_elem*nodes_per_elem), &
-             global_vec_f(num_elem*nodes_per_elem),&
-             global_vec_q(num_elem*nodes_per_elem) )
-      
+    allocate(cur_elem_soln_vec(vec_length), &
+             previous_elem_soln_vec(vec_length), &
+             global_matrix_K(vec_length, vec_length), &
+             global_matrix_M(vec_length, vec_length), &
+             global_vec_f(vec_length),&
+             global_vec_q(vec_length) )
+    !   Set zero for all matrix entries 
+    global_matrix_K(:,:) = 0.0
+    global_vec_f(:) = 0.0
+    global_vec_q(:) = 0.0
 !   Name the output files something useful 
     call proper_file_namer
 
@@ -40,6 +44,7 @@ implicit none
     call steady_state
     transient = .FALSE.
 if ( transient .eqv. .TRUE.) then
+    write(outfile_unit, fmt='(a)'), 'In transient loop'
 !   Loop over time steps until end of transient
     do 
         nl_iter = 0 

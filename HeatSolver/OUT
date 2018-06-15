@@ -1,90 +1,30 @@
-14 June 2018  11:08:28.920 AM
+15 June 2018  10:55:34.923 AM
  
 Solve the time-dependent heat equation
  
- Temp ini   278.115265       529.006653       728.115295       855.950867       900.000000       855.950867       728.115295       529.006653       278.115265    
- dt   0.00000000    
- nonlinear           0
- kappa  0.536988616    
- kappa  0.611730218    
- kappa  0.697405457    
- kappa  0.753995061    
- kappa  0.845707715    
- kappa  0.861148775    
- kappa  0.861148775    
- kappa  0.845707655    
- kappa  0.753995061    
- kappa  0.697405457    
- kappa  0.611730218    
- kappa  0.536988616    
- nonlinear           1
- kappa  0.536988616    
- kappa  0.611730218    
- kappa  0.697405457    
- kappa  0.753995061    
- kappa  0.845707715    
- kappa  0.861148775    
- kappa  0.861148775    
- kappa  0.845707655    
- kappa  0.753995061    
- kappa  0.697405457    
- kappa  0.611730218    
- kappa  0.536988616    
- dt  0.500000000    
- nonlinear           0
- kappa  0.536988616    
- kappa  0.611730218    
- kappa  0.697405457    
- kappa  0.753995061    
- kappa  0.845707715    
- kappa  0.861148775    
- kappa  0.861148775    
- kappa  0.845707655    
- kappa  0.753995061    
- kappa  0.697405457    
- kappa  0.611730218    
- kappa  0.536988616    
- nonlinear           1
- kappa  0.536988616    
- kappa  0.611730218    
- kappa  0.697405457    
- kappa  0.753995061    
- kappa  0.845707715    
- kappa  0.861148775    
- kappa  0.861148775    
- kappa  0.845707655    
- kappa  0.753995061    
- kappa  0.697405457    
- kappa  0.611730218    
- kappa  0.536988616    
- dt   1.00000000    
- nonlinear           0
- kappa  0.536988616    
- kappa  0.611730218    
- kappa  0.697405457    
- kappa  0.753995061    
- kappa  0.845707715    
- kappa  0.861148775    
- kappa  0.861148775    
- kappa  0.845707655    
- kappa  0.753995061    
- kappa  0.697405457    
- kappa  0.611730218    
- kappa  0.536988616    
- nonlinear           1
- kappa  0.536988616    
- kappa  0.611730218    
- kappa  0.697405457    
- kappa  0.753995061    
- kappa  0.845707715    
- kappa  0.861148775    
- kappa  0.861148775    
- kappa  0.845707655    
- kappa  0.753995061    
- kappa  0.697405457    
- kappa  0.611730218    
- kappa  0.536988616    
+ cos   -4.37113883E-08
+ elem    1.00000000    
+ cos    1.00000000    
+ elem   0.500000000    
+ cos    1.00000000    
+ elem    1.50000000    
+ cos    1.00000000    
+ elem    4.65661287E-10
+ cos    1.00000000    
+ elem    0.00000000    
+ cos    1.00000000    
+ elem    4.65661287E-10
+ cos    1.00000000    
+ elem    0.00000000    
+ cos    1.00000000    
+ elem    4.65661287E-10
+ cos    1.00000000    
+ elem    1.26116862E-44
+ cos    1.00000000    
+ elem    4.65661287E-10
+ cos   -4.37113883E-08
+ elem    0.00000000    
  
 Normal end of execution.
  
-14 June 2018  11:08:28.922 AM
+15 June 2018  10:55:34.925 AM

@@ -19,20 +19,22 @@ subroutine assemble_matrix (n)
 !---local
     integer :: i, j, ii, jj   
 
-
-!   Set zero for all matrix entries 
-    global_matrix_K(:,:) = 0.0
-
+!   Assemble global matrices
     do i = 1, nodes_per_elem
         ii = (2*n - 1) + (i - 1)
         do j = 1, nodes_per_elem
             jj = (2*n - 1) + (j - 1) 
-            global_matrix_K(ii,jj) = global_matrix_K(ii,jj) + heat_elem_matrix_M(i,j)
+            global_matrix_K(ii,jj) = global_matrix_K(ii,jj) + heat_elem_matrix_K(i,j)
         end do 
 
     end do
 
-!---No need for elemental matrices after they have been placed in the global one
-    
+    ii = 0
+!   Assemble global vector sources + B.C.
+    do i = 1, nodes_per_elem
+        ii = (2*n - 1) + (i - 1)
+        global_vec_f(ii) = global_vec_f(ii) + heat_elem_vec_f(i)
+        global_vec_q(ii) = global_vec_q(ii) + heat_elem_vec_q(i)
+    end do
 
 end 
