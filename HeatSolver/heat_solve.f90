@@ -16,7 +16,7 @@ implicit none
 !   Read in problem parameters here
     call datainput_fe
     
-    vec_length = 2*num_elem + 1
+    vec_length = 2*num_elem 
 !   Allocate solution vector and global matrices
     allocate(cur_elem_soln_vec(vec_length), &
              previous_elem_soln_vec(vec_length), &

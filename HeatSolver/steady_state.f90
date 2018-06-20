@@ -24,8 +24,8 @@ implicit none
     parameter (pi = 3.1415926535897932)
 
     !
-    allocate( power_initial(2*num_elem + 1) )
-    allocate( elem_node_lengths(2*num_elem + 1) )
+    allocate( power_initial(2*num_elem ) )
+    allocate( elem_node_lengths(2*num_elem ) )
 
     !   Initial conditions 
     center_temp_initial = 900
@@ -48,9 +48,9 @@ implicit none
         cosine_term = cos(ii*(pi/2.0))
         previous_elem_soln_vec(i) = center_temp_initial*cosine_term
         ! Power/Volume
-        print *,'global',global_coord(i)
-        power_initial(i) = (center_power_initial*cosine_term )/(area*(global_coord(i+1) - global_coord(i) ) )
-        
+        power_initial(i) = (center_power_initial*cosine_term )/&
+        (area*(elem_lengths( (i/num_elem)+1 )))
+
         if(cosine_term < 0.0) then
             cosine_term = 0.0
             previous_elem_soln_vec(i) = 0.0

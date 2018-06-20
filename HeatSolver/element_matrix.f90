@@ -58,8 +58,6 @@ subroutine element_matrix_heat (n, nl_iter)
         ni = conn_matrix(n,i) 
         elem_coord(i) = global_coord(ni)       
     end do
-    print *,'shape',shape_fcn
-    print *,'power-in',power_initial
 !---Integrate over Gauss Pts
     do g = 1 , num_gaus_pts 
         xi = gauspt(g)
@@ -76,12 +74,13 @@ subroutine element_matrix_heat (n, nl_iter)
                 T =  T + shape_fcn(i)*previous_elem_soln_vec( i )
                 P = P + shape_fcn(i)*power_initial(  i )
             else
-                T = T + shape_fcn(i)*previous_elem_soln_vec( n+1 + i )
+                T = T + shape_fcn(i)*previous_elem_soln_vec( n + i )
                 ! Get power at gauss pts
-                P = P + shape_fcn(i)*power_initial( n+1 + 1 )
+                P = P + shape_fcn(i)*power_initial( n + i )
             end if
         end do   
-        
+        print *,'P ', P
+        print *,'T ', T
         call kappa_corr(T,kappa) 
         call density_corr(T,density)
         call cond_corr(T,C_p)

@@ -34,12 +34,12 @@ implicit none
     
     ! setup global coordinate array 
     global_coord(1) = 0.0 
-    do i=1, num_elem
+    do i=1, num_elem-1
         ii=2*i
         global_coord(ii)   = global_coord(ii-1) + 0.5*elem_lengths(i)
         global_coord(ii+1) = global_coord(ii-1) + elem_lengths(i) 
     end do
-    
+    print *,'glob',global_coord 
     ! Write to outfile
     write(outfile_unit,fmt='(a19)'),'Connectivity Matrix'
     do j=1, num_elem

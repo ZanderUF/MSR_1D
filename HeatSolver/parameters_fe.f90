@@ -71,4 +71,5 @@ module parameters_fe
 !---Flags
     logical :: DEBUG = .TRUE.
     logical :: steady_state_flag = .TRUE.    
+    logical :: unit_test = .TRUE.
 end module parameters_fe 
