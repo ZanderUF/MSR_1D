@@ -11,9 +11,9 @@ subroutine inter_shape_fcns (xi,elem_coord, h)
 
     implicit none
 !---Dummy variable
-    real :: xi 
-    real, dimension(3) :: elem_coord
-    real :: h
+    real(kind=8) :: xi 
+    real(kind=8), dimension(3) :: elem_coord
+    real(kind=8) :: h
 
 !---local
     integer :: i   

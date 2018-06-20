@@ -12,11 +12,11 @@ subroutine cond_corr(T, C_p)
 implicit none
 
 ! Dummy
-    real, intent(in)  :: T
-    real, intent(out) :: C_p 
+    real(kind=8), intent(in)  :: T
+    real(kind=8), intent(out) :: C_p 
 ! Local
-    real :: a
-    real :: b  
+    real(kind=8) :: a
+    real(kind=8) :: b  
     
     a = 9.636 
     b = 10.487

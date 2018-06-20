@@ -16,7 +16,7 @@ subroutine boundary_cond( )
 ! Dummy
 
 ! Local
-    integer :: last_row, i,j 
+    integer :: i,j 
 
     allocate(final_global_matrix_K(2*num_elem,2*num_elem), & 
              final_global_vec_f(2*num_elem) )

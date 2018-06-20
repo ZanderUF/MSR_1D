@@ -12,11 +12,11 @@ subroutine density_corr(T, density)
 implicit none
 
 ! Dummy
-    real, intent(in)  :: T
-    real, intent(out) :: density 
+    real(kind=8), intent(in)  :: T
+    real(kind=8), intent(out) :: density 
 ! Local
-    real :: a
-    real :: b  
+    real(kind=8) :: a
+    real(kind=8) :: b  
     
     a = 2579.3 
     b = -0.624

@@ -9,9 +9,8 @@ USE datainput_fe_M
  
 implicit none
 
-    integer  :: vec_length, i, n, nl_iter,dist_num   ! counter 
-    real     :: t1  ! next time step  
-    real     :: ii 
+    integer  :: vec_length, n, nl_iter   ! counter 
+    real(kind=8)     :: t1  ! next time step  
     logical :: transient
 
 !   Read in problem parameters here
@@ -26,6 +25,8 @@ implicit none
              global_vec_f(vec_length),&
              global_vec_q(vec_length) )
     !   Set zero for all matrix entries 
+    previous_elem_soln_vec(:) = 0.0
+    
     global_matrix_K(:,:) = 0.0
     global_vec_f(:) = 0.0
     global_vec_q(:) = 0.0

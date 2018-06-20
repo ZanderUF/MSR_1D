@@ -25,17 +25,17 @@ subroutine element_matrix_heat (n, nl_iter)
     integer :: n 
     integer :: nl_iter
 !---Local variables 
-    integer ( kind = 4) :: g, j, i, ni, l, li
-    real, dimension(3) :: elem_coord
-    real,dimension(3, 3) :: K_integral, M_integral
+    integer ( kind = 4) :: g, j, i, ni
+    real(kind=8), dimension(3) :: elem_coord
+    real(kind=8),dimension(3, 3) :: K_integral, M_integral
     data M_integral / 4 , 2 , -1 , 2 , 16 , 2 , -1 , 2 ,4 / 
     data K_integral / 7, -8,   1, -8,  16, -8,   1, -8, 7 /
     !data K_integral / 37, 44, -7, -32, 64, 32, -7, 44, 37 /
     real, dimension(4)  :: gauspt, gauswt
     data gauspt /-0.8611363116, -0.3399810435, 0.3399810435, 0.8611363116 /  
     data gauswt / 0.347854851 ,  0.6521451548, 0.6521451548, 0.347854851 /
-    real  :: xi, wt, cnst, h, s, s2, T, P 
-    real  :: kappa, density, C_p, K_material, F_material
+    real(kind=8)  :: xi, wt, cnst, h, s, s2, T, P 
+    real(kind=8)  :: kappa, density, C_p, K_material, F_material
 !---Local element coordinate
 
     heat_elem_matrix_M = 0.0
@@ -58,7 +58,8 @@ subroutine element_matrix_heat (n, nl_iter)
         ni = conn_matrix(n,i) 
         elem_coord(i) = global_coord(ni)       
     end do
-    
+    print *,'shape',shape_fcn
+    print *,'power-in',power_initial
 !---Integrate over Gauss Pts
     do g = 1 , num_gaus_pts 
         xi = gauspt(g)
@@ -69,11 +70,18 @@ subroutine element_matrix_heat (n, nl_iter)
         ! Calculate shape functions at gauss pt
         call inter_shape_fcns(xi,elem_coord,h)
         ! Evaluate material properties at gauss pt, first get temp @ gauss pt
-        do i=1, nodes_per_elem
-            T = T + shape_fcn(i)*previous_elem_soln_vec( (n-1)*nodes_per_elem + i )
-            ! Get power at gauss pts
-            P = P + shape_fcn(i)*power_initial( (n-1)*nodes_per_elem + i )
-        end do         
+        
+        do i = 1 , nodes_per_elem 
+            if ( n .eq. 1) then
+                T =  T + shape_fcn(i)*previous_elem_soln_vec( i )
+                P = P + shape_fcn(i)*power_initial(  i )
+            else
+                T = T + shape_fcn(i)*previous_elem_soln_vec( n+1 + i )
+                ! Get power at gauss pts
+                P = P + shape_fcn(i)*power_initial( n+1 + 1 )
+            end if
+        end do   
+        
         call kappa_corr(T,kappa) 
         call density_corr(T,density)
         call cond_corr(T,C_p)

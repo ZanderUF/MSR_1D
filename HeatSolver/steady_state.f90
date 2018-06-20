@@ -33,25 +33,28 @@ implicit none
     max_nl_iter = 1
     Area = 5.0
 !   Apply initial guess to solution vector
-    do i = 1, num_elem
-        do j =1,  nodes_per_elem
-            elem_node_lengths( (i-1)*nodes_per_elem + j) = elem_lengths(i)
-        end do
-    end do
+    !do i = 1, num_elem
+    !    do j =1,  nodes_per_elem
+    !        elem_node_lengths( (i-1)*nodes_per_elem + j) = elem_lengths(i)
+    !    end do
+    !end do
 
-    dist_num = (2*num_elem + 1)/2 +1
+    dist_num = (2*num_elem + 1)/2 + 1
+
 !   Apply to every node point within an element
-    do i = -dist_num , dist_num 
-        ii = (real(i)/real(dist_num))
+    !do i = -dist_num , dist_num 
+    do i = 1, 2*num_elem
+        ii = (real(i-dist_num)/real(dist_num))
         cosine_term = cos(ii*(pi/2.0))
-        previous_elem_soln_vec(i+dist_num) = center_temp_initial*cosine_term
+        previous_elem_soln_vec(i) = center_temp_initial*cosine_term
         ! Power/Volume
-        power_initial(i+dist_num) = (center_power_initial*cosine_term )/(area*elem_node_lengths(i+dist_num))
+        print *,'global',global_coord(i)
+        power_initial(i) = (center_power_initial*cosine_term )/(area*(global_coord(i+1) - global_coord(i) ) )
         
         if(cosine_term < 0.0) then
             cosine_term = 0.0
-            previous_elem_soln_vec(i+dist_num) = 0.0
-            power_initial(i+dist_num) = 0.0
+            previous_elem_soln_vec(i) = 0.0
+            power_initial(i) = 0.0
         end if
 
     end do
