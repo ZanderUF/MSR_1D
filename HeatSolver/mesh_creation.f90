@@ -18,6 +18,7 @@ implicit none
     integer :: i,j,ii
 
     ! allocate arrays
+
     allocate( conn_matrix(num_elem,nodes_per_elem) , global_coord(max_num_nodes) )  
     
     ! setup connectivity matrix
@@ -30,20 +31,20 @@ implicit none
         end do 
     end do
     ! Account for periodic boundary condition, get mesh value and assign to front
-    conn_matrix(num_elem,nodes_per_elem) = 1   
+    !conn_matrix(num_elem,nodes_per_elem) = 1   
     
     ! setup global coordinate array 
     global_coord(1) = 0.0 
-    do i=1, num_elem-1
+    do i=1, num_elem
         ii=2*i
         global_coord(ii)   = global_coord(ii-1) + 0.5*elem_lengths(i)
         global_coord(ii+1) = global_coord(ii-1) + elem_lengths(i) 
     end do
-    print *,'glob',global_coord 
+    
     ! Write to outfile
     write(outfile_unit,fmt='(a19)'),'Connectivity Matrix'
     do j=1, num_elem
-           write(outfile_unit,fmt='(a8,1I2,a4,3I5)') 'Element:',j,' -->', &
+           write(outfile_unit,fmt='(a,1I2,a4,4I6)') 'Element:',j,' -->', &
                 (conn_matrix(j,i),i=1,nodes_per_elem)             
     end do
     write(outfile_unit,fmt='(a)'),' ' 

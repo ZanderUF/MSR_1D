@@ -16,39 +16,77 @@ subroutine boundary_cond( )
 ! Dummy
 
 ! Local
-    integer :: i,j, vec_length
+    integer :: i,j
+    real :: initial_cond 
+    real :: beg_temp, end_temp, heat_flux_bc
+    !allocate(final_global_matrix_K(matrix_length, matrix_length), & 
+    !         final_global_vec_f(matrix_length) )
+  
+ 
+    write(outfile_unit,fmt='(a)'), ' ' 
+    write(outfile_unit,fmt='(a)'),'Global Assembled K matrix before B.C. imposed  '
+    do j=1,matrix_length 
+           write(outfile_unit,fmt='(8es14.3)') &
+                (global_matrix_K(j,i) ,i=1,matrix_length)             
+    end do
 
-    vec_length = 2*num_elem 
-    allocate(final_global_matrix_K(vec_length, vec_length), & 
-             final_global_vec_f(vec_length) )
+    !global_vec_q(1) = global_vec_q(1) + 200
+    beg_temp = 500
+    end_temp = 300
+    heat_flux_bc = 50 
+    ! Impose boundary condition of set value at the end  
+    !global_vec_q(1) = beg_temp 
+    global_vec_q(matrix_length) = end_temp 
+    
+    ! Set main diagonal
+    !global_matrix_K(1,1) = 1.0
+    global_matrix_K(matrix_length,matrix_length) = 1.0
+   
+    ! Impose B.C. at beginning, steady heat flux
+    
+    !! combine first colum with beg B.C. to add to RHS vector
+    global_vec_q(1) = global_vec_q(1) + heat_flux_bc
+    
+    ! Set all other values along last colum = to zero except the main diagonal value
+    do j = 1, matrix_length-1
+        global_matrix_K(j, matrix_length) = 0.0 
+    end do
+    
+    !do i = 2, matrix_length
+    !    global_matrix_K(i,1) = 0.0
+    !end do
+    
+    write(outfile_unit,fmt='(a)'), ' ' 
+    write(outfile_unit,fmt='(a)'),'Global Assembled K matrix after B.C. imposed  '
+    do j=1,matrix_length 
+           write(outfile_unit,fmt='(8es14.3)') &
+                (global_matrix_K(j,i) ,i=1,matrix_length)             
+    end do
 
 !   Print out matrix before B.C. applied
-!    if (DEBUG .eqv. .TRUE. ) then
+    if (DEBUG .eqv. .TRUE. ) then
 !        write(outfile_unit,fmt='(a)'), ' ' 
 !        write(outfile_unit,fmt='(a)'),'Global Matrix - steady state before B.C. applied: '
-!        do j=1, vec_length
+!        do j=1, matrix_length
 !               write(outfile_unit,fmt='(12es14.6)') &
-!                    (global_matrix_K(j,i) ,i=1,vec_length)             
+!                    (global_matrix_K(j,i) ,i=1,matrix_length)             
 !        end do
 !
-!        write(outfile_unit,fmt='(a)'), ' '        
-!        write(outfile_unit,fmt='(a)'), 'Global vector source f - steady state before B.C. applied:  '
-!        write(outfile_unit,fmt='(12es14.6)') &
-!                    (global_vec_f(i) ,i=1,vec_length)
-!    end if
+        write(outfile_unit,fmt='(a)'), ' '        
+        write(outfile_unit,fmt='(a)'), 'Global vector source Q - steady state   '
+        write(outfile_unit,fmt='(12es14.6)') &
+                    (global_vec_q(i) ,i=1,matrix_length)
+    end if
 
 ! This is now handled in assembly
 
-!   Add last first to last
-!    do j = 1, vec_length 
-!        global_matrix_K(vec_length, j) = global_matrix_K(1,j) + global_matrix_K(vec_length,j)
-!    end do
+
 !    
 !    global_vec_f(num_elem + 1) = global_vec_f(1) + global_vec_f(num_elem + 1)
 !
 !!   Add frst column to last - sweep out first column
-!    do i = 1, vec_length   
-!        global_matrix_K(i, vec_length) = global_matrix_K(i,1) + global_matrix_K(i,vec_length)
+!    do i = 1, matrix_length   
+!        global_matrix_K(i, matrix_length) = global_matrix_K(i,1) + global_matrix_K(i,matrix_length)
 !    end do
 !!   Remove first column and row - apply periodic B.C.
 !    do i = 1, 2*num_elem

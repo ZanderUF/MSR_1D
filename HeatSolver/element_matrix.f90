@@ -25,26 +25,27 @@ subroutine element_matrix_heat (n, nl_iter)
     integer :: n 
     integer :: nl_iter
 !---Local variables 
-    integer ( kind = 4) :: g, j, i, ni
-    real(kind=8), dimension(3) :: elem_coord
-    real(kind=8),dimension(3, 3) :: K_integral, M_integral
+    integer  :: g, j, i, ni
+    real, dimension(4) :: elem_coord
+    real,dimension(3, 3) :: K_integral, M_integral
     data M_integral / 4 , 2 , -1 , 2 , 16 , 2 , -1 , 2 ,4 / 
     data K_integral / 7, -8,   1, -8,  16, -8,   1, -8, 7 /
     !data K_integral / 37, 44, -7, -32, 64, 32, -7, 44, 37 /
     real, dimension(4)  :: gauspt, gauswt
     data gauspt /-0.8611363116, -0.3399810435, 0.3399810435, 0.8611363116 /  
     data gauswt / 0.347854851 ,  0.6521451548, 0.6521451548, 0.347854851 /
-    real(kind=8)  :: xi, wt, cnst, h, s, s2, T, P 
-    real(kind=8)  :: kappa, density, C_p, K_material, F_material
+    real  :: xi, wt, cnst, h, s, s2, T, P 
+    real  :: kappa, density, C_p, K_material, F_material
 !---Local element coordinate
 
     heat_elem_matrix_M = 0.0
+    heat_elem_matrix_K = 0.0
     ! only need to calculate K on the first nonlinear iter since it doesn't change
-    if(steady_state_flag .eqv. .TRUE. .and. nl_iter .eq. 1) then 
-        heat_elem_matrix_K = 0.0   
-        analytic_heat_elem_matrix_K_ss = 0.0
-    end if
-
+    !if(steady_state_flag .eqv. .TRUE. .and. nl_iter .eq. 1) then 
+    !    heat_elem_matrix_K = 0.0   
+    !    analytic_heat_elem_matrix_K_ss = 0.0
+    !end if
+    heat_elem_matrix_Q = 0.0
     heat_elem_matrix_F = 0.0
     heat_elem_vec_f = 0.0
     heat_elem_vec_q = 0.0
@@ -52,6 +53,25 @@ subroutine element_matrix_heat (n, nl_iter)
     kappa = 0.0
     density = 0.0 
     C_p = 0.0
+
+
+    elem_matrix_P_minus = 0.0
+    elem_matrix_P_plus = 0.0
+!   compute interface matrix
+    xi = -1.0
+    !call inter_shape_fcns(xi,elem_coord,h) 
+    !do i = 1, nodes_per_elem
+    !    do j = 1, nodes_per_elem
+    !        elem_matrix_P_minus(i,j) = elem_matrix_P_minus(i,j) + der_shape_fcn(j)*shape_fcn(i)        
+    !    end do
+    !end do
+    !xi = 1.0
+    !!call inter_shape_fcns(xi,elem_coord,h) 
+    !do i = 1, nodes_per_elem
+    !    do j = 1, nodes_per_elem
+    !        elem_matrix_P_plus(i,j) = elem_matrix_P_plus(i,j) + der_shape_fcn(j)*shape_fcn(i)        
+    !    end do
+    !end do
 
 !---Setup local coordinates
     do i = 1, nodes_per_elem
@@ -70,43 +90,41 @@ subroutine element_matrix_heat (n, nl_iter)
         ! Evaluate material properties at gauss pt, first get temp @ gauss pt
         
         do i = 1 , nodes_per_elem 
-            if ( n .eq. 1) then
-                T =  T + shape_fcn(i)*previous_elem_soln_vec( i )
-                P = P + shape_fcn(i)*power_initial(  i )
-            else
-                T = T + shape_fcn(i)*previous_elem_soln_vec( n + i )
+                T = T + shape_fcn(i)*previous_elem_soln_vec( ((2*n-2) + i) )
                 ! Get power at gauss pts
-                P = P + shape_fcn(i)*power_initial( n + i )
-            end if
+                P = P + shape_fcn(i)*power_initial( n +i )
         end do   
-        print *,'P ', P
-        print *,'T ', T
+        print *,'T',T 
+        
         call kappa_corr(T,kappa) 
         call density_corr(T,density)
         call cond_corr(T,C_p)
         K_material = kappa/(density*C_p)
         F_material = 1.0/(density*C_p)
- 
+        ! constant kappa
+        !kappa = 20.0
         cnst = g_jacobian*wt
-        
+        print *,'kappa ',kappa 
         do i=1, nodes_per_elem
         !---Setup local coordinates
             ! Populate Kij, Mij, Fij, Qij
-            do j = 1, nodes_per_elem
-                
+	        do j = 1, nodes_per_elem
                 ! Steady state K - no density and C_p, only need on 1st iteration 
-                if ( steady_state_flag .eqv. .TRUE. .and. nl_iter .eq. 1 ) then 
-                    !heat_elem_matrix_K(i,j) = heat_elem_matrix_K(i,j) + &
-                    !                          cnst*der_shape_fcn(i)*der_shape_fcn(j)  
+                !if ( steady_state_flag .eqv. .TRUE. .and. nl_iter .eq. 1 ) then 
+            	if ( steady_state_flag .eqv. .TRUE.  ) then
+                !    heat_elem_matrix_Q(1,j) = heat_elem_matrix_Q(1,j) + &
+		   		!                              global_der_shape_fcn(i)*shape_fcn(j)*cnst        
+
                     heat_elem_matrix_K(i,j) = heat_elem_matrix_K(i,j) + &
-                                              cnst*global_der_shape_fcn(i)*global_der_shape_fcn(j)
-               end if 
+                                          kappa*cnst*global_der_shape_fcn(i)*global_der_shape_fcn(j)
+                end if 
                 
                 ! Only update f vector
                 if ( steady_state_flag .eqv. .TRUE. ) then 
-                    ! F_ij matrix    
-                    heat_elem_matrix_F(i,j) = heat_elem_matrix_F(i,j) + ( 1.0 / kappa ) 
-                    heat_elem_vec_f(i) = heat_elem_vec_f(i) + P*shape_fcn(i)
+                    ! F_ij matrix   
+                    !heat_elem_matrix_F(i,j) = heat_elem_matrix_F(i,j) + &
+		    			      !cnst*shape_fcn(i)*shape_fcn(j)*( 1.0 / kappa ) 
+                    !heat_elem_vec_f(i) = heat_elem_vec_f(i) + P*shape_fcn(i)
                     heat_elem_vec_q(i) = 0.0
                 end if
 
@@ -132,6 +150,8 @@ subroutine element_matrix_heat (n, nl_iter)
         end do ! End loop over i matrix entries
 
     end do ! end do over gauss pts 
+   
+    heat_elem_matrix_K = heat_elem_matrix_K + elem_matrix_P_minus + elem_matrix_P_plus
 !-------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE. ) then
         if(steady_state_flag .eqv. .FALSE. )  then 
@@ -164,31 +184,52 @@ subroutine element_matrix_heat (n, nl_iter)
         end if
 
         write(outfile_unit,fmt='(a)'),' '
+
         !---do K matrix analtically  
-        do i=1, nodes_per_elem
-            !---Setup local coordinates
-            ! Get length of element
-            h = elem_lengths(n)
-            ! Populate Kij, Mij, Fij, Qij
-            do j = 1, nodes_per_elem
-                analytic_heat_elem_matrix_K_ss(i,j) = (1.0/(3.0*h))*K_integral(i,j) 
-            end do ! End loop over j matrix entries
-        end do ! End loop over i matrix entries
+        !do i=1, nodes_per_elem
+        !    !---Setup local coordinates
+        !    ! Get length of element
+        !    h = elem_lengths(n)
+        !    ! Populate Kij, Mij, Fij, Qij
+        !    do j = 1, nodes_per_elem
+        !        analytic_heat_elem_matrix_K_ss(i,j) = (1.0/(3.0*h))*K_integral(i,j) 
+        !    end do ! End loop over j matrix entries
+        !end do ! End loop over i matrix entries
        
         write(outfile_unit,fmt='(a,1I2)'),  'Nonlinear iteration ', nl_iter
         write(outfile_unit,fmt='(a)'),'*****************************************'
-        write(outfile_unit,fmt='(a26,1I2)'),'K element Matrix analytic: ',n
+        write(outfile_unit,fmt='(a26,1I2)'),'K element Matrix analytically determined element--> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.6)') &
                     (analytic_heat_elem_matrix_K_ss(j,i),i=1,nodes_per_elem)             
         end do
-        write(outfile_unit,fmt='(a26,1I2)'),'K element Matrix  element: ',n
+        write(outfile_unit,fmt='(a26,1I2)'),'K element Matrix gaussian integration element--> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.6)') &
                     (heat_elem_matrix_K(j,i),i=1,nodes_per_elem)             
         end do
+
         write(outfile_unit,fmt='(a)'),' '
-        write(outfile_unit,fmt='(a26,1I2)'),'F element Matrix element: ',n
+        write(outfile_unit,fmt='(a26,1I2)'),'Q element Matrix gaussian integration element--> ',n
+        do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.6)') &
+                    (heat_elem_matrix_Q(j,i),i=1,nodes_per_elem)             
+        end do
+        write(outfile_unit,fmt='(a)'),' '
+	    write(outfile_unit,fmt='(a26,1I2)'),'P minus element Matrix gaussian integration element--> ',n
+        do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.6)') &
+                    (elem_matrix_P_minus(j,i),i=1,nodes_per_elem)             
+        end do
+        write(outfile_unit,fmt='(a)'),' '
+        write(outfile_unit,fmt='(a26,1I2)'),'P plus element Matrix gaussian integration element--> ',n
+        do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.6)') &
+                    (elem_matrix_P_plus(j,i),i=1,nodes_per_elem)             
+        end do
+        write(outfile_unit,fmt='(a)'),' '
+
+	    write(outfile_unit,fmt='(a26,1I2)'),'F element Matrix element: ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.6)') &
                     (heat_elem_matrix_F(j,i),i=1,nodes_per_elem)             

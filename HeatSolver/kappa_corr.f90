@@ -12,14 +12,18 @@ subroutine kappa_corr(T, kappa)
 implicit none
 
 ! Dummy
-    real(kind=8), intent(in)  :: T
-    real(kind=8), intent(out) :: kappa
+    real, intent(in)  :: T
+    real, intent(out) :: kappa
 ! Local
-    real(kind=8) :: a
-    real(kind=8) :: b  
+    real :: a
+    real :: b  
     
-    a = 0.36 
-    b = 0.00056
-    kappa = a + b*T
+    !a = 0.36 
+    !b = 0.00056
+    !kappa = a + b*T
+
+    a = 0.2
+    b = 2E-5 
+    kappa = a*(1 + b*T)
 
 end

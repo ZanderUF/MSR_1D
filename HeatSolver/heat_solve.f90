@@ -9,27 +9,27 @@ USE datainput_fe_M
  
 implicit none
 
-    integer  :: vec_length, n, nl_iter   ! counter 
+    integer  ::  n, nl_iter   ! counter 
     real(kind=8)     :: t1  ! next time step  
     logical :: transient
 
 !   Read in problem parameters here
     call datainput_fe
     
-    vec_length = 2*num_elem 
+    matrix_length = 2*num_elem+1 
 !   Allocate solution vector and global matrices
-    allocate(cur_elem_soln_vec(vec_length), &
-             previous_elem_soln_vec(vec_length), &
-             global_matrix_K(vec_length, vec_length), &
-             global_matrix_M(vec_length, vec_length), &
-             global_vec_f(vec_length),&
-             global_vec_q(vec_length) )
+    allocate(cur_elem_soln_vec(matrix_length), &
+             previous_elem_soln_vec(matrix_length), &
+             global_matrix_K(matrix_length, matrix_length), &
+             global_matrix_M(matrix_length, matrix_length), &
+             global_vec_f(matrix_length),&
+             global_vec_q(matrix_length) )
     !   Set zero for all matrix entries 
     previous_elem_soln_vec(:) = 0.0
     
     global_matrix_K(:,:) = 0.0
     global_vec_f(:) = 0.0
-    global_vec_q(:) = 0.0
+    global_vec_q(:) = 0.0 
 !   Name the output files something useful 
     call proper_file_namer
 
@@ -99,3 +99,20 @@ end if
 return
 end
 
+!*****************************************************************************80
+!
+! proper_file_namer names the output data file based on the problem type
+! 
+! No input parameters.  Uses file_name and ramp from parameters module
+!
+ 
+subroutine proper_file_namer()
+
+USE parameters_fe
+
+! Write out files depending on problem type
+      write(file_name, '(a)'),"output.txt"
+
+return
+
+end 

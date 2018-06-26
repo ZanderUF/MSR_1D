@@ -12,14 +12,16 @@ subroutine cond_corr(T, C_p)
 implicit none
 
 ! Dummy
-    real(kind=8), intent(in)  :: T
-    real(kind=8), intent(out) :: C_p 
+    real, intent(in)  :: T
+    real, intent(out) :: C_p 
 ! Local
-    real(kind=8) :: a
-    real(kind=8) :: b  
+    real :: a
+    real :: b  
     
-    a = 9.636 
-    b = 10.487
-    C_p = a + b*T
+    !a = 9.636 
+    !b = 10.487
+    !C_p = a + b*T
+
+!   Test nonlinear correlation
 
 end
