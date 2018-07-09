@@ -94,7 +94,6 @@ subroutine element_matrix_heat (n, nl_iter)
                 ! Get power at gauss pts
                 P = P + shape_fcn(i)*power_initial( n +i )
         end do   
-        print *,'T',T 
         
         call kappa_corr(T,kappa) 
         call density_corr(T,density)
@@ -104,7 +103,7 @@ subroutine element_matrix_heat (n, nl_iter)
         ! constant kappa
         !kappa = 20.0
         cnst = g_jacobian*wt
-        print *,'kappa ',kappa 
+        
         do i=1, nodes_per_elem
         !---Setup local coordinates
             ! Populate Kij, Mij, Fij, Qij
