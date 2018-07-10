@@ -22,8 +22,8 @@ subroutine solve_soln(nl_iter )
     integer, dimension(2*num_elem+1) :: ipiv
     real, dimension(2*num_elem+1) :: work
     ! matrix for testing inversion routines
-    real, dimension(4,4) :: test_global_matrix_K 
-    data test_global_matrix_K   / 1, 2, 0, 0,& 
+    real, dimension(4,4) :: test_global_matrix_A 
+    data test_global_matrix_A   / 1, 2, 0, 0,& 
                                   0, 1, 0, 0,&
                                   0, 0, 1, 0,&
                                   0, 0, 0, 1/
@@ -47,8 +47,8 @@ subroutine solve_soln(nl_iter )
         matrix_length = 4
         lda = matrix_length
         lwork = matrix_length
-        global_matrix_K(:,:) = 0.0
-        global_matrix_K= test_global_matrix_K(:,:) 
+        global_matrix_A(:,:) = 0.0
+        global_matrix_A= test_global_matrix_A(:,:) 
 
     end if
 
@@ -57,19 +57,19 @@ subroutine solve_soln(nl_iter )
         ! only need to invert K once for steady state
         !if( nl_iter .eq. 1) then
             ! Factorizes matrix
-            call dgetrf ( matrix_length, matrix_length, global_matrix_K, lda, ipiv, info )
+            call dgetrf ( matrix_length, matrix_length, global_matrix_A, lda, ipiv, info )
             
             if (DEBUG .eqv. .TRUE.) then
                   write(outfile_unit,fmt='(a)'), ' ' 
                   write(outfile_unit,fmt='(a)'),'Factorization of Matrix K-steady state after B.C. applied: '
                   do j=1,matrix_length
                          write(outfile_unit,fmt='(12es14.3)') &
-                              (global_matrix_K(j,i) ,i=1,matrix_length)             
+                              (global_matrix_A(j,i) ,i=1,matrix_length)             
                   end do
             end if
         
         !  Compute the inverse matrix.
-        call dgetri (matrix_length, global_matrix_K, lda, ipiv, work, lwork, info ) 
+        call dgetri (matrix_length, global_matrix_A, lda, ipiv, work, lwork, info ) 
         
         !end if 
         ! otherwise we don't need the inversion
@@ -77,15 +77,14 @@ subroutine solve_soln(nl_iter )
     end if
 
 !   Solve for current solution 
-    cur_elem_soln_vec = matmul(global_vec_q,global_matrix_K)
-    print *,'curr at iter', nl_iter, ' ' , cur_elem_soln_vec
+    cur_elem_soln_vec = matmul(global_vec_q,global_matrix_A)
 !--------------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE.) then
         
         if(unit_test .eqv. .TRUE.) then
             do j=1,matrix_length
                 do i=1, num_elem
-                    test_diff = global_matrix_K(i,j) - invert_test_matrix_K(i,j) 
+                    test_diff = global_matrix_A(i,j) - invert_test_matrix_K(i,j) 
                 end do
             end do
             if (test_diff > 0.0) then
@@ -95,7 +94,7 @@ subroutine solve_soln(nl_iter )
             write(outfile_unit,fmt='(a)'),'Test Inversion of Matrix K '
             do j=1,matrix_length
                write(outfile_unit,fmt='(12es14.6)') &
-                    (global_matrix_K(j,i) ,i=1,matrix_length)             
+                    (global_matrix_A(j,i) ,i=1,matrix_length)             
             end do
             write(outfile_unit,fmt='(a)'),'Known Soln of Inversion of Matrix K '
             do j=1,matrix_length
@@ -108,7 +107,7 @@ subroutine solve_soln(nl_iter )
             write(outfile_unit,fmt='(a)'),'Inversion of Matrix K- steady state after B.C. applied: '
             do j=1,matrix_length
                write(outfile_unit,fmt='(12es14.3)') &
-                    (global_matrix_K(j,i) ,i=1,matrix_length)             
+                    (global_matrix_A(j,i) ,i=1,matrix_length)             
         end do
         
         end if
@@ -116,7 +115,7 @@ subroutine solve_soln(nl_iter )
     end if
 !--------------------------------------------------------------------------------------
     
-    global_matrix_K = 0.0
+    global_matrix_A = 0.0
     global_vec_q = 0.0
 
 end 

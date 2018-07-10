@@ -18,16 +18,25 @@ module parameters_fe
     real , allocatable    :: global_coord(:)
 !---Elemental matrices
     real , dimension(4,4) :: analytic_heat_elem_matrix_K_ss
-    real , dimension(4,4) :: analytic_heat_elem_matrix_M
+    real , dimension(4,4) :: analytic_heat_elem_matrix_A
     real , dimension(4,4) :: heat_elem_matrix_K
-    real , dimension(4,4) :: heat_elem_matrix_M
+    real , dimension(4,4) :: heat_elem_matrix_A
+    real , dimension(4,4) :: heat_elem2_matrix_A_s1 ! element 2 surface 1
+    real , dimension(4,4) :: heat_elem1_matrix_A_s2 ! element 1 surface 2
+
     real , dimension(4,4) :: heat_elem_matrix_F
-    real , dimension(4,4) :: heat_elem_matrix_Q
+    real :: heat_elem2_D_s1
+    real :: heat_elem1_D_s2
+    
     real , dimension(4,4) :: elem_matrix_P_minus
     real , dimension(4,4) :: elem_matrix_P_plus 
     real , dimension(4)   :: heat_elem_vec_f 
     real , dimension(4)   :: heat_elem_vec_q
     real , allocatable    :: power_initial(:)
+    real , dimension(4) :: heat_elem1_vec_M_s1 
+    real , dimension(4) :: heat_elem2_vec_M_s2
+    real , dimension(4) :: heat_elem1_vec_f
+    real , dimension(4) :: heat_elem2_vec_f
 
 !---Gauss integration 
     integer  :: num_gaus_pts = 4
@@ -41,7 +50,7 @@ module parameters_fe
     real  , allocatable :: final_global_matrix_K(:,:) 
     real  , allocatable :: final_global_vec_f(:)
     real  , allocatable :: global_matrix_M(:,:) ! Matrix in front of time derivative
-    real  , allocatable :: global_matrix_K(:,:) ! Matrix in front of primary var 
+    real  , allocatable :: global_matrix_A(:,:) ! Matrix in front of primary var 
     real  , allocatable :: global_vec_f(:)      ! Source terms
     real  , allocatable :: global_vec_q(:)      ! Boundary terms
     real  , allocatable :: cur_elem_soln_vec(:)     ! current solution vector
@@ -79,4 +88,5 @@ module parameters_fe
     logical :: unit_test = .TRUE.
     logical :: lagrange = .FALSE.
     logical :: hermite = .TRUE.
+
 end module parameters_fe 

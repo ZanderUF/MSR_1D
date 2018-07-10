@@ -30,7 +30,7 @@ implicit none
     !   Initial conditions 
     center_temp_initial = 900
     center_power_initial = 10 
-    max_nl_iter = 10
+    max_nl_iter = 1 
     Area = 5.0
 !   Apply initial guess to solution vector
     !do i = 1, num_elem
@@ -61,7 +61,6 @@ implicit none
 
 !   Test problem - set initial condition
     previous_elem_soln_vec(:) = 500
-
     nl_iter = 1 
     steady_state_flag = .TRUE.
     
@@ -82,7 +81,7 @@ implicit none
         call boundary_cond 
 
         ! Solve T^r = [K(T^(r-1)]^-1 F^(r-1) 
-         call solve_soln(nl_iter)
+         !call solve_soln(nl_iter)
         
         ! Calculate residual
 
@@ -93,7 +92,7 @@ implicit none
 
         nl_iter = nl_iter + 1
         ! make previous = current solution vector
-        previous_elem_soln_vec = cur_elem_soln_vec
+        !previous_elem_soln_vec = cur_elem_soln_vec
 
         ! If we've gone thru too many nonlinear iterations exit
         if (nl_iter > max_nl_iter) then
@@ -102,11 +101,11 @@ implicit none
     
     end do 
  ! Write out temperature solution
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a)'), 'Temperature solution as a function of position'
-        do j = 1, matrix_length
-            write(outfile_unit, fmt='(f6.3, f10.3)')  global_coord(j), previous_elem_soln_vec(j)
-        end do   
+        !write(outfile_unit,fmt='(a)'), ' '
+        !write(outfile_unit,fmt='(a)'), 'Temperature solution as a function of position'
+        !do j = 1, matrix_length
+        !    write(outfile_unit, fmt='(f6.3, f10.3)')  global_coord(j), previous_elem_soln_vec(j)
+        !end do   
 
 !---No need for elemental matrices after they have been placed in the global one
    !if (DEBUG .eqv. .TRUE. ) then

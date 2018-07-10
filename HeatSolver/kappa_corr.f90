@@ -18,12 +18,13 @@ implicit none
     real :: a
     real :: b  
     
-    !a = 0.36 
-    !b = 0.00056
-    !kappa = a + b*T
+    a = 0.36 
+    b = 0.00056
+    kappa = a + b*T
 
-    a = 0.2
-    b = 2E-5 
-    kappa = a*(1 + b*T)
+!   Reddy correlation
+    !a = 0.2
+    !b = 2E-5 
+    !kappa = a*(1 + b*T)
 
 end

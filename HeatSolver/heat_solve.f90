@@ -13,21 +13,22 @@ implicit none
     real(kind=8)     :: t1  ! next time step  
     logical :: transient
 
+
 !   Read in problem parameters here
     call datainput_fe
-    
-    matrix_length = 2*num_elem+1 
+!   Matrix length is increased by 2 to solve for both partial currents    
+    matrix_length = 2*num_elem + 1 + 2 
 !   Allocate solution vector and global matrices
     allocate(cur_elem_soln_vec(matrix_length), &
              previous_elem_soln_vec(matrix_length), &
-             global_matrix_K(matrix_length, matrix_length), &
+             global_matrix_A(matrix_length, matrix_length), &
              global_matrix_M(matrix_length, matrix_length), &
              global_vec_f(matrix_length),&
              global_vec_q(matrix_length) )
     !   Set zero for all matrix entries 
     previous_elem_soln_vec(:) = 0.0
     
-    global_matrix_K(:,:) = 0.0
+    global_matrix_A(:,:) = 0.0
     global_vec_f(:) = 0.0
     global_vec_q(:) = 0.0 
 !   Name the output files something useful 
@@ -95,7 +96,7 @@ if ( transient .eqv. .TRUE.) then
 end if
 
     deallocate(cur_elem_soln_vec, previous_elem_soln_vec, global_matrix_M, &
-               global_matrix_K, global_vec_f, global_vec_q)      
+               global_matrix_A, global_vec_f, global_vec_q)      
 return
 end
 
