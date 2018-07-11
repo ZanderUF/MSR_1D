@@ -26,7 +26,7 @@ subroutine element_matrix_heat (n, nl_iter)
     integer :: nl_iter
 !---Local variables 
     integer  :: g, j, i, ni
-    real, dimension(4) :: elem_coord
+    real, dimension(3) :: elem_coord
     real,dimension(3, 3) :: K_integral, M_integral
     data M_integral / 4 , 2 , -1 , 2 , 16 , 2 , -1 , 2 ,4 / 
     data K_integral / 7, -8,   1, -8,  16, -8,   1, -8, 7 /
@@ -44,12 +44,13 @@ subroutine element_matrix_heat (n, nl_iter)
     heat_elem_vec_f      = 0.0
     heat_elem_vec_q      = 0.0
     
-    heat_elem2_D_s1 = 0.0
+    heat_last_elem_D_s1 = 0.0
     heat_elem1_D_s2 = 0.0
     heat_elem1_vec_M_s1 = 0.0
-    heat_elem2_vec_M_s2 = 0.0
-    heat_elem1_vec_f    = 0.0
-    heat_elem2_vec_f    = 0.0
+    heat_last_elem_vec_M_s2 = 0.0
+    
+    !heat_elem1_vec_f    = 0.0
+    !heat_last_elem_vec_f    = 0.0
 
     kappa = 0.0
     density = 0.0 
@@ -73,7 +74,10 @@ subroutine element_matrix_heat (n, nl_iter)
     call kappa_corr(T,kappa)
     do i = 1, nodes_per_elem
         heat_elem1_vec_M_s1(i) = kappa*g_jacobian*shape_fcn(i)
-        heat_elem2_D_s1 = heat_elem2_D_s1 +  kappa*g_jacobian*shape_fcn(i)*global_der_shape_fcn(i)
+        do j = 1, nodes_per_elem
+            heat_last_elem_D_s1(i,j) = heat_last_elem_D_s1(i,j) +  &
+                kappa*g_jacobian*shape_fcn(i)*global_der_shape_fcn(j)
+        end do
     end do
 
 !---Compute second interface values 
@@ -84,8 +88,11 @@ subroutine element_matrix_heat (n, nl_iter)
     end do   
     call kappa_corr(T,kappa)
     do i = 1, nodes_per_elem
-        heat_elem2_vec_M_s2(i) = kappa*g_jacobian*shape_fcn(i)  
-        heat_elem1_D_s2 = heat_elem1_D_s2 + kappa*g_jacobian*shape_fcn(i)*global_der_shape_fcn(i)
+        heat_last_elem_vec_M_s2(i) = kappa*g_jacobian*shape_fcn(i)  
+        do j = 1, nodes_per_elem
+            heat_elem1_D_s2(i,j) = heat_elem1_D_s2(i,j) + &
+                kappa*g_jacobian*shape_fcn(i)*global_der_shape_fcn(j)
+        end do
     end do
 
 !---Integrate over Gauss Pts - assembling only A matrix and source vector 'f'
@@ -111,26 +118,34 @@ subroutine element_matrix_heat (n, nl_iter)
         cnst = g_jacobian*wt
         
         do i=1, nodes_per_elem
-	        do j = 1, nodes_per_elem
+
+	        !heat_elem_vec_f(i) = P*kappa*cnst*shape_fcn(i)
+            
+            
+            do j = 1, nodes_per_elem
                 !---Steady state A - no density and C_p, only need on 1st iteration 
             	if ( steady_state_flag .eqv. .TRUE.  ) then
 
+                    heat_elem_vec_f(i) = P*kappa*cnst*shape_fcn(i)*shape_fcn(j)
+                    if( n .eq. 1) then 
+                         heat_elem1_vec_f(i) = heat_elem_vec_f(i)
+                    end if
+                    if( n .eq. num_elem) then
+                         heat_last_elem_vec_f(i) = heat_elem_vec_f(i)
+                    end if        
+                    
                     heat_elem_matrix_A(i,j) = heat_elem_matrix_A(i,j) + &
                         kappa*cnst*global_der_shape_fcn(i)*global_der_shape_fcn(j)
                     
                     ! Source 
-                    heat_elem_vec_f(i) = P*kappa*cnst*shape_fcn(i)*shape_fcn(j)
-                     
                     ! Save first element values needed later on for partial currents
                     if( n .eq. 1) then 
                         heat_elem1_matrix_A_s2(i,j) = heat_elem_matrix_A(i,j)
-                        heat_elem1_vec_f(i) = heat_elem_vec_f(i)
                     end if 
                     
                     ! Save last element values needed later on for partial currents
                     if( n .eq. num_elem) then
-                        heat_elem2_matrix_A_s1(i,j) = heat_elem_matrix_A(i,j)
-                        heat_elem2_vec_f(i) = heat_elem_vec_f(i)
+                        heat_last_elem_matrix_A_s1(i,j) = heat_elem_matrix_A(i,j)
                     end if
                     
                 end if ! end steady state if 
@@ -160,10 +175,10 @@ subroutine element_matrix_heat (n, nl_iter)
 
 !   Account for modification to first and last elements
     if( n .eq. 1) then
-        heat_elem_matrix_A(3,3) = heat_elem_matrix_A(3,3) - heat_elem1_D_s2 
+        heat_elem_matrix_A = heat_elem_matrix_A - heat_elem1_D_s2
     end if 
     if( n .eq. num_elem) then
-        heat_elem_matrix_A(1,1) = heat_elem_matrix_A(1,1) + heat_elem2_D_s1
+        heat_elem_matrix_A = heat_elem_matrix_A + heat_last_elem_D_s1
     end if
 
     !heat_elem_matrix_K = heat_elem_matrix_K + elem_matrix_P_minus + elem_matrix_P_plus
@@ -201,12 +216,22 @@ subroutine element_matrix_heat (n, nl_iter)
         write(outfile_unit,fmt='(a)'),' '
         write(outfile_unit,fmt='(a,1I2)'),  'Nonlinear iteration ', nl_iter
         write(outfile_unit,fmt='(a)'),'*****************************************'
-               write(outfile_unit,fmt='(a26,1I2)'),'A element Matrix gaussian integration element--> ',n
+        write(outfile_unit,fmt='(a,1I2)'),'(A-D) element Matrix gaussian integration element--> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.6)') &
                     (heat_elem_matrix_A(j,i),i=1,nodes_per_elem)             
         end do
-   
+        write(outfile_unit,fmt='(a,1I2)'),'D element 1 surface 2 Matrix gaussian integration element--> ',n
+        do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.6)') &
+                    (heat_elem1_D_s2(j,i),i=1,nodes_per_elem)             
+        end do
+        write(outfile_unit,fmt='(a,1I2)'),'D last element surface 1 Matrix gaussian integration element--> ',n
+        do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.6)') &
+                    (heat_last_elem_D_s1(j,i),i=1,nodes_per_elem)             
+        end do
+        
         write(outfile_unit,fmt='(a)'),' '
         write(outfile_unit,fmt='(a26,1I2)'),'f element vector element: ',n
         write(outfile_unit,fmt='(12es14.6)') (heat_elem_vec_f(i),i=1,nodes_per_elem)             

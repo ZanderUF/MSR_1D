@@ -31,7 +31,7 @@ subroutine assemble_matrix (n)
         ii = (2*n - 1) + (i - 1)
         global_vec_q(ii) = global_vec_q(ii) + heat_elem_vec_f(i)
     end do
-
+    
 !   Assemble response matrix for partial current evaluation
     
 

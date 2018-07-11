@@ -17,33 +17,33 @@ module parameters_fe
     integer, allocatable :: conn_matrix(:,:)
     real , allocatable    :: global_coord(:)
 !---Elemental matrices
-    real , dimension(4,4) :: analytic_heat_elem_matrix_K_ss
-    real , dimension(4,4) :: analytic_heat_elem_matrix_A
-    real , dimension(4,4) :: heat_elem_matrix_K
-    real , dimension(4,4) :: heat_elem_matrix_A
-    real , dimension(4,4) :: heat_elem2_matrix_A_s1 ! element 2 surface 1
-    real , dimension(4,4) :: heat_elem1_matrix_A_s2 ! element 1 surface 2
+    real , dimension(3,3) :: analytic_heat_elem_matrix_K_ss
+    real , dimension(3,3) :: analytic_heat_elem_matrix_A
+    real , dimension(3,3) :: heat_elem_matrix_K
+    real , dimension(3,3) :: heat_elem_matrix_A
+    real , dimension(3,3) :: heat_last_elem_matrix_A_s1 ! element 2 surface 1
+    real , dimension(3,3) :: heat_elem1_matrix_A_s2 ! element 1 surface 2
 
-    real , dimension(4,4) :: heat_elem_matrix_F
-    real :: heat_elem2_D_s1
-    real :: heat_elem1_D_s2
+    real , dimension(3,3) :: heat_elem_matrix_F
+    real , dimension(3,3):: heat_last_elem_D_s1
+    real , dimension(3,3):: heat_elem1_D_s2
     
-    real , dimension(4,4) :: elem_matrix_P_minus
-    real , dimension(4,4) :: elem_matrix_P_plus 
-    real , dimension(4)   :: heat_elem_vec_f 
-    real , dimension(4)   :: heat_elem_vec_q
+    real , dimension(3,3) :: elem_matrix_P_minus
+    real , dimension(3,3) :: elem_matrix_P_plus 
+    real , dimension(3)   :: heat_elem_vec_f 
+    real , dimension(3)   :: heat_elem_vec_q
     real , allocatable    :: power_initial(:)
-    real , dimension(4) :: heat_elem1_vec_M_s1 
-    real , dimension(4) :: heat_elem2_vec_M_s2
-    real , dimension(4) :: heat_elem1_vec_f
-    real , dimension(4) :: heat_elem2_vec_f
+    real , dimension(3) :: heat_elem1_vec_M_s1 
+    real , dimension(3) :: heat_last_elem_vec_M_s2
+    real , dimension(3) :: heat_elem1_vec_f
+    real , dimension(3) :: heat_last_elem_vec_f
 
 !---Gauss integration 
     integer  :: num_gaus_pts = 4
 !---Shape functions, Lagrange, quadratic order
-    real , dimension(4) :: shape_fcn
-    real , dimension(4) :: der_shape_fcn
-    real , dimension(4) :: global_der_shape_fcn 
+    real , dimension(3) :: shape_fcn
+    real , dimension(3) :: der_shape_fcn
+    real , dimension(3) :: global_der_shape_fcn 
     real                :: g_jacobian
 !---Global matrices
     real  , allocatable :: inverse_matrix_K(:,:)

@@ -95,8 +95,8 @@ if ( transient .eqv. .TRUE.) then
 
 end if
 
-    deallocate(cur_elem_soln_vec, previous_elem_soln_vec, global_matrix_M, &
-               global_matrix_A, global_vec_f, global_vec_q)      
+    !deallocate(cur_elem_soln_vec, previous_elem_soln_vec, global_matrix_M, &
+     !          global_matrix_A, global_vec_f, global_vec_q)      
 return
 end
 
