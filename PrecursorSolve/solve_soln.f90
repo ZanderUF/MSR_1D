@@ -27,8 +27,8 @@ subroutine solve_soln(nl_iter )
                                   0, 1, 0, 0,&
                                   0, 0, 1, 0,&
                                   0, 0, 0, 1/
-    real, dimension(4,4) :: invert_test_matrix_K
-    data invert_test_matrix_K  / 1, -2, 0, 0,&
+    real, dimension(4,4) :: invert_test_matrix_P
+    data invert_test_matrix_P  / 1, -2, 0, 0,&
                                  0,  1, 0, 0,&
                                  0,  0, 1, 0,&
                                  0,  0, 0, 1 /
@@ -39,7 +39,8 @@ subroutine solve_soln(nl_iter )
     lwork = matrix_length
     info =0.0 
 
-    unit_test = .FALSE.
+    unit_test = .TRUE.
+
 !   Unit test for matrix inversion routines
     if(unit_test .eqv. .TRUE. ) then
         num_elem=2
@@ -79,7 +80,7 @@ subroutine solve_soln(nl_iter )
         if(unit_test .eqv. .TRUE.) then
             do j=1,matrix_length
                 do i=1, num_elem
-                    test_diff = global_matrix_A(i,j) - invert_test_matrix_K(i,j) 
+                    test_diff = global_matrix_A(i,j) - invert_test_matrix_P(i,j) 
                 end do
             end do
             if (test_diff > 0.0) then
@@ -94,7 +95,7 @@ subroutine solve_soln(nl_iter )
             write(outfile_unit,fmt='(a)'),'Known Soln of Inversion of Matrix A '
             do j=1,matrix_length
                write(outfile_unit,fmt='(12es14.6)') &
-                    (invert_test_matrix_K(j,i) ,i=1,matrix_length)             
+                    (invert_test_matrix_P(j,i) ,i=1,matrix_length)             
             end do
         
         else

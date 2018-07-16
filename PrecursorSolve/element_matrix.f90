@@ -10,7 +10,7 @@
 !       n - element number
 !  Output:
 !         elem_matrix_A
-!         elem_matrix_K
+!         elem_matrix_P
 !         elem_vec_F
 !         elem_vec_Q
 !*****************************************************************************80
@@ -31,12 +31,12 @@ subroutine element_matrix (n, nl_iter)
     real, dimension(4)  :: gauspt, gauswt
     data gauspt /-0.8611363116, -0.3399810435, 0.3399810435, 0.8611363116 /  
     data gauswt / 0.347854851 ,  0.6521451548, 0.6521451548, 0.347854851 /
-    real  :: xi, wt, cnst, h, s, s2, T, P  kappa, density, &
-             C_p, K_material, F_material
+    real  :: xi, wt, cnst, h, s, s2, T, P,  kappa, density
+    real  :: C_p, K_material, F_material
 
 !---Initialize
     elem_matrix_A = 0.0
-    elem_matrix_K = 0.0
+    elem_matrix_P = 0.0
     elem_matrix_F   = 0.0
     elem_vec_f      = 0.0
     elem_vec_q      = 0.0
@@ -59,123 +59,95 @@ subroutine element_matrix (n, nl_iter)
 !---Get length of the element 
     h = elem_lengths(n)
 
-!---Compute first interface values 
-    xi = -1.0
-    call inter_shape_fcns(xi,elem_coord,h) 
-    do i = 1 , nodes_per_elem
-        T = T + shape_fcn(i)*previous_elem_soln_vec( ((2*n-2) + i) )
-    end do   
-    call kappa_corr(T,kappa)
-    do i = 1, nodes_per_elem
-        elem1_vec_M_s1(i) = kappa*g_jacobian*shape_fcn(i)
-        do j = 1, nodes_per_elem
-            last_elem_D_s1(i,j) = last_elem_D_s1(i,j) +  &
-                kappa*g_jacobian*shape_fcn(i)*global_der_shape_fcn(j)
-        end do
-    end do
-
-!---Compute second interface values 
-    xi = 1.0
-    call inter_shape_fcns(xi,elem_coord,h) 
-    do i = 1 , nodes_per_elem
-        T = T + shape_fcn(i)*previous_elem_soln_vec( ((2*n-2) + i) )
-    end do   
-    call kappa_corr(T,kappa)
-    do i = 1, nodes_per_elem
-        last_elem_vec_M_s2(i) = kappa*g_jacobian*shape_fcn(i)  
-        do j = 1, nodes_per_elem
-            elem1_D_s2(i,j) = elem1_D_s2(i,j) + &
-                kappa*g_jacobian*shape_fcn(i)*global_der_shape_fcn(j)
-        end do
-    end do
-
 !---Integrate over Gauss Pts - assembling only A matrix and source vector 'f'
     do g = 1 , num_gaus_pts 
+    !---Calculate shape functions at gauss pt
+        call inter_shape_fcns(xi,elem_coord,h)
         xi = gauspt(g)
         wt = gauswt(g)
         h = elem_lengths(n)
-        T = 0.0
-        P = 0.0
-    !---Calculate shape functions at gauss pt
-        call inter_shape_fcns(xi,elem_coord,h)
-    !---Evaluate material properties at gauss pt, first get temp @ gauss pt
-        do i = 1 , nodes_per_elem
-                T = T + shape_fcn(i)*previous_elem_soln_vec( ((2*n-2) + i) )
-                P = P + shape_fcn(i)*power_initial( n +i )
-        end do   
-        call kappa_corr(T,kappa) 
-        call density_corr(T,density)
-        call cond_corr(T,C_p)
-        K_material = kappa/(density*C_p)
-        F_material = 1.0/(density*C_p)
-        
         cnst = g_jacobian*wt
         
-        do i=1, nodes_per_elem
+        !---Unit test 
+        if(unit_test .eqv. .TRUE.) then
+            ! Unit test solver
+            do i = 1, nodes_per_elem
+                do j = 1, nodes_per_elem
+                    !---Assemble A matrix
+                    elem_matrix_A(i,j) = cnst*shape_fcn(i)*shape_fcn(j) 
+                    !---Assemble P matrix
+                    elem_matrix_P(i,j) = cnst*shape_fcn(i)*global_der_shape_fcn(j)
+                    
+                end do
+            end do
+        end if ! end unit test if
 
-	        !elem_vec_f(i) = P*kappa*cnst*shape_fcn(i)
+        if(unit_test .eqv. .FALSE.) then
+            !---Evaluate material properties at gauss pt, first get temp @ gauss pt
+            T = 0.0
+            P = 0.0
             
-            
-            do j = 1, nodes_per_elem
-                !---Steady state A - no density and C_p, only need on 1st iteration 
-            	if ( steady_state_flag .eqv. .TRUE.  ) then
+            do i = 1 , nodes_per_elem
+                    T = T + shape_fcn(i)*previous_elem_soln_vec( ((2*n-2) + i) )
+                    P = P + shape_fcn(i)*power_initial( n +i )
+            end do   
+            call kappa_corr(T,kappa) 
+            call density_corr(T,density)
+            call cond_corr(T,C_p)
+            K_material = kappa/(density*C_p)
+            F_material = 1.0/(density*C_p)
+        
+            do i=1, nodes_per_elem
+                do j = 1, nodes_per_elem
+                    !---Steady state A - no density and C_p, only need on 1st iteration 
+                	if ( steady_state_flag .eqv. .TRUE.  ) then
 
-                    elem_vec_f(i) = P*kappa*cnst*shape_fcn(i)*shape_fcn(j)
-                    if( n .eq. 1) then 
-                         elem1_vec_f(i) = elem_vec_f(i)
-                    end if
-                    if( n .eq. num_elem) then
-                         last_elem_vec_f(i) = elem_vec_f(i)
-                    end if        
+                        elem_vec_f(i) = P*kappa*cnst*shape_fcn(i)*shape_fcn(j)
+                        if( n .eq. 1) then 
+                             elem1_vec_f(i) = elem_vec_f(i)
+                        end if
+                        if( n .eq. num_elem) then
+                             last_elem_vec_f(i) = elem_vec_f(i)
+                        end if        
+                        
+                        elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
+                            kappa*cnst*global_der_shape_fcn(i)*global_der_shape_fcn(j)
+                        
+                        ! Source 
+                        ! Save first element values needed later on for partial currents
+                        if( n .eq. 1) then 
+                            elem1_matrix_A_s2(i,j) = elem_matrix_A(i,j)
+                        end if 
+                        
+                        ! Save last element values needed later on for partial currents
+                        if( n .eq. num_elem) then
+                            last_elem_matrix_A_s1(i,j) = elem_matrix_A(i,j)
+                        end if
+                        
+                    end if ! end steady state if 
                     
-                    elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
-                        kappa*cnst*global_der_shape_fcn(i)*global_der_shape_fcn(j)
-                    
-                    ! Source 
-                    ! Save first element values needed later on for partial currents
-                    if( n .eq. 1) then 
-                        elem1_matrix_A_s2(i,j) = elem_matrix_A(i,j)
-                    end if 
-                    
-                    ! Save last element values needed later on for partial currents
-                    if( n .eq. num_elem) then
-                        last_elem_matrix_A_s1(i,j) = elem_matrix_A(i,j)
-                    end if
-                    
-                end if ! end steady state if 
-                
-                ! Transient calculation
-                if ( steady_state_flag .eqv. .FALSE.) then 
-                    elem_matrix_K(i,j) = elem_matrix_K(i,j) + s2
-                    ! M_ij matrix
-                    s = shape_fcn(i)*shape_fcn(j)*cnst
-                    elem_matrix_A(i,j) = elem_matrix_A(i,j) + s 
-                    ! K_ij matrix 
-                    s2 = K_material*( der_shape_fcn(i)*der_shape_fcn(j) )*( 1/shape_fcn(j) )
-                    ! F_ij matrix    
-                    elem_matrix_F(i,j) = elem_matrix_F(i,j) + shape_fcn(i)*F_material         
-                    ! Form f vector
-                    elem_vec_f(i) = elem_vec_f(i) + elem_matrix_F(i,j)*P*shape_fcn(i)    
-                    ! Form q vector - place holder until apply B.C.
-                    elem_vec_q(i) = 0.0
+                    ! Transient calculation
+                    if ( steady_state_flag .eqv. .FALSE.) then 
+                        elem_matrix_P(i,j) = elem_matrix_P(i,j) + s2
+                        ! M_ij matrix
+                        s = shape_fcn(i)*shape_fcn(j)*cnst
+                        elem_matrix_A(i,j) = elem_matrix_A(i,j) + s 
+                        ! K_ij matrix 
+                        s2 = K_material*( der_shape_fcn(i)*der_shape_fcn(j) )*( 1/shape_fcn(j) )
+                        ! F_ij matrix    
+                        elem_matrix_F(i,j) = elem_matrix_F(i,j) + shape_fcn(i)*F_material         
+                        ! Form f vector
+                        elem_vec_f(i) = elem_vec_f(i) + elem_matrix_F(i,j)*P*shape_fcn(i)    
+                        ! Form q vector - place holder until apply B.C.
+                        elem_vec_q(i) = 0.0
 
-                end if 
-                 
-            end do ! End loop over j matrix entries
-
-        end do ! End loop over i matrix entries
-
+                    end if ! end transient case if 
+                end do ! End loop over j matrix entries
+            end do ! End loop over i matrix entries
+        end if ! end unit test if 
+    
     end do ! end do over gauss pts 
 
-!   Account for modification to first and last elements
-    if( n .eq. 1) then
-        elem_matrix_A = elem_matrix_A - elem1_D_s2
-    end if 
-    if( n .eq. num_elem) then
-        elem_matrix_A = elem_matrix_A + last_elem_D_s1
-    end if
-
-    !elem_matrix_K = elem_matrix_K + elem_matrix_P_minus + elem_matrix_P_plus
 !-------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE. ) then
         if(steady_state_flag .eqv. .FALSE. )  then 

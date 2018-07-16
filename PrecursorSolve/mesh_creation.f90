@@ -16,26 +16,34 @@ USE parameters_fe
 implicit none
 
     integer :: i,j,ii
+    real :: temp
 
 !---allocate arrays
     allocate( conn_matrix(num_elem, nodes_per_elem) , global_coord(matrix_length) )  
     
 !---setup connectivity matrix
-    do i=1, nodes_per_elem
-       conn_matrix(1,i) = i  
-    end do
-    do j=2, num_elem
-        do i=1,nodes_per_elem
-            conn_matrix(j,i) = conn_matrix(j-1,i) + nodes_per_elem-1
+    do i=1, num_elem
+        do j=1,nodes_per_elem
+            conn_matrix(i,j) = j + (i-1)*nodes_per_elem
         end do 
     end do
     
 !---setup global coordinate array 
     global_coord(1) = 0.0 
-    do i=1, num_elem
-        ii=2*i
-        global_coord(ii)   = global_coord(ii-1) + 0.5*elem_lengths(i)
-        global_coord(ii+1) = global_coord(ii-1) + elem_lengths(i) 
+    do i = 1, nodes_per_elem-1
+        global_coord(i+1) = global_coord(i) + 0.5*elem_lengths(i)
+    end do
+    
+    do i=2, num_elem
+        temp = global_coord( (i-1)* 3)
+        do j = 1, nodes_per_elem
+            ii = j + (i-1)*nodes_per_elem
+            if ( j .eq. 1) then
+                global_coord(ii) = temp 
+            else
+                global_coord(ii) = global_coord(ii-1) + 0.5*elem_lengths(i)
+            end if
+        end do
     end do
 
 !-------------------------------------------------------------------------------
@@ -47,8 +55,8 @@ implicit none
     end do
     write(outfile_unit,fmt='(a)'),' ' 
     write(outfile_unit,fmt='(a24)'),'Global Coordinate Matrix'
-    do j=1, max_num_nodes 
-           write(outfile_unit,fmt='(a5,1I2,a4,f8.3)') 'Node:',j,' -->', &
+    do j=1, matrix_length 
+           write(outfile_unit,fmt='(a5,1I2,a,f8.3)') 'Node:',j,' x-coord -->', &
                 global_coord(j)             
     end do
 

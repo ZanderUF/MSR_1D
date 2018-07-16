@@ -18,6 +18,8 @@ subroutine assemble_matrix (n)
     integer :: n
 !---local
     integer :: i, j, ii, jj, nr,nc, ncl   
+    
+!---Assemble into global matrix 
     do i = 1, nodes_per_elem
         nr = conn_matrix(n,i)
         do j = 1, nodes_per_elem
@@ -26,24 +28,19 @@ subroutine assemble_matrix (n)
         end do
     end do
 
-!   Assemble global vector sources + B.C.
-    do i = 1, nodes_per_elem
-        ii = (2*n - 1) + (i - 1)
-        global_vec_q(ii) = global_vec_q(ii) + elem_vec_f(i)
-    end do
-    
-!   Assemble response matrix for partial current evaluation
-    
+    if(n > 1) then 
+        nr = conn_matrix(n,1) - 1
+        nc = conn_matrix(n,1)
+        global_matrix_A(nr,nc) = global_matrix_A(nr,nc) + -1.0
+    end if
 
-!!   Assemble global matrices
-!    do i = 1, nodes_per_elem
-!        ii = (2*n - 1) + (i - 1)
-!        do j = 1, nodes_per_elem
-!            jj = (2*n - 1) + (j - 1) 
-!            global_matrix_A(ii,jj) = global_matrix_A(ii,jj) + elem_matrix_K(i,j)
-!        end do 
-!
-!    end do
-!    ii = 0
+!---Assemble global vector source
+    if(unit_test .eqv. .FALSE.) then 
+        !---Assemble global vector sources + B.C.
+        do i = 1, nodes_per_elem
+            ii = (2*n - 1) + (i - 1)
+            global_vec_q(ii) = global_vec_q(ii) + elem_vec_f(i)
+        end do
+    end if 
 
 end 

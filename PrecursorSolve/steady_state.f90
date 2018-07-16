@@ -21,38 +21,46 @@ implicit none
     real :: pi, cosine_term
     parameter (pi = 3.1415926535897932)
 
-!---
+if (unit_test .eqv. .FALSE.) then
     allocate( power_initial(matrix_length) )
     allocate( elem_node_lengths(matrix_length) )
+    !---Initial guesses 
+        center_temp_initial = 900
+        center_power_initial = 100 
+    !---Sets the max number of nonlinear iterations    
+        max_nl_iter = 100 
+    !---Apply to every node point within an element
+        dist_num = ((matrix_length-3) + 1)/2 + 1
+        do i = 1, matrix_length
+            ii = (real(i-dist_num)/real(dist_num))
+            cosine_term = cos(ii*(pi/2.0))
+            previous_elem_soln_vec(i) = center_temp_initial*cosine_term
+        !---Power
+            power_initial(i) = (center_power_initial*cosine_term)
 
-!---Initial guesses 
-    center_temp_initial = 900
-    center_power_initial = 100 
-!---Sets the max number of nonlinear iterations    
-    max_nl_iter = 100 
+            if(cosine_term < 0.0) then
+                cosine_term = 0.0
+                previous_elem_soln_vec(i) = 0.0
+                power_initial(i) = 0.0
+            end if
 
+        end do
 
-!---Apply to every node point within an element
-    dist_num = ((matrix_length-3) + 1)/2 + 1
-    do i = 1, matrix_length
-        ii = (real(i-dist_num)/real(dist_num))
-        cosine_term = cos(ii*(pi/2.0))
-        previous_elem_soln_vec(i) = center_temp_initial*cosine_term
-    !---Power
-        power_initial(i) = (center_power_initial*cosine_term
-        !(area*(elem_lengths( 1 )))
+    !---Set initial soln guess
+        previous_elem_soln_vec(:) = 800
+        nl_iter = 1 
+    end if 
+    
+    !---Simplified unit test
+    !---Have sinusodial initial condition
+    if(unit_test .eqv. .TRUE.) then
+        nl_iter = 1
+        max_nl_iter = 1 ! this unit test is linear 
+        do i = 1, matrix_length
+            previous_elem_soln_vec(i) = sin(2.0*pi*i)
+        end do
+    end if
 
-        if(cosine_term < 0.0) then
-            cosine_term = 0.0
-            previous_elem_soln_vec(i) = 0.0
-            power_initial(i) = 0.0
-        end if
-
-    end do
-
-!---Set initial soln guess
-    previous_elem_soln_vec(:) = 800
-    nl_iter = 1 
     steady_state_flag = .TRUE.
     
     write(outfile_unit, fmt='(a)'), ' ' 
@@ -72,7 +80,7 @@ implicit none
         call boundary_cond 
 
         !---Solve T^r = [K(T^(r-1)]^-1 F^(r-1) 
-        call solve_soln(nl_iter)
+        !call solve_soln(nl_iter)
         
         !---Calculate residual
 
