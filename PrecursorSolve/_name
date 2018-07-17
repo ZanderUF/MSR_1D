@@ -9,9 +9,9 @@ USE datainput_fe_M
  
 implicit none
 
-    integer  ::  j, n, nl_iter   ! counter 
-    real(kind=8)     :: t1  ! next time step  
-    logical :: transient
+    integer  ::  n, nl_iter   ! counter 
+    real(kind=8)       :: t1  ! next time step  
+    logical :: transient      ! flag for turning on transient part of calculation
 
 !---Read in problem parameters here
     call datainput_fe
@@ -46,11 +46,9 @@ implicit none
 !---Steady state solve for temperature 
     call steady_state
 
-!---Start time-dependent solve
+!---Start time dependent solve
     transient = .TRUE.
 if ( transient .eqv. .TRUE.) then
-
-    write(outfile_unit, fmt='(a)'), ' ' 
     write(outfile_unit, fmt='(a)'), 'In transient loop'
     !---Loop over time steps until end of transient
     do 
@@ -64,14 +62,6 @@ if ( transient .eqv. .TRUE.) then
                 !---Assemble element matrices to solve for elemental coeficients 
                 call assemble_matrix(n) 
             end do ! end loop over num elements
-            
-            !---Write out solution vector
-            write(outfile_unit,fmt='(a)'), ' ' 
-            write(outfile_unit,fmt='(a,12es14.3)'),'Solution Vector at time --> ',t0
-            write(outfile_unit,fmt='(a)'),'Position(x) Nodal'
-            do j=1,matrix_length 
-                   write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') global_coord(j), previous_elem_soln_vec(j)             
-            end do
             
             previous_elem_soln_vec = cur_elem_soln_vec
 
@@ -111,7 +101,7 @@ if ( transient .eqv. .TRUE.) then
 end if
 
     !deallocate(cur_elem_soln_vec, previous_elem_soln_vec, global_matrix_P, &
-     !          global_matrix_A, global_vec_f, global_vec_q)      
+    !          global_matrix_A, global_vec_f, global_vec_q)      
 return
 end
 
@@ -126,8 +116,8 @@ subroutine proper_file_namer()
 
 USE parameters_fe
 
-! Write out files depending on problem type
-      write(file_name, '(a)'),"output.txt"
+!---Write out files depending on problem type
+    write(file_name, '(a)'),"output.txt"
 
 return
 

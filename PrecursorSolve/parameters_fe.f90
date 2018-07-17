@@ -30,8 +30,9 @@ module parameters_fe
     
     real , dimension(3,3) :: elem_matrix_P_minus
     real , dimension(3,3) :: elem_matrix_P_plus 
+    real , dimension(3) :: Pu_minus_flux_vec
     real , dimension(3)   :: elem_vec_f 
-    real , dimension(3)   :: elem_vec_q
+    real , dimension(3)   :: elem_vec_Pu
     real , allocatable    :: power_initial(:)
     real , dimension(3) :: elem1_vec_M_s1 
     real , dimension(3) :: last_elem_vec_M_s2
@@ -49,7 +50,7 @@ module parameters_fe
     real  , allocatable :: inverse_matrix_P(:,:)
     real  , allocatable :: final_global_matrix_P(:,:) 
     real  , allocatable :: final_global_vec_f(:)
-    real  , allocatable :: global_matrix_M(:,:) ! Matrix in front of time derivative
+    real  , allocatable :: global_matrix_P(:,:) ! Matrix in front of time derivative
     real  , allocatable :: global_matrix_A(:,:) ! Matrix in front of primary var 
     real  , allocatable :: global_vec_f(:)      ! Source terms
     real  , allocatable :: global_vec_q(:)      ! Boundary terms
@@ -85,7 +86,9 @@ module parameters_fe
 !---Flags
     logical :: DEBUG = .TRUE.
     logical :: steady_state_flag = .TRUE.    
-    logical :: unit_test 
+    logical :: unit_test = .TRUE. 
+    logical :: unit_test_2 = .FALSE. 
+
     logical :: lagrange = .FALSE.
     logical :: hermite = .TRUE.
 

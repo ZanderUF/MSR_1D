@@ -22,7 +22,7 @@ subroutine element_matrix (n, nl_iter)
   implicit none
 
 !---Dummy variables
-    integer  :: g, j, i, ni, n, nl_iter
+    integer  :: g, j, i,ii, ni, n, nl_iter
 !---Local variables 
     real, dimension(3) :: elem_coord
     real,dimension(3, 3) :: K_integral, M_integral
@@ -39,7 +39,6 @@ subroutine element_matrix (n, nl_iter)
     elem_matrix_P = 0.0
     elem_matrix_F   = 0.0
     elem_vec_f      = 0.0
-    elem_vec_q      = 0.0
     
     last_elem_D_s1 = 0.0
     elem1_D_s2 = 0.0
@@ -70,18 +69,20 @@ subroutine element_matrix (n, nl_iter)
         
         !---Unit test 
         if(unit_test .eqv. .TRUE.) then
-            ! Unit test solver
+            !---Unit test solver
             do i = 1, nodes_per_elem
                 do j = 1, nodes_per_elem
                     !---Assemble A matrix
-                    elem_matrix_A(i,j) = cnst*shape_fcn(i)*shape_fcn(j) 
+                    elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
+                                         cnst*shape_fcn(i)*shape_fcn(j) 
                     !---Assemble P matrix
-                    elem_matrix_P(i,j) = cnst*shape_fcn(i)*global_der_shape_fcn(j)
-                    
+                    elem_matrix_P(i,j) = elem_matrix_P(i,j) + &
+                                         cnst*shape_fcn(i)*global_der_shape_fcn(j)
                 end do
             end do
-        end if ! end unit test if
+        end if !---end unit test if
 
+        !---Normal calculation flow
         if(unit_test .eqv. .FALSE.) then
             !---Evaluate material properties at gauss pt, first get temp @ gauss pt
             T = 0.0
@@ -138,8 +139,6 @@ subroutine element_matrix (n, nl_iter)
                         elem_matrix_F(i,j) = elem_matrix_F(i,j) + shape_fcn(i)*F_material         
                         ! Form f vector
                         elem_vec_f(i) = elem_vec_f(i) + elem_matrix_F(i,j)*P*shape_fcn(i)    
-                        ! Form q vector - place holder until apply B.C.
-                        elem_vec_q(i) = 0.0
 
                     end if ! end transient case if 
                 end do ! End loop over j matrix entries
@@ -150,61 +149,37 @@ subroutine element_matrix (n, nl_iter)
 
 !-------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE. ) then
-        if(steady_state_flag .eqv. .FALSE. )  then 
-    !---do K matrix analytically  
-            do i=1, nodes_per_elem
-                !---Setup local coordinates
-                ! Get length of element
-                h = elem_lengths(n)
-                ! Populate Kij, Mij, Fij, Qij
-                do j = 1, nodes_per_elem
-                    analytic_elem_matrix_A(i,j) =  (h/30.0)*M_integral(i,j)               
-                end do ! End loop over j matrix entries
-            end do ! End loop over i matrix entries
-
-            write(outfile_unit,fmt='(a)'),' '
-            !---Write out each element matrix to the outfile 
-            write(outfile_unit,fmt="(a,f8.3)"), 'At time ',t0
-            write(outfile_unit,fmt="(a,1I2)"), 'Nonlinear iter: ',nl_iter
-            write(outfile_unit,fmt='(a,1I2)'),'M element Matrix analytical: ',n
-            do j=1,nodes_per_elem 
-                   write(outfile_unit,fmt='(12es14.6)') &
-                        (analytic_elem_matrix_A(j,i),i=1,nodes_per_elem)             
-            end do
-            write(outfile_unit,fmt='(a)'),' ' 
-            write(outfile_unit,fmt='(a24,1I2)'),'M element Matrix gauss: ',n
-            do j=1,nodes_per_elem 
-                   write(outfile_unit,fmt='(12es14.6)') &
-                        (elem_matrix_A(j,i),i=1,nodes_per_elem)             
-            end do
-        end if
 
         write(outfile_unit,fmt='(a)'),' '
         write(outfile_unit,fmt='(a,1I2)'),  'Nonlinear iteration ', nl_iter
         write(outfile_unit,fmt='(a)'),'*****************************************'
-        write(outfile_unit,fmt='(a,1I2)'),'(A-D) element Matrix gaussian integration element--> ',n
+        write(outfile_unit,fmt='(a,1I2)'),'[A] element Matrix gaussian integration | element --> ',n
         do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.6)') &
+               write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_A(j,i),i=1,nodes_per_elem)             
         end do
-        write(outfile_unit,fmt='(a,1I2)'),'D element 1 surface 2 Matrix gaussian integration element--> ',n
+        write(outfile_unit,fmt='(a,1I2)'),'[P] element Matrix gaussian integration | element --> ',n
         do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.6)') &
-                    (elem1_D_s2(j,i),i=1,nodes_per_elem)             
-        end do
-        write(outfile_unit,fmt='(a,1I2)'),'D last element surface 1 Matrix gaussian integration element--> ',n
-        do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.6)') &
-                    (last_elem_D_s1(j,i),i=1,nodes_per_elem)             
+               write(outfile_unit,fmt='(12es14.3)') &
+                    (elem_matrix_P(j,i),i=1,nodes_per_elem)             
         end do
         
         write(outfile_unit,fmt='(a)'),' '
-        write(outfile_unit,fmt='(a26,1I2)'),'f element vector element: ',n
-        write(outfile_unit,fmt='(12es14.6)') (elem_vec_f(i),i=1,nodes_per_elem)             
-        write(outfile_unit,fmt='(a)'),'*****************************************'
-    
-!---End matrix write out
-    end if
+        write(outfile_unit,fmt='(a,1I2)'),'Element solution vector | element: ',n 
+        do j = 1, nodes_per_elem 
+            ii = j + (n - 1)*nodes_per_elem 
+            write(outfile_unit,fmt='(a,1I2,a12es14.3)')  'Node #-->', ii, 'Soln:', previous_elem_soln_vec(ii) 
+        end do
+
+        !---Normal calculation flow
+        if(unit_test .eqv. .FALSE.) then
+            write(outfile_unit,fmt='(a)'),' '
+            write(outfile_unit,fmt='(a,1I2)'),'{f} element vector | element --> ',n
+            write(outfile_unit,fmt='(12es14.3)') (elem_vec_f(i),i=1,nodes_per_elem)             
+            write(outfile_unit,fmt='(a)'),'*****************************************'
+        end if
+
+    end if !---End matrix write out
 !------------------------------------------------------------------------------
  
 

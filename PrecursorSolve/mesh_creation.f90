@@ -3,7 +3,7 @@
 !! Sets up 1D mesh assuming quadratic functions  
 !
 !  Discussion:
-!             Creates connectivity mesh assuming 1D and elements in a line
+!          Creates connectivity mesh assuming 1D discontinuous elements in a line
 !     	       
 !  Parameters:
 !  	      conn_matrix(max # elements, nodes per element) 
@@ -30,8 +30,8 @@ implicit none
     
 !---setup global coordinate array 
     global_coord(1) = 0.0 
-    do i = 1, nodes_per_elem-1
-        global_coord(i+1) = global_coord(i) + 0.5*elem_lengths(i)
+    do i = 2, nodes_per_elem
+        global_coord(i) = global_coord(i-1) + 0.5*elem_lengths(1)
     end do
     
     do i=2, num_elem

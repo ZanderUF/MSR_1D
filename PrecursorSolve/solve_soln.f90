@@ -39,10 +39,8 @@ subroutine solve_soln(nl_iter )
     lwork = matrix_length
     info =0.0 
 
-    unit_test = .TRUE.
-
 !   Unit test for matrix inversion routines
-    if(unit_test .eqv. .TRUE. ) then
+    if(unit_test_2 .eqv. .TRUE. ) then
         num_elem=2
         matrix_length = 4
         lda = matrix_length
@@ -53,7 +51,7 @@ subroutine solve_soln(nl_iter )
     end if
 
 !   Check if we are doing steady state solve
-    if (steady_state_flag .eqv. .TRUE. .and. unit_test .eqv. .FALSE.) then
+    if (steady_state_flag .eqv. .TRUE. .and. unit_test_2 .eqv. .FALSE.) then
         ! Factorizes matrix
             call dgetrf ( matrix_length, matrix_length, global_matrix_A, lda, ipiv, info )
             
@@ -77,7 +75,7 @@ subroutine solve_soln(nl_iter )
 !--------------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE.) then
         
-        if(unit_test .eqv. .TRUE.) then
+        if(unit_test_2 .eqv. .TRUE.) then
             do j=1,matrix_length
                 do i=1, num_elem
                     test_diff = global_matrix_A(i,j) - invert_test_matrix_P(i,j) 
