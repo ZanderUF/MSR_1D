@@ -31,6 +31,15 @@ implicit none
             previous_elem_soln_vec(i) = sin(2.0*pi*norm_sin)
         end do
     end if
+    
+!-------------------------------------------------------------------------------
+!---Write out temperature solution
+        write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a)'), 'Initial condition '
+        write(outfile_unit,fmt='(a)'), 'Position(x) Solution'
+        do j = 1, matrix_length
+            write(outfile_unit, fmt='(f6.3, f10.3)')  global_coord(j), previous_elem_soln_vec(j)
+        end do
 
 !---Normal calculation flow - no need if doing unit test
     if (unit_test .eqv. .FALSE.) then
@@ -57,8 +66,7 @@ implicit none
             end if
 
         end do
-
-    !---Set initial soln guess
+        !---Set initial soln guess
         previous_elem_soln_vec(:) = 800
         nl_iter = 1 
         steady_state_flag = .TRUE.
@@ -105,13 +113,7 @@ implicit none
 !---Set steady state flag off
     steady_state_flag = .FALSE.
 
-!-------------------------------------------------------------------------------
-!---Write out temperature solution
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a)'), 'Steady state solution as a function of position'
-        do j = 1, matrix_length-2
-            write(outfile_unit, fmt='(f6.3, f10.3)')  global_coord(j), previous_elem_soln_vec(j)
-        end do   
+   
 
 
 end

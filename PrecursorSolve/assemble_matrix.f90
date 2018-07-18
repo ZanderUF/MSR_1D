@@ -37,7 +37,7 @@ subroutine assemble_matrix (n)
     flux_rhs = 0
     flux_lhs = 0
     Pu_minus_flux_vec = 0
-
+    elem_vec_Pu = 0
 !---Solve for elemental coeficients, no global assembly 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
@@ -75,13 +75,34 @@ subroutine assemble_matrix (n)
         end do
 
     end if
-   
+
+!---Write out {flux_rhs}
+    write(outfile_unit,fmt='(a)'), ' ' 
+    write(outfile_unit,fmt='(a,1I3)'),'{f^+} vector | element --> ', n
+    do j=1,nodes_per_elem 
+           write(outfile_unit,fmt='(12es14.3)') flux_rhs(j)             
+    end do
+
+!---Write out {flux_lhs}
+    write(outfile_unit,fmt='(a)'), ' ' 
+    write(outfile_unit,fmt='(a,1I3)'),'{f^-} vector | element --> ', n
+    do j=1,nodes_per_elem 
+           write(outfile_unit,fmt='(12es14.3)') flux_lhs(j)             
+    end do
+
+!---Write out {Pu}
+    write(outfile_unit,fmt='(a)'), ' ' 
+    write(outfile_unit,fmt='(a,1I3)'),'{Pu} vector | element --> ', n
+    do j=1,nodes_per_elem 
+           write(outfile_unit,fmt='(12es14.3)') elem_vec_Pu(j)             
+    end do  
+
 !---Combine (Pu - f)
     Pu_minus_flux_vec = elem_vec_Pu + flux_rhs - flux_lhs
-    
+   
 !---Write out {Pu - f}
     write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),'{Pu -f} vector | element --> ', n
+    write(outfile_unit,fmt='(a,1I3)'),'{Pu - f} vector | element --> ', n
     do j=1,nodes_per_elem 
            write(outfile_unit,fmt='(12es14.3)') Pu_minus_flux_vec(j)             
     end do
@@ -109,11 +130,18 @@ subroutine assemble_matrix (n)
     end do
 
 !---Determine vector (Pu - f)*A^-1
-    elem_prev_soln = matmul(Pu_minus_flux_vec,elem_matrix_A)
+    elem_prev_soln = matmul( elem_matrix_A, Pu_minus_flux_vec)
+
+!---Write out {Pu-f}*A-1
+    write(outfile_unit,fmt='(a)'), ' ' 
+    write(outfile_unit,fmt='(a,1I3)'),'{Pu - f}*A^-1 vector | element --> ', n
+    do j=1,nodes_per_elem 
+           write(outfile_unit,fmt='(12es14.3)') elem_prev_soln(j)          
+    end do
 
 !---Solve for next time step solution
     do i = 1, nodes_per_elem
-        ii = i + (n-1)*nodes_per_elem  
+        ii = i + (n-1)*nodes_per_elem 
         cur_elem_soln_vec(ii) = dt*elem_prev_soln(i) + previous_elem_soln_vec(ii) 
     end do
 

@@ -70,10 +70,10 @@ if ( transient .eqv. .TRUE.) then
             write(outfile_unit,fmt='(a,12es14.3)'),'Solution Vector at time --> ',t0
             write(outfile_unit,fmt='(a)'),'Position(x) Nodal'
             do j=1,matrix_length 
-                   write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') global_coord(j), previous_elem_soln_vec(j)             
+                   write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') global_coord(j), cur_elem_soln_vec(j)             
             end do
             
-            previous_elem_soln_vec = cur_elem_soln_vec
+            previous_elem_soln_vec = cur_elem_soln_vec 
 
             !---Set boundary conditions
             !call boundary_cond
