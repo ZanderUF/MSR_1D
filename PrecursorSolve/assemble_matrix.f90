@@ -18,8 +18,18 @@ subroutine assemble_matrix (n)
     integer :: n
 !---Local variables
     integer :: i, j, ii, jj, nr,nc, ncl,length   
-    real, dimension(3) :: elem_prev_soln, flux_rhs, flux_lhs, basis_at_lhs
-    data basis_at_lhs / 1, 0, 0/
+    real, dimension(3) :: elem_prev_soln, flux_rhs, flux_lhs,&
+                          basis_at_lhs, basis_at_rhs
+    data basis_at_lhs / 1,0,0/
+    data basis_at_rhs / 0,0,1/
+                
+    !real, dimension(3,3) :: basis_at_lhs, basis_at_rhs
+    !data basis_at_lhs / 0, 0, 1/
+    !                    0, 0, 0,&
+    !                    0, 0, 0/
+    !data basis_at_rhs / 0, 0, 0,&
+    !                    0, 0, 0,&
+    !                    0, 0, 1/
     real :: temp_soln
 !---Inversion routine parameters
     integer :: lda, info, lwork
@@ -38,6 +48,37 @@ subroutine assemble_matrix (n)
     flux_lhs = 0
     Pu_minus_flux_vec = 0
     elem_vec_Pu = 0
+
+!---All elements except the first
+    if(n > 1) then
+        !---Grab current solution at rhs of current element 
+        ii = 1 + (n-1)*nodes_per_elem
+        temp_soln = previous_elem_soln_vec(ii+2)
+        do i = 1, nodes_per_elem
+            flux_rhs(i) = temp_soln*basis_at_rhs(i)
+        end do
+        !---Grab previous solution at rhs of previous element
+        temp_soln = previous_elem_soln_vec(ii-1)
+        do i = 1, nodes_per_elem
+            !flux_lhs(i) =basis_at_rhs(i)
+            flux_lhs(i) = temp_soln*basis_at_lhs(i)
+        end do
+    else!---For periodic B.C. need to connect first to the last element
+        
+        !---Get current solution at lhs of current element
+        ii = 1 + (n-1)*nodes_per_elem
+        temp_soln = previous_elem_soln_vec(ii+2)
+        do i = 1, nodes_per_elem
+            flux_rhs(i) = temp_soln*basis_at_rhs(i)
+        end do
+        !---Connect the last element to first
+        temp_soln = previous_elem_soln_vec(matrix_length)
+        do i = 1, nodes_per_elem
+            flux_lhs(i) = temp_soln*basis_at_lhs(i)
+        end do
+
+    end if
+
 !---Solve for elemental coeficients, no global assembly 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
@@ -47,34 +88,6 @@ subroutine assemble_matrix (n)
         end do
     end do
 
-!---All elements except the first
-    if(n > 1) then
-        !---Grab current solution at lhs of current element 
-        ii = 1 + (n-1)*nodes_per_elem
-        temp_soln = previous_elem_soln_vec(ii)
-        do i = 1, nodes_per_elem
-            flux_rhs(i) = temp_soln*basis_at_lhs(i)
-        end do
-        !---Grab previous solution at rhs of previous element
-        temp_soln = previous_elem_soln_vec(ii-1)
-        do i = 1, nodes_per_elem
-            flux_lhs(i) = temp_soln*basis_at_lhs(i)
-        end do
-    else!---For periodic B.C. need to connect first to the last element
-        
-        !---Get current solution at lhs of current element
-        ii = 1 + (n-1)*nodes_per_elem
-        temp_soln = previous_elem_soln_vec(ii)
-        do i = 1, nodes_per_elem
-            flux_rhs(i) = temp_soln*basis_at_lhs(i)
-        end do
-        !---Connect the last element to first
-        temp_soln = previous_elem_soln_vec(matrix_length)
-        do i = 1, nodes_per_elem
-            flux_lhs(i) = temp_soln*basis_at_lhs(i)
-        end do
-
-    end if
 
 !---Write out {flux_rhs}
     write(outfile_unit,fmt='(a)'), ' ' 
@@ -98,7 +111,7 @@ subroutine assemble_matrix (n)
     end do  
 
 !---Combine (Pu - f)
-    Pu_minus_flux_vec = elem_vec_Pu + flux_rhs - flux_lhs
+    Pu_minus_flux_vec = elem_vec_Pu - (flux_rhs - flux_lhs)
    
 !---Write out {Pu - f}
     write(outfile_unit,fmt='(a)'), ' ' 

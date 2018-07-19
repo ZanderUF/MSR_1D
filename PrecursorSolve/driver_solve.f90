@@ -27,6 +27,7 @@ implicit none
 !---Area of the channel
     area = 5.0
 !---Set zero for all matrix entries 
+    cur_elem_soln_vec = 0.0
     previous_elem_soln_vec(:) = 0.0
     global_matrix_A(:,:) = 0.0
     global_vec_f(:) = 0.0
@@ -76,7 +77,7 @@ if ( transient .eqv. .TRUE.) then
             previous_elem_soln_vec = cur_elem_soln_vec 
 
             !---Set boundary conditions
-            !call boundary_cond
+            ! call boundary_cond
 
             !---Solve the global system of equations
             ! call solve_global_sys
@@ -85,9 +86,9 @@ if ( transient .eqv. .TRUE.) then
             ! call calc_residual            
 
             ! Check if nonlinearities have converged
-            !if ( residual < tolerance) then
+            ! if ( residual < tolerance) then
             !    exit 
-            !end if
+            ! end if
             nl_iter = nl_iter + 1 ! nonlinear iteration counter
             !---Check if we have done too many nonlinear iterations and still not converging
             if ( nl_iter > max_iter) then

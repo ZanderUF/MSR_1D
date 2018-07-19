@@ -29,6 +29,7 @@ implicit none
         do i = 1, matrix_length
             norm_sin = real(global_coord(i))/real(global_coord(matrix_length))
             previous_elem_soln_vec(i) = sin(2.0*pi*norm_sin)
+            !previous_elem_soln_vec(i) = 1.0
         end do
     end if
     

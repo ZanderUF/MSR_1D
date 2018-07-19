@@ -54,20 +54,20 @@ subroutine element_matrix (n, nl_iter)
         ni = conn_matrix(n,i) 
         elem_coord(i) = global_coord(ni)       
     end do
-
 !---Get length of the element 
     h = elem_lengths(n)
 
 !---Integrate over Gauss Pts - assembling only A matrix and source vector 'f'
     do g = 1 , num_gaus_pts 
     !---Calculate shape functions at gauss pt
-        call inter_shape_fcns(xi,elem_coord,h)
         xi = gauspt(g)
         wt = gauswt(g)
         h = elem_lengths(n)
-        cnst = g_jacobian*wt
         
-        !---Unit test 
+        call inter_shape_fcns(xi,elem_coord,h)
+       
+        cnst = g_jacobian*wt
+       !---Unit test 
         if(unit_test .eqv. .TRUE.) then
             !---Unit test solver
             do i = 1, nodes_per_elem
@@ -77,7 +77,7 @@ subroutine element_matrix (n, nl_iter)
                                          cnst*shape_fcn(i)*shape_fcn(j) 
                     !---Assemble P matrix
                     elem_matrix_P(i,j) = elem_matrix_P(i,j) + &
-                                         cnst*shape_fcn(i)*global_der_shape_fcn(j)
+                                         cnst*shape_fcn(j)*global_der_shape_fcn(i)
                 end do
             end do
         end if !---end unit test if
@@ -87,7 +87,6 @@ subroutine element_matrix (n, nl_iter)
             !---Evaluate material properties at gauss pt, first get temp @ gauss pt
             T = 0.0
             P = 0.0
-            
             do i = 1 , nodes_per_elem
                     T = T + shape_fcn(i)*previous_elem_soln_vec( ((2*n-2) + i) )
                     P = P + shape_fcn(i)*power_initial( n +i )
