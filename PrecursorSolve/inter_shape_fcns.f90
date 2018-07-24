@@ -5,14 +5,14 @@
 !             Calculates shape fcns and derivatives at the gauss pts
 !  Parameters:
 
-subroutine inter_shape_fcns (xi,elem_coord, h)
+subroutine inter_shape_fcns (xi, h)
 !
     USE parameters_fe  
 
     implicit none
 !---Dummy variable
     real :: xi 
-    real, dimension(3) :: elem_coord
+    !real, dimension(3) :: elem_coord
     real :: h
 
 !---local

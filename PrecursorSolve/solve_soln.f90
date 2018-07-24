@@ -32,7 +32,6 @@ subroutine solve_soln(nl_iter )
                                  0,  1, 0, 0,&
                                  0,  0, 1, 0,&
                                  0,  0, 0, 1 /
-    real, dimension(2*num_elem+1) :: temperature
     ipiv = 0.0
     work = 0.0
     lda = matrix_length
@@ -45,71 +44,69 @@ subroutine solve_soln(nl_iter )
         matrix_length = 4
         lda = matrix_length
         lwork = matrix_length
-        global_matrix_A(:,:) = 0.0
-        global_matrix_A= test_global_matrix_A(:,:) 
 
     end if
-
-!   Check if we are doing steady state solve
-    if (steady_state_flag .eqv. .TRUE. .and. unit_test_2 .eqv. .FALSE.) then
-        ! Factorizes matrix
-            call dgetrf ( matrix_length, matrix_length, global_matrix_A, lda, ipiv, info )
-            
-            if (DEBUG .eqv. .TRUE.) then
-                  write(outfile_unit,fmt='(a)'), ' ' 
-                  write(outfile_unit,fmt='(a)'),'Factorization of Matrix A-steady state after B.C. applied: '
-                  do j=1,matrix_length
-                         write(outfile_unit,fmt='(12es14.3)') &
-                              (global_matrix_A(j,i) ,i=1,matrix_length)             
-                  end do
-            end if
-        
-        !  Compute the inverse matrix.
-        call dgetri (matrix_length, global_matrix_A, lda, ipiv, work, lwork, info ) 
-        
-    end if
-
-!   Solve for current solution 
-    cur_elem_soln_vec = matmul(global_vec_q,global_matrix_A)
-
-!--------------------------------------------------------------------------------------
-    if (DEBUG .eqv. .TRUE.) then
-        
-        if(unit_test_2 .eqv. .TRUE.) then
-            do j=1,matrix_length
-                do i=1, num_elem
-                    test_diff = global_matrix_A(i,j) - invert_test_matrix_P(i,j) 
-                end do
-            end do
-            if (test_diff > 0.0) then
-                write(outfile_unit, fmt='(a)') 'The matrix inverison routine is failing'
-            end if
-            write(outfile_unit,fmt='(a)'), ' ' 
-            write(outfile_unit,fmt='(a)'),'Test Inversion of Matrix A '
-            do j=1,matrix_length
-               write(outfile_unit,fmt='(12es14.6)') &
-                    (global_matrix_A(j,i) ,i=1,matrix_length)             
-            end do
-            write(outfile_unit,fmt='(a)'),'Known Soln of Inversion of Matrix A '
-            do j=1,matrix_length
-               write(outfile_unit,fmt='(12es14.6)') &
-                    (invert_test_matrix_P(j,i) ,i=1,matrix_length)             
-            end do
-        
-        else
-            write(outfile_unit,fmt='(a)'), ' ' 
-            write(outfile_unit,fmt='(a)'),'Inversion of Matrix A steady state after B.C. applied: '
-            do j=1,matrix_length
-               write(outfile_unit,fmt='(12es14.3)') &
-                    (global_matrix_A(j,i) ,i=1,matrix_length)             
-        end do
-        
-        end if
-
-    end if
-!--------------------------------------------------------------------------------------
-    
-    global_matrix_A = 0.0
-    global_vec_q = 0.0
+!
+!!   Check if we are doing steady state solve
+!    if (steady_state_flag .eqv. .TRUE. .and. unit_test_2 .eqv. .FALSE.) then
+!        ! Factorizes matrix
+!            call dgetrf ( matrix_length, matrix_length, global_matrix_A, lda, ipiv, info )
+!            
+!            if (DEBUG .eqv. .TRUE.) then
+!                  write(outfile_unit,fmt='(a)'), ' ' 
+!                  write(outfile_unit,fmt='(a)'),'Factorization of Matrix A-steady state after B.C. applied: '
+!                  do j=1,matrix_length
+!                         write(outfile_unit,fmt='(12es14.3)') &
+!                              (global_matrix_A(j,i) ,i=1,matrix_length)             
+!                  end do
+!            end if
+!        
+!        !  Compute the inverse matrix.
+!        call dgetri (matrix_length, global_matrix_A, lda, ipiv, work, lwork, info ) 
+!        
+!    end if
+!
+!!   Solve for current solution 
+!    cur_elem_soln_vec = matmul(global_vec_q,global_matrix_A)
+!
+!!--------------------------------------------------------------------------------------
+!    if (DEBUG .eqv. .TRUE.) then
+!        
+!        if(unit_test_2 .eqv. .TRUE.) then
+!            do j=1,matrix_length
+!                do i=1, num_elem
+!                    test_diff = global_matrix_A(i,j) - invert_test_matrix_P(i,j) 
+!                end do
+!            end do
+!            if (test_diff > 0.0) then
+!                write(outfile_unit, fmt='(a)') 'The matrix inverison routine is failing'
+!            end if
+!            write(outfile_unit,fmt='(a)'), ' ' 
+!            write(outfile_unit,fmt='(a)'),'Test Inversion of Matrix A '
+!            do j=1,matrix_length
+!               write(outfile_unit,fmt='(12es14.6)') &
+!                    (global_matrix_A(j,i) ,i=1,matrix_length)             
+!            end do
+!            write(outfile_unit,fmt='(a)'),'Known Soln of Inversion of Matrix A '
+!            do j=1,matrix_length
+!               write(outfile_unit,fmt='(12es14.6)') &
+!                    (invert_test_matrix_P(j,i) ,i=1,matrix_length)             
+!            end do
+!        
+!        else
+!            write(outfile_unit,fmt='(a)'), ' ' 
+!            write(outfile_unit,fmt='(a)'),'Inversion of Matrix A steady state after B.C. applied: '
+!            do j=1,matrix_length
+!               write(outfile_unit,fmt='(12es14.3)') &
+!                    (global_matrix_A(j,i) ,i=1,matrix_length)             
+!        end do
+!        
+!        end if
+!
+!    end if
+!!--------------------------------------------------------------------------------------
+!    
+!    global_matrix_A = 0.0
+!    global_vec_q = 0.0
 
 end 

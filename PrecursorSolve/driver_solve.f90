@@ -18,20 +18,26 @@ implicit none
 !---Max dimension of the matrices to be computed, including solution vector
     matrix_length = 3*num_elem  
 !---Allocate solution vector and global matrices
-    allocate(cur_elem_soln_vec(matrix_length), &
-             previous_elem_soln_vec(matrix_length), &
-             global_matrix_A(matrix_length, matrix_length), &
-             global_matrix_P(matrix_length, matrix_length), &
-             global_vec_f(matrix_length),&
-             global_vec_q(matrix_length) )
-!---Area of the channel
-    area = 5.0
+    allocate(cur_elem_soln_vec(num_elem,nodes_per_elem), &
+             previous_elem_soln_vec(num_elem,nodes_per_elem), &
+             velocity_vec( num_elem,nodes_per_elem),&
+             density_vec( num_elem,nodes_per_elem), &
+             temperature_vec( num_elem,nodes_per_elem) )
+    
+!---Reactor properties
+    area = 1.0
+    mass_flow = 1800.0
+    lambda = 0.5
+    beta = 2.5E-3
+    gen_time = 1E-6
+    mass_elem = 100.0/num_elem
+
+!---Starting element for non fuel region
+    non_fuel_start = matrix_length
+
 !---Set zero for all matrix entries 
-    cur_elem_soln_vec = 0.0
-    previous_elem_soln_vec(:) = 0.0
-    global_matrix_A(:,:) = 0.0
-    global_vec_f(:) = 0.0
-    global_vec_q(:) = 0.0 
+    cur_elem_soln_vec(:,:) = 0.0
+    previous_elem_soln_vec(:,:) = 0.0
 
 !---Name the output files something useful 
     call proper_file_namer
@@ -48,7 +54,7 @@ implicit none
     call steady_state
 
 !---Start time-dependent solve
-    transient = .TRUE.
+    transient = .FALSE.
 if ( transient .eqv. .TRUE.) then
 
     write(outfile_unit, fmt='(a)'), ' ' 
@@ -70,9 +76,9 @@ if ( transient .eqv. .TRUE.) then
             write(outfile_unit,fmt='(a)'), ' ' 
             write(outfile_unit,fmt='(a,12es14.3)'),'Solution Vector at time --> ',t0
             write(outfile_unit,fmt='(a)'),'Position(x) Nodal'
-            do j=1,matrix_length 
-                   write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') global_coord(j), cur_elem_soln_vec(j)             
-            end do
+            !do j=1,matrix_length 
+            !       write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') global_coord(j), cur_elem_soln_vec(j)             
+            !end do
             
             previous_elem_soln_vec = cur_elem_soln_vec 
 
@@ -111,8 +117,6 @@ if ( transient .eqv. .TRUE.) then
 
 end if
 
-    !deallocate(cur_elem_soln_vec, previous_elem_soln_vec, global_matrix_P, &
-     !          global_matrix_A, global_vec_f, global_vec_q)      
 return
 end
 

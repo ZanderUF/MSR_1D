@@ -40,21 +40,10 @@ subroutine boundary_cond( )
     lda =   length
     lwork = length
 
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a)'),'Global Assembled (A) matrix before B.C. imposed  '
-    do j=1,matrix_length 
-           write(outfile_unit,fmt='(12es14.3)') &
-                (global_matrix_A(j,i) ,i=1,matrix_length)             
-    end do
     
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a)'),'Global Assembled (P) matrix before B.C. imposed  '
-    do j=1,matrix_length 
-           write(outfile_unit,fmt='(12es14.3)') &
-                (global_matrix_P(j,i) ,i=1,matrix_length)             
-    end do
+   
     ! Impose periodicity
-    global_matrix_A(1,matrix_length) = global_matrix_A(1,matrix_length) + 1.0
+  !  global_matrix_A(1,matrix_length) = global_matrix_A(1,matrix_length) + 1.0
     !global_matrix_A(2,matrix_length) = 1.0
     !global_matrix_A(3,matrix_length) = 1.0
     !! 
@@ -156,19 +145,5 @@ subroutine boundary_cond( )
 !---Put fixed loss at a node spot
 !    global_vec_q(matrix_length-4) = global_vec_q(matrix_length-4) - 5E-3
 
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a)'),'Global Assembled (A-P) matrix after B.C. imposed  '
-    do j=1,matrix_length 
-           write(outfile_unit,fmt='(12es14.3)') &
-                (global_matrix_A(j,i) ,i=1,matrix_length)             
-    end do
-
-!   Print out matrix before B.C. applied
-    if (DEBUG .eqv. .TRUE. ) then
-        write(outfile_unit,fmt='(a)'), ' '        
-        write(outfile_unit,fmt='(a)'), 'Global vector source Q - steady state   '
-        write(outfile_unit,fmt='(12es14.6)') &
-                    (global_vec_q(i) ,i=1,matrix_length)
-    end if
 
 end
