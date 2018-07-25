@@ -22,7 +22,7 @@ implicit none
     real :: b  
    
     a = 2603
-    b= 6.69E-1
+    b= -6.69E-1
 
     density = a + b*T
 

@@ -26,14 +26,14 @@ implicit none
     
 !---Reactor properties
     area = 1.0
-    mass_flow = 1800.0
+    mass_flow = 18000.0
     lambda = 0.01
     beta = 2.5E-3
     gen_time = 1E-6
     mass_elem = 100.0/num_elem
 
 !---Starting element for non fuel region
-    non_fuel_start = num_elem 
+    non_fuel_start = num_elem-2 
 
 !---Set zero for all matrix entries 
     cur_elem_soln_vec(:,:) = 0.0
@@ -132,7 +132,7 @@ subroutine proper_file_namer()
 USE parameters_fe
 
 ! Write out files depending on problem type
-      write(file_name, '(a)'),"output.txt"
+      write(file_name, '(a)'),"converged_ss_soln.txt"
 
 return
 

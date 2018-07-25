@@ -24,16 +24,15 @@ subroutine element_matrix (n, nl_iter)
 !---Dummy variables
     integer  :: g, j, i,ii, ni, n, nl_iter
 !---Local variables 
-    real , dimension(3) :: elem_coord
+    real , dimension(3) :: elem_coord, velocity
     real , dimension(3, 3) :: K_integral, M_integral
     data M_integral / 4 , 2 , -1 , 2 , 16 , 2 , -1 , 2 ,4 / 
     data K_integral / 7, -8,   1, -8,  16, -8,   1, -8, 7 /
     real , dimension(4)  :: gauspt, gauswt
     data gauspt /-0.8611363116, -0.3399810435, 0.3399810435, 0.8611363116 /  
     data gauswt / 0.347854851 ,  0.6521451548, 0.6521451548, 0.347854851 /
-    real  :: xi, wt, cnst, h, s, s2, T, P,  kappa, density, velocity, &
-             C_p, K_material, F_material
-
+    real  :: xi, wt, cnst, h, s, s2, T, P,  kappa, density, &
+             C_p, K_material, F_material, evaluated_velocity
 !---Initialize
     elem_matrix_A = 0.0
     elem_matrix_U = 0.0
@@ -52,8 +51,18 @@ subroutine element_matrix (n, nl_iter)
         wt = gauswt(g)
         h  = global_coord(n,3) - global_coord(n,1) 
         call inter_shape_fcns(xi,h)
-       
         cnst = g_jacobian*wt
+        !---Evaluate velocity at gauss pt
+        velocity = 0.0
+        do i = 1, nodes_per_elem
+                velocity(i) = velocity(i) + shape_fcn(i)*velocity_vec(n,i)
+        end do
+        evaluated_velocity = sum(velocity) 
+        print *,'velocity tot',sum(velocity), g
+        !do i = 1 , nodes_per_elem
+        !    velocity = velocity + velocity*velocity_vec(n,i)
+        !end do
+
         !---UNIT TEST 
         if(unit_test .eqv. .TRUE.) then
             !---Unit test solver
@@ -62,7 +71,7 @@ subroutine element_matrix (n, nl_iter)
                     !---Assemble A matrix
                     elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                          cnst*shape_fcn(i)*shape_fcn(j) 
-                    !---Assemble P matrix
+                    !---Assemble U matrix
                     elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                          cnst*shape_fcn(j)*global_der_shape_fcn(i)
                 end do
@@ -80,7 +89,7 @@ subroutine element_matrix (n, nl_iter)
                                          cnst*shape_fcn(i)*shape_fcn(j)
                     !---Assemble P matrix
                     elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
-                                        cnst*shape_fcn(j)*global_der_shape_fcn(i)
+                                        evaluated_velocity*cnst*shape_fcn(j)*global_der_shape_fcn(i)
 
                     !---Transient calculation
                     if ( steady_state_flag .eqv. .FALSE.) then 

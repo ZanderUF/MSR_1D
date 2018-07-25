@@ -86,14 +86,14 @@ subroutine assemble_matrix (n)
             do j = 1, nodes_per_elem
                 elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*power_initial(n,i)    
             end do 
-            !elem_vec_q(i) = elem_vec_q(i)*(beta/gen_time)
+            elem_vec_q(i) = elem_vec_q(i)*(beta/gen_time)
          end do
 
          !---Calculate G matrix, will be inverted later on
          do i = 1, nodes_per_elem
              do j = 1, nodes_per_elem
-                 elem_matrix_G(i,j) = (-velocity_vec(n,j)*elem_matrix_U(i,j)) + &
-                                       (0.69314718056/lambda)*elem_matrix_A(i,j) + &
+                 elem_matrix_G(i,j) = (-elem_matrix_U(i,j)) + &
+                                       (log(2.0)/lambda)*elem_matrix_A(i,j) + &
                                        matrix_W_right_face(i,j)
              end do 
          end do 

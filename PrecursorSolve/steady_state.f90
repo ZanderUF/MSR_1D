@@ -42,7 +42,7 @@ implicit none
         steady_state_flag = .TRUE.
         nonlinear_ss_flag = .TRUE.
         !---Sets the max number of nonlinear iterations    
-        max_nl_iter = 100 
+        max_nl_iter = 2 
          
         allocate( power_initial(num_elem,nodes_per_elem) )
         !---Initial guesses 
@@ -56,29 +56,29 @@ implicit none
         do i = 1,num_elem
             do j = 1, nodes_per_elem
                 !---Apply to active fuel region
-                !if( i <= non_fuel_start) then
-                 if( i == 2 ) then
-                 cosine_term = cos( (pi/2)*(global_coord(i,j) - real(global_coord(non_fuel_start,j))/2.0) )
-                    !power_initial(i,j) = (center_power_initial*cosine_term)
-                    power_initial(i,j) = 1 
+                if( i <= non_fuel_start) then
+                    norm_cos = (real(global_coord(i,j)) - &
+                                real(global_coord(non_fuel_start,3))/2)
+                    cosine_term = cos( (pi/2)*(global_coord(i,j) - &
+                                   real(global_coord(non_fuel_start,3))/2))
+                    power_initial(i,j) = (center_power_initial*cosine_term)
                     !---Set temperature distribution
                     temperature_vec(i,j) = (center_temp_initial*cosine_term)
                     !---Get density to set the velocity
-                    call density_corr(800,density)
+                    call density_corr(temperature_vec(i,j),density)
                     density_vec(i,j) = density
                     !---Need to get initial velocity distribution
-                    !velocity_vec(i,j) = mass_flow/(area*density)
-                    velocity_vec(i,j) = 100 
+                    velocity_vec(i,j) = mass_flow/(area*density)
+                    !velocity_vec(i,j) = 100 
                 !---Inactive region assumed to have zero power 
                 else
                     !---Temperature in inactive region same as end of active region ==> no loss
-                    temperature_vec(i,j) = temperature_vec(non_fuel_start - 1,j)
+                    temperature_vec(i,j) = temperature_vec(non_fuel_start ,3)
                     !---Get density to set the velocity
                     call density_corr(temperature_vec(i,j),density)
                     density_vec = density
                     !---Need to get initial velocity distribution
-                    !velocity_vec(i,j) = mass_flow/(area*density)
-                     velocity_vec(i,j) = 100 
+                    velocity_vec(i,j) = mass_flow/(area*density)
                     power_initial(i,j) = 0.0
                 end if
            end do 
@@ -116,10 +116,10 @@ implicit none
         !---Write out initial solution
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a)'), 'Initial density distribition '
-        write(outfile_unit,fmt='(a)'), 'Position(x) Velocity [kg/m^3]'
+        write(outfile_unit,fmt='(a)'), 'Position(x) Density [kg/m^3]'
         do i = 1, num_elem 
             do j = 1, nodes_per_elem
-                write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), velocity_vec(i,j)
+                write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), density_vec(i,j)
             end do
         end do
         !-------------------------------------------------------------------------------
@@ -174,7 +174,14 @@ implicit none
             end do !---end nonlinear iteration loop
         end if !---end nonlinear if 
     end if !---end normal calculation if 
-
+    
+    !---write out converged solution for plotting
+    write(soln_outfile_unit,fmt='(a)'), 'Position(x) | Precursor Concentration'
+    do i = 1, num_elem 
+        do j = 1, nodes_per_elem
+            write(soln_outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), cur_elem_soln_vec(i,j)
+        end do
+    end do
 !---Set steady state flag off
     steady_state_flag = .FALSE.
 

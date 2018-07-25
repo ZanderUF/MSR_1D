@@ -8,5 +8,5 @@ read parm
   npe=3
 end parm
 read mesh 
-  len= 2.0 2.0 2.0 2.0  end
+  len= .5 .5 .5 .5  end
 end delay
