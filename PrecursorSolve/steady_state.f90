@@ -18,7 +18,7 @@ implicit none
     real :: ii, elem_length, density
     real :: center_temp_initial, center_power_initial,total_power_initial
     integer :: dist_num
-    real :: norm_sin,norm_cos, pi, cosine_term
+    real :: norm_sin,norm_cos, pi, cosine_term, x_last, x_curr
     parameter (pi = 3.1415926535897932)
 
 !---Simplified UNIT TEST 
@@ -42,14 +42,14 @@ implicit none
         steady_state_flag = .TRUE.
         nonlinear_ss_flag = .TRUE.
         !---Sets the max number of nonlinear iterations    
-        max_nl_iter = 2 
+        max_nl_iter = 100 
          
         allocate( power_initial(num_elem,nodes_per_elem) )
         !---Initial guesses 
         center_temp_initial  = 800
         total_power_initial  = 10
         center_power_initial = 10
-
+        print *,'global_coord las',global_coord(non_fuel_start,3)
         !---Used to apply cosine shape over active domain 
         dist_num = ((non_fuel_start) + 1 )/2
         !---Apply to every node point within an element
@@ -57,10 +57,10 @@ implicit none
             do j = 1, nodes_per_elem
                 !---Apply to active fuel region
                 if( i <= non_fuel_start) then
-                    norm_cos = (real(global_coord(i,j)) - &
-                                real(global_coord(non_fuel_start,3))/2)
-                    cosine_term = cos( (pi/2)*(global_coord(i,j) - &
-                                   real(global_coord(non_fuel_start,3))/2))
+                    x_curr = real(global_coord(i,j) )
+                    x_last =  real(global_coord(non_fuel_start,3))
+                    norm_cos = (x_curr - x_last/2)/(x_last) !+ 
+                    cosine_term = cos( (pi/2)*norm_cos )
                     power_initial(i,j) = (center_power_initial*cosine_term)
                     !---Set temperature distribution
                     temperature_vec(i,j) = (center_temp_initial*cosine_term)

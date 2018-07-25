@@ -58,7 +58,6 @@ subroutine element_matrix (n, nl_iter)
                 velocity(i) = velocity(i) + shape_fcn(i)*velocity_vec(n,i)
         end do
         evaluated_velocity = sum(velocity) 
-        print *,'velocity tot',sum(velocity), g
         !do i = 1 , nodes_per_elem
         !    velocity = velocity + velocity*velocity_vec(n,i)
         !end do

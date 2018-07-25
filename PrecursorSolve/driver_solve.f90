@@ -25,9 +25,9 @@ implicit none
              temperature_vec( num_elem,nodes_per_elem) )
     
 !---Reactor properties
-    area = 1.0
-    mass_flow = 18000.0
-    lambda = 0.01
+    area = 1.0 
+    mass_flow = 1800.0
+    lambda = 2 
     beta = 2.5E-3
     gen_time = 1E-6
     mass_elem = 100.0/num_elem

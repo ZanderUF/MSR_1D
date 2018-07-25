@@ -18,42 +18,50 @@ from matplotlib import rcParams
 current_dir = os.getcwd()
 ##-------Check if user wants help w/cmd line options
 arglist = str(sys.argv)
-if "help" in arglist:
-	print 'user wants help'
-	print 'cmd line options are: \n f - will read files for plotting from a file \n read - type file name containing data file names \n r - plot reactivity \n p - power \n np - normalize power \n  y - plot yield \n xl - x log scale \n yl - y log scale \n pdf - save figure as pdf \n png - save figure as png \n s - plot figure in window'
-	exit()
-
-twiglall= np.loadtxt(current_dir + "/" + 'twiglall_ramp.txt',skiprows=2)
 
 f=plt.figure()
 
-#-------Have x log scale
-if re.search(r'\bxl\b',arglist[1:]):
-        plt.xscale('log')
-#-------Have y log scale
-if re.search(r'\byl\b',arglist[1:]):
-        plt.yscale('log')
-
-if re.search(r'\bread\b',arglist[1:]):
 data_file_names="data_file_names.txt"
 file_names = [line.rstrip('\n') for line in open(data_file_names)]
 
 i=0
 while i < len(file_names):
-	data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=2)
-	x_coord = data1[:,0]
-    prec_conc = data1[:,5]
-    plt.plot(x_coord,prec_conc,label='Test')
-    plt.ylabel('Precursor Concentration')
-	plt.xlabel('Distance')
+    data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=1)
+    x_coord = data1[:,0]
+    prec_conc = data1[:,1]
+
     i=i+1
 
-##------Evaluate command line
-length = len(str(arglist[1]))
-print 'Argument List:', arglist[length:]
+max_length = len(x_coord)
+starting = x_coord[0]
+ending =   x_coord[max_length-1]
+x_space = np.linspace(starting,ending,100)
+norm_space = np.linspace(-1,1,10)
+
+# evaluate using quadratic interpolation functions
+nodes_per_elem = 3
+num_elem = max_length/nodes_per_elem
+
+# evaluate solution between nodal points
+for i in range(0, num_elem):
+    for k in range(0,len(norm_space)):
+        for j in range(0,nodes_per_elem):
+              
+
+plt.plot(x_coord,prec_conc,label='Test')
+plt.ylabel('Precursor Concentration')
+plt.xlabel('Distance')
 
 
-##------Plot benchmark data
+##------Shape functions------##
+def shape_fcn(fcn,x,i):
+    if (i == 1) :
+        fcn = -0.5*x*(1.0 - x) 
+    if (i == 2) :
+        fcn = (1 + x)*(1 - x)
+    if (i == 3) :
+        fcn = 0.5*x*(1 + x)
+    return soln
 
 ##------Configure the legend --- ##
 plt.legend(loc='lower right',prop={'size':14},numpoints=1)
