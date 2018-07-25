@@ -37,7 +37,6 @@ subroutine element_matrix (n, nl_iter)
 !---Initialize
     elem_matrix_A = 0.0
     elem_matrix_U = 0.0
-    elem_vec_q = 0.0
     
     elem_matrix_F   = 0.0
     elem_vec_f      = 0.0
@@ -52,7 +51,6 @@ subroutine element_matrix (n, nl_iter)
         xi = gauspt(g)
         wt = gauswt(g)
         h  = global_coord(n,3) - global_coord(n,1) 
-        
         call inter_shape_fcns(xi,h)
        
         cnst = g_jacobian*wt
@@ -75,8 +73,6 @@ subroutine element_matrix (n, nl_iter)
         if(unit_test .eqv. .FALSE.) then
             
             do i=1, nodes_per_elem
-                !---Assemble q vector 
-                elem_vec_q(i) = elem_vec_q(i) + cnst*shape_fcn(i) 
                 
                 do j = 1, nodes_per_elem
                     !---Assemble A matrix
@@ -110,7 +106,7 @@ subroutine element_matrix (n, nl_iter)
                write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_A(j,i),i=1,nodes_per_elem)             
         end do
-        write(outfile_unit,fmt='(a,1I2)'),'[P] element Matrix gaussian integration | element --> ',n
+        write(outfile_unit,fmt='(a,1I2)'),'[U] element Matrix gaussian integration | element --> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_U(j,i),i=1,nodes_per_elem)             
@@ -123,14 +119,7 @@ subroutine element_matrix (n, nl_iter)
         !    write(outfile_unit,fmt='(a,1I2,a12es14.3)')  'Node #-->', ii, 'Soln:', previous_elem_soln_vec(ii) 
         !end do
 
-        !---Normal calculation flow
-        if(unit_test .eqv. .FALSE.) then
-            write(outfile_unit,fmt='(a)'),' '
-            write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
-            write(outfile_unit,fmt='(12es14.3)') (elem_vec_q(i),i=1,nodes_per_elem)             
-        end if
-
-    end if !---End matrix write out
+            end if !---End matrix write out
 !------------------------------------------------------------------------------
  
 

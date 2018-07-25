@@ -27,13 +27,13 @@ implicit none
 !---Reactor properties
     area = 1.0
     mass_flow = 1800.0
-    lambda = 0.5
+    lambda = 0.01
     beta = 2.5E-3
     gen_time = 1E-6
     mass_elem = 100.0/num_elem
 
 !---Starting element for non fuel region
-    non_fuel_start = matrix_length
+    non_fuel_start = num_elem 
 
 !---Set zero for all matrix entries 
     cur_elem_soln_vec(:,:) = 0.0

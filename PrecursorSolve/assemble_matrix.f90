@@ -18,7 +18,7 @@ subroutine assemble_matrix (n)
     integer :: n
 !---Local variables
     integer :: i, j, ii, jj, nr,nc, ncl,length   
-    real, dimension(3) :: elem_vec_upwind, elem_prev_soln, flux_rhs, flux_lhs, &
+    real, dimension(3) :: elem_vec_w_left_face, elem_prev_soln, flux_rhs, flux_lhs, &
                           temp_vec, basis_at_lhs, basis_at_rhs, rhs_final_vec, & 
                           interp_fcn_rhs, interp_fcn_lhs
     real, dimension(3,3) :: inverse_matrix,temp_matrix
@@ -40,10 +40,12 @@ subroutine assemble_matrix (n)
 
     elem_prev_soln = 0
     elem_matrix_G = 0
-    elem_vec_upwind = 0
+    elem_vec_w_left_face = 0
     matrix_W_right_face = 0
     matrix_W_left_face = 0
-
+    elem_vec_q = 0
+    rhs_final_vec = 0
+    
     elem_vec_Pu = 0
     temp_vec = 0
     temp_matrix = 0
@@ -52,25 +54,29 @@ subroutine assemble_matrix (n)
     if(steady_state_flag .eqv. .TRUE. ) then
          write(outfile_unit,fmt='(a)'), ' '
          write(outfile_unit,fmt='(a)'), 'Start steady state assembly '
-         write(outfile_unit,fmt='(a)'), ' '
          
          !---Applies for all elements except the first one
          if(n > 1) then !--- n - element #
              !---Grab previous precursor conc. + velocity at rhs of previous element
              do i = 1, nodes_per_elem
                 do j = 1, nodes_per_elem
-                    matrix_W_right_face(i,j) = velocity_vec(n,3)*interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                    matrix_W_left_face(i,j) = velocity_vec(n,1)*interp_fcn_lhs(i)*interp_fcn_rhs(j)
+                    matrix_W_right_face(i,j) = velocity_vec(n,i)*&
+                                               interp_fcn_rhs(i)*interp_fcn_rhs(j)  
+                    matrix_W_left_face(i,j) = velocity_vec(n,i)*&
+                                              interp_fcn_lhs(i)*interp_fcn_lhs(j)
+                    elem_vec_w_left_face(i) =  elem_vec_w_left_face(i) + &
+                                matrix_W_left_face(i,j)*cur_elem_soln_vec(n-1,3)
                 end do
              end do
-             
-         else!---First element, need to connect with last
+         else!---First element case, need to connect with end element 
              do i = 1, nodes_per_elem
                 do j = 1, nodes_per_elem
-                    matrix_W_right_face(i,j) = velocity_vec(num_elem,3)*&
+                    matrix_W_right_face(i,j) = velocity_vec(num_elem,i)*&
                                                interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                    matrix_W_left_face(i,j) =  velocity_vec(num_elem,1)*&
-                                               interp_fcn_lhs(i)*interp_fcn_rhs(j)
+                    matrix_W_left_face(i,j) =  velocity_vec(num_elem,i)*&
+                                               interp_fcn_lhs(i)*interp_fcn_lhs(j)
+                    elem_vec_w_left_face(i) =  elem_vec_w_left_face(i) + &
+                                matrix_W_left_face(i,j)*cur_elem_soln_vec(num_elem,3)
                 end do
              end do
          end if!---End flux calculation
@@ -78,36 +84,61 @@ subroutine assemble_matrix (n)
          !---Calculate source vector
          do i = 1, nodes_per_elem
             do j = 1, nodes_per_elem
-                elem_vec_q(i) = elem_vec_q(i) + power_initial(n,i)*elem_matrix_A(i,j)     
+                elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*power_initial(n,i)    
             end do 
-         end do
-         
-         do i = 1, nodes_per_elem
-            elem_vec_q(i) = elem_vec_q(i)*(beta/gen_time)
+            !elem_vec_q(i) = elem_vec_q(i)*(beta/gen_time)
          end do
 
-         !---Calculate G matrix to be inverted
+         !---Calculate G matrix, will be inverted later on
          do i = 1, nodes_per_elem
              do j = 1, nodes_per_elem
-                 elem_matrix_G(i,j) = -velocity_vec(n,j)*elem_matrix_U(i,j) + &
-                                       lambda*elem_matrix_A(i,j) + &
+                 elem_matrix_G(i,j) = (-velocity_vec(n,j)*elem_matrix_U(i,j)) + &
+                                       (0.69314718056/lambda)*elem_matrix_A(i,j) + &
                                        matrix_W_right_face(i,j)
-                 elem_vec_upwind(i) =  elem_vec_upwind(i) + &
-                                       velocity_vec(n,j)*cur_elem_soln_vec(n-1,i)*matrix_W_left_face(i,j)         
              end do 
          end do 
+        
+         !---RHS vector
+         do i = 1, nodes_per_elem
+            rhs_final_vec(i) = elem_vec_q(i) + elem_vec_w_left_face(i)
+         end do
 
-         !---Write out RHS vector
+!****************************************************************
+         write(outfile_unit,fmt='(a)'), ' '
+         write(outfile_unit,fmt='(a,1I2)'),'G Matrix | element --> ',n
+         do i=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.3)') &
+                    (elem_matrix_G(i,j),j=1,nodes_per_elem)             
+         end do
+         
+         write(outfile_unit,fmt='(a)'), ' '
+         write(outfile_unit,fmt='(a,1I2)'),'W right Matrix | element --> ',n
+         do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.3)') &
+                    (matrix_W_right_face(j,i),i=1,nodes_per_elem)             
+         end do
+         
+         write(outfile_unit,fmt='(a)'), ' '
+         write(outfile_unit,fmt='(a,1I2)'),'W left Matrix | element --> ',n
+         do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.3)') &
+                    (matrix_W_left_face(j,i),i=1,nodes_per_elem)             
+         end do
+         
          write(outfile_unit,fmt='(a)'), ' ' 
          write(outfile_unit,fmt='(a,1I3)'),'left face vector | element --> ', n
          do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.3)') elem_vec_upwind(j)             
+               write(outfile_unit,fmt='(12es14.3)') elem_vec_w_left_face(j)             
          end do
-         write(outfile_unit,fmt='(a)'), ' '
-         write(outfile_unit,fmt='(a,1I2)'),'LHS Matrix | element --> ',n
+         
+         write(outfile_unit,fmt='(a)'), ' ' 
+         write(outfile_unit,fmt='(a)'),' '
+         write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
+         write(outfile_unit,fmt='(12es14.3)') (elem_vec_q(i),i=1,nodes_per_elem)             
+         write(outfile_unit,fmt='(a)'), ' ' 
+         write(outfile_unit,fmt='(a,1I3)'),'RHS final vector | element --> ', n
          do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.3)') &
-                    (elem_matrix_G(j,i),i=1,nodes_per_elem)             
+               write(outfile_unit,fmt='(12es14.3)') rhs_final_vec(j)             
          end do
     end if !---End steady state
 
@@ -199,26 +230,23 @@ subroutine assemble_matrix (n)
     
 !---Write out inverse matrix
     write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),'inverse [A]^-1 matrix | element --> ',n
+    write(outfile_unit,fmt='(a,1I3)'),'inverse [G]^-1 matrix | element --> ',n
     do j=1,nodes_per_elem
            write(outfile_unit,fmt='(12es14.3)') &
                 ( inverse_matrix(j,i) ,i=1,nodes_per_elem )             
     end do
-
+    
 !---CALCULATE SOLUTION for a given element
-
-    elem_prev_soln = matmul(inverse_matrix,rhs_final_vec)
+    
+    do i = 1, nodes_per_elem
+        do j = 1, nodes_per_elem
+            elem_prev_soln(i) = elem_prev_soln(i) + inverse_matrix(i,j)*rhs_final_vec(j)
+        end do
+    end do
 
 !---Evaluate time step if transient case
     if(steady_state_flag .eqv. .FALSE.) then    
-    !---Write out change in solution space (before multiplying by delta t 
-        write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),'Change in solution space vector | element --> ', n
-        do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.3)') elem_prev_soln(j)          
-        end do
-    
-    !---Solve for next time step solution
+        !---Solve for next time step solution
         do i = 1, nodes_per_elem
             cur_elem_soln_vec(n,i) = dt*elem_prev_soln(i) + previous_elem_soln_vec(n,i) 
         end do

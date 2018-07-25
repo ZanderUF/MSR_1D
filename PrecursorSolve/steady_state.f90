@@ -42,7 +42,7 @@ implicit none
         steady_state_flag = .TRUE.
         nonlinear_ss_flag = .TRUE.
         !---Sets the max number of nonlinear iterations    
-        max_nl_iter = 2 
+        max_nl_iter = 100 
          
         allocate( power_initial(num_elem,nodes_per_elem) )
         !---Initial guesses 
@@ -56,16 +56,19 @@ implicit none
         do i = 1,num_elem
             do j = 1, nodes_per_elem
                 !---Apply to active fuel region
-                if( i <= non_fuel_start) then
-                    cosine_term = cos( (pi/2)*(global_coord(i,j) - real(global_coord(non_fuel_start,j))/2.0) )
-                    power_initial(i,j) = (center_power_initial*cosine_term)
+                !if( i <= non_fuel_start) then
+                 if( i == 2 ) then
+                 cosine_term = cos( (pi/2)*(global_coord(i,j) - real(global_coord(non_fuel_start,j))/2.0) )
+                    !power_initial(i,j) = (center_power_initial*cosine_term)
+                    power_initial(i,j) = 1 
                     !---Set temperature distribution
                     temperature_vec(i,j) = (center_temp_initial*cosine_term)
                     !---Get density to set the velocity
                     call density_corr(800,density)
                     density_vec(i,j) = density
                     !---Need to get initial velocity distribution
-                    velocity_vec(i,j) = mass_flow/(area*density)
+                    !velocity_vec(i,j) = mass_flow/(area*density)
+                    velocity_vec(i,j) = 100 
                 !---Inactive region assumed to have zero power 
                 else
                     !---Temperature in inactive region same as end of active region ==> no loss
@@ -74,7 +77,8 @@ implicit none
                     call density_corr(temperature_vec(i,j),density)
                     density_vec = density
                     !---Need to get initial velocity distribution
-                    velocity_vec(i,j) = mass_flow/(area*density)
+                    !velocity_vec(i,j) = mass_flow/(area*density)
+                     velocity_vec(i,j) = 100 
                     power_initial(i,j) = 0.0
                 end if
            end do 
@@ -84,40 +88,50 @@ implicit none
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a)'), 'Initial Power distribution '
         write(outfile_unit,fmt='(a)'), 'Position(x) Power [W]'
-        !do j = 1, matrix_length
-        !    write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(j), power_initial(j)
-        !end do
+        do i = 1,num_elem
+            do j = 1, nodes_per_elem
+                write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), power_initial(i,j)
+            end do
+        end do
         
         !-------------------------------------------------------------------------------
         !---Write out initial solution
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a)'), 'Initial temperature distribution '
         write(outfile_unit,fmt='(a)'), 'Position(x) Temperature [K]'
-        !do j = 1, matrix_length
-        !    write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(j), temperature_vec(j)
-        !end do
+        do i = 1, num_elem 
+            do j = 1, nodes_per_elem
+                write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), temperature_vec(i,j)
+            end do
+        end do
         !---Write out initial solution
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a)'), 'Initial velocity distribution '
         write(outfile_unit,fmt='(a)'), 'Position(x) Velocity [m/s]'
-        !do j = 1, matrix_length
-        !    write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(j), velocity_vec(j)
-        !end do
+        do i = 1, num_elem 
+            do j = 1, nodes_per_elem
+                write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), velocity_vec(i,j)
+            end do 
+        end do
         !---Write out initial solution
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a)'), 'Initial density distribition '
         write(outfile_unit,fmt='(a)'), 'Position(x) Velocity [kg/m^3]'
-        !do j = 1, matrix_length
-        !    write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(j), velocity_vec(j)
-        !end do
+        do i = 1, num_elem 
+            do j = 1, nodes_per_elem
+                write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), velocity_vec(i,j)
+            end do
+        end do
         !-------------------------------------------------------------------------------
         !---Write out initial solution
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a)'), 'Initial condition '
         write(outfile_unit,fmt='(a)'), 'Position(x) Precursor Concentration'
-        !do j = 1, matrix_length
-        !    write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(j), cur_elem_soln_vec(j)
-        !end do
+        do i = 1, num_elem 
+            do j = 1, nodes_per_elem
+                write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), cur_elem_soln_vec(i,j)
+            end do
+        end do
         
         !---Steady state solver for nonlinear ss problems
         if(nonlinear_ss_flag .eqv. .TRUE.) then 
@@ -140,11 +154,14 @@ implicit none
                 !-------------------------------------------------------------------------------
                 !---Write out initial solution
                 write(outfile_unit,fmt='(a)'), ' '
-                write(outfile_unit,fmt='(a,1I2)'), 'Steady state soln at nl iter', nl_iter
+                write(outfile_unit,fmt='(a,1I4)'), 'Steady state soln at nl iter', nl_iter
                 write(outfile_unit,fmt='(a)'), 'Position(x) Precursor Concentration'
-                !do j = 1, matrix_length
-                !    write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(j), cur_elem_soln_vec(j)
-                !end do
+                do i = 1, num_elem 
+                    do j = 1, nodes_per_elem
+                        write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), cur_elem_soln_vec(i,j)
+                    end do
+                end do
+
                 nl_iter = nl_iter + 1
                 ! make previous = current solution vector
                 !previous_elem_soln_vec = cur_elem_soln_vec

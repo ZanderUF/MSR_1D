@@ -7,7 +7,7 @@
 !     	       
 !  Parameters:
 !  	      conn_matrix(max # elements, nodes per element) 
-! 	      global_coord(max # elements)
+! 	      global_coord(# elements, nodes per element)
 
 subroutine mesh_creation ( )
 !
@@ -29,11 +29,14 @@ implicit none
     end do
     
 !---setup global coordinate array 
-       
-    do i = 1, num_elem
+    global_coord(1,1) = 0
+    global_coord(1,2) = global_coord(1,1) + 0.5*elem_lengths(1)
+    global_coord(1,3) = global_coord(1,2) + 0.5*elem_lengths(1)
+
+    do i = 2, num_elem
         do j = 1, nodes_per_elem
             if ( j .eq. 1) then
-                global_coord(i,j) = elem_lengths(i)
+                global_coord(i,j) = global_coord(i-1,3) 
             else
                 global_coord(i,j) = global_coord(i,j-1) + 0.5*elem_lengths(i)
             end if
@@ -50,7 +53,7 @@ implicit none
     write(outfile_unit,fmt='(a)'),' ' 
     write(outfile_unit,fmt='(a24)'),'Global Coordinate Matrix'
     do j=1, num_elem 
-           write(outfile_unit,fmt='(a5,1I2,a,f8.3)') 'Node:',j,' x-coord -->', &
+           write(outfile_unit,fmt='(12es14.3)')  &
                 (global_coord(j,i),i=1,nodes_per_elem)              
     end do
 
