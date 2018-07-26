@@ -16,7 +16,7 @@ USE parameters_fe
 implicit none
 
     integer :: i,j,ii
-    real :: temp
+    real :: temp,elem_size
 
 !---allocate arrays
     allocate( conn_matrix(num_elem, nodes_per_elem) , global_coord(num_elem,nodes_per_elem) )  
@@ -27,7 +27,13 @@ implicit none
             conn_matrix(i,j) = j + (i-1)*nodes_per_elem
         end do 
     end do
-    
+
+!---Setup element length array. assume all elements have the same size
+    elem_size = 1.0
+    do i = 1, num_elem
+        elem_lengths(i) = elem_size 
+    end do
+
 !---setup global coordinate array 
     global_coord(1,1) = 0
     global_coord(1,2) = global_coord(1,1) + 0.5*elem_lengths(1)

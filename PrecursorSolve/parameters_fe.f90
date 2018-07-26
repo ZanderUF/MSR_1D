@@ -18,7 +18,7 @@ module parameters_fe
     real     :: gen_time
     integer  :: non_fuel_start
     real     :: mass_elem ! mass per element
-
+    real     :: total_power
 !---Mesh arrays
     integer, allocatable  :: conn_matrix(:,:)
     real , allocatable    :: global_coord(:,:)
@@ -31,10 +31,12 @@ module parameters_fe
     real , dimension(3,3) :: elem1_matrix_A_s2 ! element 1 surface 2
     real , dimension(3,3) :: elem_matrix_G
     real , dimension(3,3) :: elem_matrix_F
+    real , dimension(3,3) :: elem_matrix_H
     real , dimension(3,3) :: matrix_W_left_face
     real , dimension(3,3) :: matrix_W_right_face
     
-    real , dimension(3) :: elem_vec_q 
+    real , dimension(3)   :: elem_vec_v
+    real , dimension(3)   :: elem_vec_q 
     real , dimension(3)   :: Pu_minus_flux_vec
     real , dimension(3)   :: elem_vec_f 
     real , dimension(3)   :: elem_vec_Pu
@@ -62,7 +64,7 @@ module parameters_fe
     logical :: time_solve       ! decide if we are doing time solve or not  
     real   alpha     ! time solve 
     real   t0        ! starting time
-    real   dt        ! time step 
+    real   delta_t        ! time step 
     real   tmax      ! max time 
     real   t_initial ! starting time
 

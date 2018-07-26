@@ -9,7 +9,7 @@ USE datainput_fe_M
  
 implicit none
 
-    integer  ::  j, n, nl_iter   ! counter 
+    integer  ::  i,j, n, nl_iter   ! counter 
     real(kind=8)     :: t1  ! next time step  
     logical :: transient
 
@@ -33,7 +33,7 @@ implicit none
     mass_elem = 100.0/num_elem
 
 !---Starting element for non fuel region
-    non_fuel_start = num_elem-2 
+    non_fuel_start = num_elem-3 
 
 !---Set zero for all matrix entries 
     cur_elem_soln_vec(:,:) = 0.0
@@ -54,66 +54,63 @@ implicit none
     call steady_state
 
 !---Start time-dependent solve
-    transient = .FALSE.
-if ( transient .eqv. .TRUE.) then
+    transient = .TRUE.
+    if ( transient .eqv. .TRUE.) then
+        !---Set I.C. based on steady state solution
+        previous_elem_soln_vec = cur_elem_soln_vec 
+        write(outfile_unit, fmt='(a)'), ' ' 
+        write(outfile_unit, fmt='(a)'), 'In transient loop'
+        !---Loop over time steps until end of transient
+        do 
+            nl_iter = 1 
+            !---Nonlinear iterations until residual converges to prescribed value
+            do  
+                !---Create element matrices and assemble
+                do n = 1 , num_elem 
+                    !---Generate elemental matrices
+                    call element_matrix(n, nl_iter) 
+                    !---Assemble element matrices to solve for elemental coeficients 
+                    call assemble_matrix(n) 
+                end do ! end loop over num elements
+                
+                !---Write out solution vector
+                write(outfile_unit,fmt='(a)'), ' ' 
+                write(outfile_unit,fmt='(a,12es14.3)'),'Solution Vector at time --> ',t0
+                write(outfile_unit,fmt='(a)'),'Position(x) Nodal'
+                do i=1, num_elem
+                       do j = 1, nodes_per_elem
+                            write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') &
+                            global_coord(i,j), cur_elem_soln_vec(i,j)             
+                        end do
+                end do
+                
 
-    write(outfile_unit, fmt='(a)'), ' ' 
-    write(outfile_unit, fmt='(a)'), 'In transient loop'
-    !---Loop over time steps until end of transient
-    do 
-        nl_iter = 1 
-        !---Nonlinear iterations until residual converges to prescribed value
-        do  
-            !---Create element matrices and assemble
-            do n = 1 , num_elem 
-                !---Generate elemental matrices
-                call element_matrix(n, nl_iter) 
-                !---Assemble element matrices to solve for elemental coeficients 
-                call assemble_matrix(n) 
-            end do ! end loop over num elements
-            
-            !---Write out solution vector
-            write(outfile_unit,fmt='(a)'), ' ' 
-            write(outfile_unit,fmt='(a,12es14.3)'),'Solution Vector at time --> ',t0
-            write(outfile_unit,fmt='(a)'),'Position(x) Nodal'
-            !do j=1,matrix_length 
-            !       write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') global_coord(j), cur_elem_soln_vec(j)             
-            !end do
-            
-            previous_elem_soln_vec = cur_elem_soln_vec 
+                ! Calculate residual
+                ! call calc_residual            
 
-            !---Set boundary conditions
-            ! call boundary_cond
-
-            !---Solve the global system of equations
-            ! call solve_global_sys
-
-            ! Calculate residual
-            ! call calc_residual            
-
-            ! Check if nonlinearities have converged
-            ! if ( residual < tolerance) then
-            !    exit 
-            ! end if
-            nl_iter = nl_iter + 1 ! nonlinear iteration counter
-            !---Check if we have done too many nonlinear iterations and still not converging
-            if ( nl_iter > max_iter) then
-                exit
-            end if 
-            
-        end do ! end nonlinear loop
+                ! Check if nonlinearities have converged
+                ! if ( residual < tolerance) then
+                !    exit 
+                ! end if
+                nl_iter = nl_iter + 1 ! nonlinear iteration counter
+                !---Check if we have done too many nonlinear iterations and still not converging
+                if ( nl_iter > max_iter) then
+                    exit
+                end if 
+                
+            end do ! end nonlinear loop
  
-       !---Stop if we've exceeded TMAX.
-       if ( tmax <= t0 ) then
-           exit
-       end if
-       
-       t1 = t0 + dt
+                previous_elem_soln_vec = cur_elem_soln_vec 
+           !---Stop if we've exceeded TMAX.
+           if ( tmax <= t0 ) then
+               exit
+           end if
+           
+           t1 = t0 + delta_t
 
-       !---Shift the data to prepare for another step.
-       t0 = t1
-   
-   end do !---end time loop
+           !---Shift the data to prepare for another step.
+           t0 = t1
+       end do !---end time loop
 
 end if
 

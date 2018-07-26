@@ -49,7 +49,6 @@ implicit none
         center_temp_initial  = 800
         total_power_initial  = 10
         center_power_initial = 10
-        print *,'global_coord las',global_coord(non_fuel_start,3)
         !---Used to apply cosine shape over active domain 
         dist_num = ((non_fuel_start) + 1 )/2
         !---Apply to every node point within an element
@@ -83,6 +82,7 @@ implicit none
                 end if
            end do 
         end do
+        total_power = sum(power_initial)
         !-------------------------------------------------------------------------------
         !---Write out initial solution
         write(outfile_unit,fmt='(a)'), ' '

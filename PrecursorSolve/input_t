@@ -1,8 +1,8 @@
 heat solve sample
 read parm
   time=yes
-  del=0.001
-  tmax=0.8
+  del=0.25
+  tmax=2.0
   tin=0.0 
   nem=10
   npe=3

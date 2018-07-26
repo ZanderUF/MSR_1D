@@ -92,7 +92,7 @@ subroutine element_matrix (n, nl_iter)
 
                     !---Transient calculation
                     if ( steady_state_flag .eqv. .FALSE.) then 
-                      
+                          
                     end if !---end transient case if 
                 
                 end do !---End loop over j matrix entries
