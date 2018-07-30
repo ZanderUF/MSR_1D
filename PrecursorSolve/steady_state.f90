@@ -59,6 +59,7 @@ implicit none
                     x_curr = real(global_coord(i,j) )
                     x_last =  real(global_coord(non_fuel_start,3))
                     norm_cos = (x_curr - x_last/2)/(x_last) !+ 
+                    print * ,' norm ' , norm_cos, ' at ' , x_curr
                     cosine_term = cos( (pi/2)*norm_cos )
                     power_initial(i,j) = (center_power_initial*cosine_term)
                     !---Set temperature distribution

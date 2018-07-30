@@ -43,7 +43,7 @@ while i < len(file_names):
 max_length = len(x_coord)
 starting = x_coord[0]
 ending =   x_coord[max_length-1]
-elem_interval = 10
+elem_interval = 100
 norm_space = np.linspace(-1,1,elem_interval)
 x_interval = ending*elem_interval
 # Break the x coordinate into smaller intervals
@@ -55,6 +55,7 @@ num_elem = max_length/nodes_per_elem
 
 value = 0
 
+# array to hold quadratically interpolated solution
 soln = []
 # evaluate solution between nodal points
 for i in range(0, num_elem):
@@ -67,13 +68,16 @@ for i in range(0, num_elem):
             linear_comb = linear_comb + value*prec_conc[j + ii]
         soln.append(linear_comb)  
 
-plt.plot(x_space,soln,label='Quadratic')
+plt.plot(x_space,soln,label='Quadratic Interp')
 plt.plot(x_coord,prec_conc,'r.', label='Nodal values')
-plt.ylabel('Precursor Concentration')
-plt.xlabel('Distance')
+plt.ylabel('Power',size=14)
+plt.xlabel('Distance',size=14)
+
+## Name of saved image
+name = 'power_sample'
 
 ##------Configure the legend --- ##
-plt.legend(loc='lower right',prop={'size':14},numpoints=1)
+plt.legend(loc='lower left',prop={'size':14},numpoints=1)
 
 if re.search(r'\bpng\b',arglist[1:]):
 	f.savefig("./" + name + ".png")
