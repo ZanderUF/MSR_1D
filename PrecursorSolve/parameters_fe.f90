@@ -48,7 +48,7 @@ module parameters_fe
                          0,1,0,&
                          0,0,1/
     
-    
+    real , dimension(3)   :: elem_vec_A_times_q
     real , dimension(3)   :: A_times_W_times_upwind_elem_vec 
     real , dimension(3)   :: H_times_soln_vec
     real , dimension(3)   :: elem_vec_w_left_face
@@ -70,6 +70,7 @@ module parameters_fe
     real , dimension(3) :: global_der_shape_fcn 
     real                :: g_jacobian
 !---Solution matrices - global
+    real , allocatable :: elem_vol_int(:,:)
     real , allocatable :: precursor_soln_new(:,:)
     real , allocatable :: power_soln_new(:,:)
     real , allocatable :: temperature_soln_new(:,:)
@@ -94,11 +95,6 @@ module parameters_fe
     real   tmax      ! max time 
     real   t_initial ! starting time
 
-!---Initial conditions
-    real, allocatable :: initial_conditions(:)
-    real :: T_ic
-!---Boundary conditions
-    real :: T_bc
 !---Material properties 
     !real, dimension(:)  ( kind = 8 ) conductivity
     !real, dimension(:)  ( kind = 8 ) spec_heat

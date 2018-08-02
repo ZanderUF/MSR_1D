@@ -58,6 +58,7 @@ subroutine element_matrix (n, nl_iter)
     density = 0.0 
     C_p = 0.0
 
+    elem_vol_int(n,:) = 0 
 !---Integrate over Gauss Pts - assembling only A matrix and source vector 'f'
     do g = 1 , num_gaus_pts 
     !---Calculate shape functions at gauss pt
@@ -74,16 +75,18 @@ subroutine element_matrix (n, nl_iter)
             evaluated_velocity = evaluated_velocity + &
                                  shape_fcn(i)*velocity_soln_prev(n,i)
             evaluated_amplitude = evaluated_amplitude + &
-                                  shape_fcn(i)*amplitude_fcn(n,i)
+                                 shape_fcn(i)*amplitude_fcn(n,i)*total_power_prev
         end do
     
         !---Normal calculation flow
         if(unit_test .eqv. .FALSE.) then
             
             do i=1, nodes_per_elem
+                elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
                 !---Assemble q vector
-                elem_vec_q(i) = elem_vec_q(i) + &
-                                cnst*shape_fcn(i)*evaluated_amplitude*total_power_prev 
+                !elem_vec_q(i) = elem_vec_q(i) + &
+                !                cnst*shape_fcn(i)*evaluated_amplitude!*total_power_prev 
+                !elem_vol_int(n,i) = elem_vol_int(n,i) +elem_vec_q(i)
                 do j = 1, nodes_per_elem
                     
                     !---Assemble A matrix - only needs to be done once
@@ -119,6 +122,9 @@ subroutine element_matrix (n, nl_iter)
 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
+        
+            elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*amplitude_fcn(n,j)*total_power_prev
+           
         !---Applies for all elements except the first one
             if(n > 1) then !--- n - element #
                 !---Grab previous precursor conc. + velocity at 
@@ -160,12 +166,31 @@ subroutine element_matrix (n, nl_iter)
                write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_A(j,i),i=1,nodes_per_elem)             
         end do
+        write(outfile_unit,fmt='(a)'),' '
+        write(outfile_unit,fmt='(a,1I2)'),'[A^-1] element Matrix  | element --> ',n
+        do j=1,nodes_per_elem 
+               write(outfile_unit,fmt='(12es14.3)') &
+                    (inverse_A_matrix(j,i),i=1,nodes_per_elem)             
+        end do
+        write(outfile_unit,fmt='(a)'),' '
         write(outfile_unit,fmt='(a,1I2)'),'[U] element Matrix gaussian integration | element --> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_U(j,i),i=1,nodes_per_elem)             
         end do
+        write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a,1I2)'),'[W] right Matrix | element --> ',n
+        do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)') &
+                   (matrix_W_right_face(j,i),i=1,nodes_per_elem)             
+        end do
         
+        write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a,1I2)'),'[W] left Matrix | element --> ',n
+        do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)') &
+                   (matrix_W_left_face(j,i),i=1,nodes_per_elem)             
+        end do       
    end if !---End matrix write out
 !------------------------------------------------------------------------------
 

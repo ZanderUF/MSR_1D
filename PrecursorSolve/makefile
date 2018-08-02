@@ -35,7 +35,8 @@ main_driver : common_unit.o error_functions.o \
 	vast_kind_param.o y0trns_M.o free_form.o \
 	parameters_fe.o rdmesh_M.o \
 	rdparm_fe_M.o \
-	assemble_matrix.o boundary_cond.o cond_corr.o  \
+	assemble_matrix.o assemble_matrix_transient.o \
+    boundary_cond.o cond_corr.o  \
 	datainput_fe_M.o \
 	density_corr.o   \
 	element_matrix.o \
@@ -77,6 +78,9 @@ rdparm_fe_M.o : rdparm_fe_M.f90 free_form.o parameters_fe.o
 
 assemble_matrix.o: assemble_matrix.f90 parameters_fe.o
 	$(F90) $(FFLAGS) -c assemble_matrix.f90 
+
+assemble_matrix_transient.o: assemble_matrix_transient.f90 parameters_fe.o
+	$(F90) $(FFLAGS) -c assemble_matrix_transient.f90 
 
 boundary_cond.o: boundary_cond.f90 parameters_fe.o
 	$(F90) $(FFLAGS) -c boundary_cond.f90   

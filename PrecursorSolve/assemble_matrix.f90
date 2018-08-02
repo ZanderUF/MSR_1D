@@ -43,83 +43,33 @@ subroutine assemble_matrix (n)
     
     elem_vec_Pu = 0
 
-    if(steady_state_flag .eqv. .TRUE.) then
-        do i = 1, nodes_per_elem
-            !---Calculate q vector
-            elem_vec_q(i) = (beta/gen_time)*elem_vec_q(i)
-            do j = 1, nodes_per_elem
-                if (n > 1) then
-                    elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
+    do i = 1, nodes_per_elem
+        !---Calculate q vector
+        !elem_vec_q(i) = (beta/gen_time)*elem_vec_q(i)
+        do j = 1, nodes_per_elem
+            if (n > 1) then
+                elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
                                           matrix_W_left_face(i,j)*precursor_soln_new(n-1,3)
-                else
-                    elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
+            else
+                elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
                                           matrix_W_left_face(i,j)*precursor_soln_new(num_elem,3)
-                end if
-                
-                elem_matrix_G(i,j) = -elem_matrix_U(i,j) + (log(2.0)/lambda)*elem_matrix_A(i,j) + &
-                                     matrix_W_right_face(i,j)
-            end do
+            end if
+            
+            elem_matrix_G(i,j) = -elem_matrix_U(i,j) + &
+                                 (lambda)*elem_matrix_A(i,j) + &
+                                 matrix_W_right_face(i,j)
         end do
-        
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I2)'),'G Matrix | element --> ',n
-        do i=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (elem_matrix_G(i,j),j=1,nodes_per_elem)             
-        end do
+    end do
     
-    else !---TRANSIENT
-        !---Calculate H matrix, will be inverted later on
-        elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
-                        lambda*identity_matrix - &
-                        matmul(inverse_A_matrix,matrix_W_right_face)
-        elem_matrix_A_times_W = matmul(inverse_A_matrix,matrix_W_left_face)
-   !---Multiply H matrix by previous soln vec
-        do i = 1, nodes_per_elem
-            !---Calculate q vector
-            elem_vec_q(i) = (beta/gen_time)*elem_vec_q(i)
-            do j = 1, nodes_per_elem
-                H_times_soln_vec(i) = H_times_soln_vec(i) + &
-                                      elem_matrix_H(i,j)*precursor_soln_prev(n,j) 
-                if ( n > 1) then
-                    A_times_W_times_upwind_elem_vec(i) = A_times_W_times_upwind_elem_vec(i) + &
-                                    elem_matrix_A_times_W(i,j)*precursor_soln_prev(n-1,j)
-                    !elem_vec_w_left_face(i) =  elem_vec_w_left_face(i) + &
-                    !                           matrix_W_left_face(i,j)*precursor_soln_new(n-1,3)
-                else
-                    A_times_W_times_upwind_elem_vec(i) = A_times_W_times_upwind_elem_vec(i) + &
-                                    elem_matrix_A_times_W(i,j)*precursor_soln_prev(num_elem,j)
-                    !elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
-                    !                           matrix_W_left_face(i,j)*precursor_soln_new(num_elem,3)
-                end if
-            end do 
-        end do
-        
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I2)'),'H Matrix | element --> ',n
-        do i=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (elem_matrix_H(i,j),j=1,nodes_per_elem)             
-        end do
-   end if
+    write(outfile_unit,fmt='(a)'), ' '
+    write(outfile_unit,fmt='(a,1I2)'),'G Matrix | element --> ',n
+    do i=1,nodes_per_elem 
+          write(outfile_unit,fmt='(12es14.3)') &
+               (elem_matrix_G(i,j),j=1,nodes_per_elem)             
+    end do
 
 !****************************************************************
 !---Write out    
-
-    write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit,fmt='(a,1I2)'),'W right Matrix | element --> ',n
-    do j=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)') &
-               (matrix_W_right_face(j,i),i=1,nodes_per_elem)             
-    end do
-    
-    write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit,fmt='(a,1I2)'),'W left Matrix | element --> ',n
-    do j=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)') &
-               (matrix_W_left_face(j,i),i=1,nodes_per_elem)             
-    end do
-    
     write(outfile_unit,fmt='(a)'), ' ' 
     write(outfile_unit,fmt='(a,1I3)'),'left face vector | element --> ', n
     do j=1,nodes_per_elem 

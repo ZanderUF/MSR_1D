@@ -19,7 +19,7 @@ implicit none
              norm_sin,norm_cos, pi, cosine_term, x_last, x_curr,&
              temperature
     parameter (pi = 3.1415926535897932)
-
+    real, dimension(num_elem) :: temp_vec_prec, temp_vec_num_elem
 !---------------------------------------------------------------
 !---Simplified UNIT TEST 
     if(unit_test .eqv. .TRUE.) then
@@ -33,8 +33,6 @@ implicit none
             end do
         end do
     end if
-
-    cos_tot = 0.0
 !---------------------------------------------------------------
 
 !---Normal calculation flow - no need if doing unit test
@@ -42,19 +40,10 @@ implicit none
         precursor_soln_new(:,:) = 0 
         power_soln_new(:,:) = 0 
         !---Starting off total power
+        
+        total_power_initial = total_power_initial/global_coord(num_elem,3)
+        print *,'total pow',total_power_initial
         total_power_prev = total_power_initial
-        !--Calculate total power making sure not to double count boundary values, which are =
-        do i = 1, non_fuel_start 
-            do j = 1, nodes_per_elem - 1
-                x_curr = real(global_coord(i,j) )
-                x_last =  real(global_coord(non_fuel_start,3))
-                norm_cos = ( (x_curr) - (x_last*0.5) )/ (0.5*x_last)
-                cosine_term = cos( (pi/2)*norm_cos )
-                cos_tot = cos_tot + cosine_term
-            end do
-        end do
-        center_power_initial = total_power_initial/cos_tot
-        cos_tot = 0.0
         
         nl_iter = 1 
         steady_state_flag = .TRUE.
@@ -69,6 +58,11 @@ implicit none
                 if( i <= non_fuel_start ) then
                     call get_norm_coord(i,j,norm_cos) 
                     cosine_term = cos( (pi/2)*norm_cos )
+                    !if (cosine_term < 1E-10) then
+                    !    cosine_term = 0 
+                    !else
+                        cosine_term = cosine_term 
+                    !end if
                     !amplitude_fcn(i,j) = cosine_term
                     !if( i == 1) then
                     !    amplitude_fcn(i,j)  = 0
@@ -77,9 +71,10 @@ implicit none
                     !    amplitude_fcn(i,j)  = 1.0 
                     !    power_soln_new(i,j) = 1.0
                     !end if
-                    amplitude_fcn(i,j) = cosine_term 
-                    cos_tot = cos_tot + cosine_term
-                    power_soln_new(i,j) = (center_power_initial*cosine_term)
+                    !amplitude_fcn(i,j) = cosine_term 
+                    amplitude_fcn(i,j) = 1.0
+                    !power_soln_new(i,j) = (total_power_initial*cosine_term)
+                    power_soln_new(i,j) =  1.0 
                     !---Set temperature distribution
                     temperature_soln_new(i,j) = (center_temp_initial*cosine_term)
                     temperature = temperature_soln_new(i,j)
@@ -87,29 +82,32 @@ implicit none
                     call density_corr(temperature,density)
                     density_soln_new(i,j) = density
                     !---Need to get initial velocity distribution
-                    velocity_soln_new(i,j) = mass_flow/(area*density)
-                    !velocity_soln_new(i,j) = 100
+                    !velocity_soln_new(i,j) = mass_flow/(area*density)
+                    velocity_soln_new(i,j) = 150.0
+                    !velocity_soln_new(i,j) = 0
                 !---Inactive region assumed to have zero power 
                 else
+                    print *,'OUT OF ACTIVE'
                     !---Temperature in inactive region same as end of active region ==> no loss
                     temperature_soln_new(i,j) = temperature_soln_new(non_fuel_start ,3)
                     !---Get density to set the velocity
                     call density_corr(temperature_soln_new(i,j),density)
                     density_soln_new = density
                     !---Need to get initial velocity distribution
-                    velocity_soln_new(i,j) = mass_flow/(area*density)
-                    !velocity_soln_new(i,j) = 100
+                    !velocity_soln_new(i,j) = mass_flow/(area*density)
+                    !velocity_soln_new(i,j) = 0
                     power_soln_new(i,j) = 0.0
                     amplitude_fcn(i,j) = 0.0
+                    velocity_soln_new(i,j) = 150.0
                 end if
             end do 
         end do
-        
         do i = 1,num_elem 
             do j = 1,nodes_per_elem
                 velocity_soln_prev(i,j) = velocity_soln_new(i,j) 
             end do
         end do 
+        
         !-------------------------------------------------------------------------------
         !---Write out initial solution
         write(outfile_unit,fmt='(a)'), ' '
@@ -188,8 +186,6 @@ implicit none
                 end do
                 
                 nl_iter = nl_iter + 1
-                ! make previous = current solution vector
-                !previous_elem_soln_vec = cur_elem_soln_vec
     
                 ! If we've gone thru too many nonlinear iterations exit
                 if (nl_iter > max_nl_iter) then
@@ -206,16 +202,33 @@ implicit none
             precursor_soln_prev(i,j) = precursor_soln_new(i,j)
         end do
     end do
+    temp_vec_num_elem = 0 
+    temp_vec_prec = 0
+    !---Calc total precursor power over domain
+    do i = 1, num_elem
+        do j = 1, nodes_per_elem
+           temp_vec_num_elem(i) = temp_vec_num_elem(i) + elem_vol_int(i,j)*power_soln_new(i,j) 
+           temp_vec_prec(i)    = temp_vec_prec(i) + elem_vol_int(i,j)*precursor_soln_prev(i,j)
+        end do
+    end do
+    
+    print *,' sum P over domain', sum(temp_vec_num_elem)
+    print *,'sum prec over domain',lambda*sum(temp_vec_prec)
 
     !---write out converged solution for plotting
     write(soln_outfile_unit,fmt='(a)'), 'Position(x) | Precursor Concentration'
     do i = 1, num_elem 
         do j = 1, nodes_per_elem
-            write(soln_outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), precursor_soln_new(i,j)
+            write(soln_outfile_unit, fmt='(f10.3, 12es14.3)')  global_coord(i,j), precursor_soln_prev(i,j)
         end do
     end do
 !---Set steady state flag off
     steady_state_flag = .FALSE.
+    
+    write(outfile_unit, '(a)'), ' '
+    write(outfile_unit, '(a)'), ' *******************************'
+    write(outfile_unit, '(a)'), 'End of Steady state solve'
+    write(outfile_unit, '(a)'), ' *******************************'
 
 end
 

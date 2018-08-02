@@ -17,7 +17,8 @@ implicit none
 !---Open file for writing out debug information
     open (unit=outfile_unit, file="outfile.txt",status='unknown',form='formatted',position='asis')
 !---Open file for writing out solution
-    open (unit=soln_outfile_unit, file='solution_file.txt',status='unknown',form='formatted',position='asis')
+    open (unit=soln_outfile_unit, file='ss_solution_file.txt',status='unknown',form='formatted',position='asis')
+    open (unit=66, file='last_t_solution_file.txt',status='unknown',form='formatted',position='asis')
 !---Read in problem parameters here
     call datainput_fe
 !---Max dimension of the matrices to be computed, including solution vector
@@ -34,9 +35,11 @@ implicit none
              density_soln_prev( num_elem,nodes_per_elem),  &
              velocity_soln_prev( num_elem,nodes_per_elem), &
              amplitude_fcn( num_elem, nodes_per_elem) )
+    allocate(elem_vol_int(num_elem,nodes_per_elem))
 
+    elem_vol_int(:,:) = 0
 !---Reactor properties
-    lambda = 0.5 
+    lambda = 1 
     beta = 2.5E-3
     gen_time = 1E-6
     mass_elem = 100.0/num_elem

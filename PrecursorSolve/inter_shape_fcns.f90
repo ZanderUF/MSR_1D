@@ -29,7 +29,7 @@ subroutine inter_shape_fcns (xi, h)
     	der_shape_fcn(1) = xi - 0.5 
     	der_shape_fcn(2) = -2.0*xi
     	der_shape_fcn(3) = xi + 0.5
-        
+       
         g_jacobian = h*0.5 
         !! Compute jacobian
     	!do i = 1, nodes_per_elem

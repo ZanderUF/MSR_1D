@@ -30,7 +30,7 @@ implicit none
     end do
 
 !---Setup element length array. assume all elements have the same size
-    elem_size = 2.0
+    !elem_size = 2.0
     do i = 1, num_elem
         elem_lengths(i) = elem_size 
     end do
