@@ -18,29 +18,45 @@ module parameters_fe
     real     :: gen_time
     integer  :: non_fuel_start
     real     :: mass_elem ! mass per element
-    real     :: total_power
+    real     :: total_power_prev
+    integer  :: num_elem_external
+    real     :: total_power_initial
+    real     :: elem_size
+    real     :: center_power_initial
+    real     :: cos_tot
 !---Mesh arrays
     integer, allocatable  :: conn_matrix(:,:)
     real , allocatable    :: global_coord(:,:)
+
 !---Elemental matrices
+    real , dimension(3,3) :: elem_matrix_A_times_W
+    real , dimension(3,3) :: identity_matrix
+    real , dimension(3,3) :: inverse_A_matrix
     real , dimension(3,3) :: analytic_elem_matrix_P_ss
     real , dimension(3,3) :: analytic_elem_matrix_A
     real , dimension(3,3) :: elem_matrix_U
     real , dimension(3,3) :: elem_matrix_A
-    real , dimension(3,3) :: last_elem_matrix_A_s1 ! element 2 surface 1
-    real , dimension(3,3) :: elem1_matrix_A_s2 ! element 1 surface 2
     real , dimension(3,3) :: elem_matrix_G
     real , dimension(3,3) :: elem_matrix_F
     real , dimension(3,3) :: elem_matrix_H
     real , dimension(3,3) :: matrix_W_left_face
     real , dimension(3,3) :: matrix_W_right_face
+    real , dimension(3)   :: interp_fcn_rhs, interp_fcn_lhs
+    data interp_fcn_lhs / 1,0,0/
+    data interp_fcn_rhs / 0,0,1/
+    data identity_matrix /1,0,0,&
+                         0,1,0,&
+                         0,0,1/
     
+    
+    real , dimension(3)   :: A_times_W_times_upwind_elem_vec 
+    real , dimension(3)   :: H_times_soln_vec
+    real , dimension(3)   :: elem_vec_w_left_face
     real , dimension(3)   :: elem_vec_v
     real , dimension(3)   :: elem_vec_q 
     real , dimension(3)   :: Pu_minus_flux_vec
     real , dimension(3)   :: elem_vec_f 
     real , dimension(3)   :: elem_vec_Pu
-    real , allocatable    :: power_initial(:,:)
     real , dimension(3)   :: elem1_vec_M_s1 
     real , dimension(3)   :: last_elem_vec_M_s2
     real , dimension(3)   :: elem1_vec_f
@@ -53,13 +69,23 @@ module parameters_fe
     real , dimension(3) :: der_shape_fcn
     real , dimension(3) :: global_der_shape_fcn 
     real                :: g_jacobian
-!---Global matrices
-    real  , allocatable :: temperature_vec(:,:)
-    real  , allocatable :: density_vec(:,:)
-    real  , allocatable :: velocity_vec(:,:) 
-    real  , allocatable :: inverse_matrix_U(:,:)
-    real  , allocatable :: cur_elem_soln_vec(:,:)     ! current solution vector
-    real  , allocatable :: previous_elem_soln_vec(:,:)   ! previous solution vector
+!---Solution matrices - global
+    real , allocatable :: precursor_soln_new(:,:)
+    real , allocatable :: power_soln_new(:,:)
+    real , allocatable :: temperature_soln_new(:,:)
+    real , allocatable :: density_soln_new(:,:)
+    real , allocatable :: velocity_soln_new(:,:)
+
+    real , allocatable :: precursor_soln_prev(:,:)
+    real , allocatable :: power_soln_prev(:,:)
+    real , allocatable :: temperature_soln_prev(:,:)
+    real , allocatable :: density_soln_prev(:,:)
+    real , allocatable :: velocity_soln_prev(:,:) 
+    real , allocatable :: amplitude_fcn(:,:)
+    
+    real , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
+    real , allocatable :: previous_elem_soln_vec(:,:)  ! previous solution vector
+
 !---Time information 
     logical :: time_solve       ! decide if we are doing time solve or not  
     real   alpha     ! time solve 
@@ -84,6 +110,7 @@ module parameters_fe
     integer :: soln_outfile_unit = 99
 !---Nonlinear variables
     integer :: max_iter = 1        ! max num of nonlinear iterations to do
+    integer :: max_nl_iter  ! numer of nonllinear iterations to do
     real :: residual
     real :: tolerance = 0.001 ! prescribed tolerance
     
@@ -95,5 +122,5 @@ module parameters_fe
     logical :: nonlinear_ss_flag 
     logical :: lagrange = .FALSE.
     logical :: hermite = .TRUE.
-
+    logical :: transient
 end module parameters_fe 

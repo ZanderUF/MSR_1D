@@ -46,6 +46,18 @@
               num_elem = iread(i0, iret)
           case ('npe=')
               nodes_per_elem = iread(i0, iret)         
+          case('pipe')
+              num_elem_external = iread(i0,iret)
+          case('area')
+              area = fread(i0,iret)
+          case('mflo')
+              mass_flow=fread(i0,iret)
+          case('tpow')
+              total_power_initial=fread(i0,iret)
+          case('nitr')
+              max_nl_iter = iread(i0,iret)
+          case('elem')
+              elem_size = fread(i0,iret)
           end select
       
       end do

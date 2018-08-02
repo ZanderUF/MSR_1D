@@ -16,11 +16,12 @@ USE parameters_fe
 implicit none
 
     integer :: i,j,ii
-    real :: temp,elem_size
+    real :: temp
 
 !---allocate arrays
-    allocate( conn_matrix(num_elem, nodes_per_elem) , global_coord(num_elem,nodes_per_elem) )  
-    
+    allocate( conn_matrix(num_elem, nodes_per_elem) , &
+              global_coord(num_elem,nodes_per_elem) )  
+
 !---setup connectivity matrix
     do i=1, num_elem
         do j=1,nodes_per_elem
@@ -29,12 +30,12 @@ implicit none
     end do
 
 !---Setup element length array. assume all elements have the same size
-    elem_size = 1.0
+    elem_size = 2.0
     do i = 1, num_elem
         elem_lengths(i) = elem_size 
     end do
 
-!---setup global coordinate array 
+!---Setup global coordinate array 
     global_coord(1,1) = 0
     global_coord(1,2) = global_coord(1,1) + 0.5*elem_lengths(1)
     global_coord(1,3) = global_coord(1,2) + 0.5*elem_lengths(1)

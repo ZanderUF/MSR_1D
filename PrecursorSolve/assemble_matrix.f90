@@ -18,14 +18,12 @@ subroutine assemble_matrix (n)
     integer :: n
 !---Local variables
     integer :: i, j, ii, jj, nr,nc, ncl,length   
-    real, dimension(3) :: elem_vec_w_left_face, elem_prev_soln, flux_rhs, flux_lhs, &
-                          temp_vec, basis_at_lhs, basis_at_rhs, rhs_final_vec, & 
-                          interp_fcn_rhs, interp_fcn_lhs
+    real, dimension(3) ::  elem_prev_soln, flux_rhs, flux_lhs, &
+                          temp_vec, basis_at_lhs, basis_at_rhs, rhs_final_vec
+                          
     real, dimension(3,3) :: inverse_matrix,temp_matrix
     real :: temp_soln
-    data interp_fcn_lhs / 1,0,0/
-    data interp_fcn_rhs / 0,0,1/
-
+    
 !---Inversion routine parameters
     integer :: lda, info, lwork
     integer, dimension(3) :: ipiv
@@ -38,121 +36,75 @@ subroutine assemble_matrix (n)
     lda =   length
     lwork = length
 
-    elem_vec_v = 0
     elem_matrix_H = 0
-    elem_prev_soln = 0
     elem_matrix_G = 0
     elem_vec_w_left_face = 0
-    matrix_W_right_face = 0
-    matrix_W_left_face = 0
-    elem_vec_q = 0
     rhs_final_vec = 0
     
     elem_vec_Pu = 0
-    temp_vec = 0
-    temp_matrix = 0
 
-         
-    !---Applies for all elements except the first one
-    if(n > 1) then !--- n - element #
-        !---Grab previous precursor conc. + velocity at rhs of previous element
+    if(steady_state_flag .eqv. .TRUE.) then
         do i = 1, nodes_per_elem
-           do j = 1, nodes_per_elem
-               matrix_W_right_face(i,j) = velocity_vec(n,i)*&
-                                          interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-               matrix_W_left_face(i,j) = velocity_vec(n,i)*&
-                                         interp_fcn_lhs(i)*interp_fcn_lhs(j)
-               elem_vec_w_left_face(i) =  elem_vec_w_left_face(i) + &
-                           matrix_W_left_face(i,j)*cur_elem_soln_vec(n-1,3)
-           end do
-        end do
-    else!---First element case, need to connect with end element 
-        do i = 1, nodes_per_elem
-           do j = 1, nodes_per_elem
-               matrix_W_right_face(i,j) = velocity_vec(num_elem,i)*&
-                                          interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-               matrix_W_left_face(i,j) =  velocity_vec(num_elem,i)*&
-                                          interp_fcn_lhs(i)*interp_fcn_lhs(j)
-               elem_vec_w_left_face(i) =  elem_vec_w_left_face(i) + &
-                           matrix_W_left_face(i,j)*cur_elem_soln_vec(num_elem,3)
-           end do
-        end do
-    end if!---End flux calculation
-
-    !---Calculate source vector
-    
-    if(t0 > 1.0) then
-        if( n > non_fuel_start) then 
-            do i = 1, nodes_per_elem
-                do j = 1, nodes_per_elem
-                    elem_vec_q(i) = elem_vec_q(i) - elem_matrix_A(i,j)*total_power
-                end do 
-                elem_vec_q(i) = elem_vec_q(i)*(beta/gen_time)
+            !---Calculate q vector
+            elem_vec_q(i) = (beta/gen_time)*elem_vec_q(i)
+            do j = 1, nodes_per_elem
+                if (n > 1) then
+                    elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
+                                          matrix_W_left_face(i,j)*precursor_soln_new(n-1,3)
+                else
+                    elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
+                                          matrix_W_left_face(i,j)*precursor_soln_new(num_elem,3)
+                end if
+                
+                elem_matrix_G(i,j) = -elem_matrix_U(i,j) + (log(2.0)/lambda)*elem_matrix_A(i,j) + &
+                                     matrix_W_right_face(i,j)
             end do
-        end if
-    else
-        do i = 1, nodes_per_elem
-           do j = 1, nodes_per_elem
-               elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*power_initial(n,i)    
-           end do 
-           elem_vec_q(i) = elem_vec_q(i)*(beta/gen_time)
         end do
-    end if
-    
-    if( steady_state_flag .eqv. .TRUE.) then
-       !---Calculate G matrix, will be inverted later on
-       do i = 1, nodes_per_elem
-           do j = 1, nodes_per_elem
-               elem_matrix_G(i,j) = (-elem_matrix_U(i,j)) + &
-                                    (log(2.0)/lambda)*elem_matrix_A(i,j) + &
-                                    matrix_W_right_face(i,j)
-           end do 
-       end do 
-    else
-       !---Calculate H matrix, will be inverted later on
-       do i = 1, nodes_per_elem
-           do j = 1, nodes_per_elem
-               elem_matrix_H(i,j) = ( elem_matrix_A(i,j) - delta_t*elem_matrix_U(i,j)) + &
-                                    delta_t*(log(2.0)/lambda)*elem_matrix_A(i,j) + &
-                                    delta_t*matrix_W_right_face(i,j)
-           end do 
-       end do
-    end if 
-    !---Calculate previous solution vector change
-    do i = 1, nodes_per_elem
-       do j = 1, nodes_per_elem
-           elem_vec_v(i) = elem_vec_v(i) +&
-               elem_matrix_A(i,j)*previous_elem_soln_vec(n,j)
-       end do
-    end do 
-
-    !---RHS vector
-    if(steady_state_flag .eqv. .TRUE.) then
-       do i = 1, nodes_per_elem
-          rhs_final_vec(i) = elem_vec_q(i) + elem_vec_w_left_face(i)
-       end do
-    else
-        do i = 1, nodes_per_elem
-            rhs_final_vec(i) = delta_t*elem_vec_q(i) + delta_t*elem_vec_w_left_face(i) + elem_vec_v(i)
-        end do
-    end if
-
-!****************************************************************
-    if(steady_state_flag .eqv. .TRUE.) then
+        
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a,1I2)'),'G Matrix | element --> ',n
         do i=1,nodes_per_elem 
               write(outfile_unit,fmt='(12es14.3)') &
                    (elem_matrix_G(i,j),j=1,nodes_per_elem)             
         end do
-    else
+    
+    else !---TRANSIENT
+        !---Calculate H matrix, will be inverted later on
+        elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
+                        lambda*identity_matrix - &
+                        matmul(inverse_A_matrix,matrix_W_right_face)
+        elem_matrix_A_times_W = matmul(inverse_A_matrix,matrix_W_left_face)
+   !---Multiply H matrix by previous soln vec
+        do i = 1, nodes_per_elem
+            !---Calculate q vector
+            elem_vec_q(i) = (beta/gen_time)*elem_vec_q(i)
+            do j = 1, nodes_per_elem
+                H_times_soln_vec(i) = H_times_soln_vec(i) + &
+                                      elem_matrix_H(i,j)*precursor_soln_prev(n,j) 
+                if ( n > 1) then
+                    A_times_W_times_upwind_elem_vec(i) = A_times_W_times_upwind_elem_vec(i) + &
+                                    elem_matrix_A_times_W(i,j)*precursor_soln_prev(n-1,j)
+                    !elem_vec_w_left_face(i) =  elem_vec_w_left_face(i) + &
+                    !                           matrix_W_left_face(i,j)*precursor_soln_new(n-1,3)
+                else
+                    A_times_W_times_upwind_elem_vec(i) = A_times_W_times_upwind_elem_vec(i) + &
+                                    elem_matrix_A_times_W(i,j)*precursor_soln_prev(num_elem,j)
+                    !elem_vec_w_left_face(i) = elem_vec_w_left_face(i) + &
+                    !                           matrix_W_left_face(i,j)*precursor_soln_new(num_elem,3)
+                end if
+            end do 
+        end do
+        
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a,1I2)'),'H Matrix | element --> ',n
         do i=1,nodes_per_elem 
               write(outfile_unit,fmt='(12es14.3)') &
                    (elem_matrix_H(i,j),j=1,nodes_per_elem)             
         end do
-    end if
+   end if
+
+!****************************************************************
+!---Write out    
 
     write(outfile_unit,fmt='(a)'), ' '
     write(outfile_unit,fmt='(a,1I2)'),'W right Matrix | element --> ',n
@@ -177,130 +129,5 @@ subroutine assemble_matrix (n)
     write(outfile_unit,fmt='(a)'),' '
     write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
     write(outfile_unit,fmt='(12es14.3)') (elem_vec_q(i),i=1,nodes_per_elem)             
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),'RHS final vector | element --> ', n
-    do j=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)') rhs_final_vec(j)             
-    end do
-
-!---UNIT TEST
-   ! if(unit_test .eqv. .TRUE.) then
-   ! !---Grab current solution at rhs of current element 
-   !     ii = 1 + (n-1)*nodes_per_elem
-   !     temp_soln = previous_elem_soln_vec(ii+2)
-   !     do i = 1, nodes_per_elem
-   !         flux_rhs(i) = temp_soln*basis_at_rhs(i)
-   !     end do
-   ! !---All elements except the first
-   !     if(n > 1) then
-   !         !---Grab previous solution at rhs of previous element
-   !         temp_soln = previous_elem_soln_vec(ii-1)
-   !         do i = 1, nodes_per_elem
-   !             flux_lhs(i) = temp_soln*basis_at_lhs(i)
-   !         end do
-   !     else!---For periodic B.C. need to connect first to the last element
-   !         temp_soln = previous_elem_soln_vec(matrix_length)
-   !         do i = 1, nodes_per_elem
-   !             flux_lhs(i) = temp_soln*basis_at_lhs(i)
-   !         end do
-   !     end if
-   ! !---Solve for elemental coeficients, no global assembly 
-   !     do i = 1, nodes_per_elem
-   !         do j = 1, nodes_per_elem
-   !             ii = j + (n-1)*nodes_per_elem
-   !             elem_vec_Pu(i) = elem_vec_Pu(i) + &
-   !                              elem_matrix_U(i,j)*previous_elem_soln_vec(ii)
-   !         end do
-   !     end do
-   ! !---Combine (Pu - f)
-   !     rhs_final_vec = elem_vec_Pu - (flux_rhs - flux_lhs)
-   !     inverse_matrix = elem_matrix_A
-   ! end if 
-   ! !---End UNIT TEST if for calc of upwind flux
-   
-   if(steady_state_flag .eqv. .TRUE.) then
-       do i = 1, nodes_per_elem
-           do j = 1, nodes_per_elem
-               inverse_matrix(i,j) = elem_matrix_G(i,j)  
-           end do
-       end do 
-   else
-       do i = 1, nodes_per_elem
-            do j = 1, nodes_per_elem
-                inverse_matrix(i,j) = elem_matrix_H(i,j)
-            end do
-       end do
-   end if
-
-   !---Factorize matrix
-    call dgetrf ( length, length, inverse_matrix, lda, ipiv, info )
-    !---Compute the inverse matrix.
-    call dgetri ( length, inverse_matrix, lda, ipiv, work, lwork, info )      
-    
-!---Write out inverse matrix
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),'inverse LHS matrix matrix | element --> ',n
-    do j=1,nodes_per_elem
-           write(outfile_unit,fmt='(12es14.3)') &
-                ( inverse_matrix(j,i) ,i=1,nodes_per_elem )             
-    end do
-    
-!---CALCULATE SOLUTION for a given element
-    
-    do i = 1, nodes_per_elem
-        do j = 1, nodes_per_elem
-            elem_prev_soln(i) = elem_prev_soln(i) + inverse_matrix(i,j)*rhs_final_vec(j)
-        end do
-    end do
-
-!---Evaluate time step if transient case
-    if(unit_test .eqv. .TRUE.  ) then    
-        !---Solve for next time step solution
-        do i = 1, nodes_per_elem
-            cur_elem_soln_vec(n,i) = delta_t*elem_prev_soln(i) + previous_elem_soln_vec(n,i) 
-        end do
-    else 
-        do i = 1, nodes_per_elem
-            cur_elem_soln_vec(n,i) = elem_prev_soln(i)
-        end do
-    end if
-
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),'Solution | element --> ', n
-    do j=1,nodes_per_elem 
-          ii = j + (n-1)*nodes_per_elem
-          write(outfile_unit,fmt='(a,1I2,12es14.3)'), 'Node -->', ii, elem_prev_soln(j)          
-    end do   
-    write(outfile_unit,fmt='(a)'), '********************************'
-
-!---UNIT TEST write info out to file
-    if(unit_test .eqv. .TRUE.) then
-    !---Write out {flux_rhs}
-        write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),'{f^+} vector | element --> ', n
-        do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.3)') flux_rhs(j)             
-        end do
-    
-    !---Write out {flux_lhs}
-        write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),'{f^-} vector | element --> ', n
-        do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.3)') flux_lhs(j)             
-        end do
-    
-    !---Write out {Pu}
-        write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),'{Pu} vector | element --> ', n
-        do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.3)') elem_vec_Pu(j)             
-        end do
-    !---Write out {Pu - f}
-        write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),'{Pu - f} vector | element --> ', n
-        do j=1,nodes_per_elem 
-               write(outfile_unit,fmt='(12es14.3)') rhs_final_vec(j)             
-        end do   
-    end if
 
 end 

@@ -28,7 +28,7 @@ LIB = -llapack -lblas
 #	inter_shape_fcns.o \ 
 #	kappa_corr.o     \
 #	mesh_creation.o  \ 
-#	solve_soln.o     \
+#	solve_soln_steady.o     \
 #	timestamp_M.o      
 ################################
 main_driver : common_unit.o error_functions.o \
@@ -42,7 +42,9 @@ main_driver : common_unit.o error_functions.o \
 	driver_solve.o     \
 	inter_shape_fcns.o \
 	kappa_corr.o     \
-	mesh_creation.o steady_state.o solve_soln.o     \
+	mesh_creation.o steady_state.o \
+    solve_soln_transient.o transient_solve_euler.o \
+    solve_soln_steady.o     \
 	timestamp_M.o      
 	$(F90) $(FFLAGS) main_driver.f90 *.o -L $(LIBDIR)$(LIB) 
 
@@ -103,12 +105,18 @@ kappa_corr.o: kappa_corr.f90
 mesh_creation.o: mesh_creation.f90 parameters_fe.o   
 	$(F90) $(FFLAGS) -c mesh_creation.f90
 
-solve_soln.o:   solve_soln.f90 parameters_fe.o 
-	$(F90) $(FFLAGS) -c solve_soln.f90
+solve_soln_steady.o:   solve_soln_steady.f90 parameters_fe.o 
+	$(F90) $(FFLAGS) -c solve_soln_steady.f90
+
+solve_soln_transient.o:   solve_soln_steady.f90 parameters_fe.o 
+	$(F90) $(FFLAGS) -c solve_soln_transient.f90
 
 steady_state.o : steady_state.f90 parameters_fe.o
 	$(F90) $(FFLAGS) -c steady_state.f90
 
+transient_solve_euler.o : transient_solve_euler.f90 parameters_fe.o
+	$(F90) $(FFLAGS) -c transient_solve_euler.f90
+    
 timestamp_M.o: timestamp_M.f90     
 	$(F90) $(FFLAGS) -c timestamp_M.f90
 

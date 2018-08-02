@@ -41,18 +41,20 @@ while i < len(file_names):
     i=i+1
 
 max_length = len(x_coord)
+
+element_length = x_coord[2] - x_coord[0]
 starting = x_coord[0]
 ending =   x_coord[max_length-1]
 elem_interval = 100
+
 norm_space = np.linspace(-1,1,elem_interval)
-x_interval = ending*elem_interval
+x_interval = (ending*elem_interval)/element_length
 # Break the x coordinate into smaller intervals
 x_space = np.linspace(starting,ending,x_interval)
 
 # evaluate using quadratic interpolation functions
 nodes_per_elem = 3
 num_elem = max_length/nodes_per_elem
-
 value = 0
 
 # array to hold quadratically interpolated solution
@@ -67,6 +69,9 @@ for i in range(0, num_elem):
             value = shape_fcn(value,x,j)
             linear_comb = linear_comb + value*prec_conc[j + ii]
         soln.append(linear_comb)  
+
+print len(x_space)
+print len(soln)
 
 plt.plot(x_space,soln,label='Quadratic Interp')
 plt.plot(x_coord,prec_conc,'r.', label='Nodal values')

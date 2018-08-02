@@ -8,7 +8,7 @@ program main
   implicit none
 
   !call timestamp ( )
-  write ( *, '(a)' ) 'Test heat solve '
+  write ( *, '(a)' ) 'Begin Solve'
 
   call driver_solve ( )
 !

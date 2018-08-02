@@ -20,6 +20,8 @@
       character(8) :: key_word
       integer      :: iret
       character    :: title*70
+
+      write(outfile_unit,fmt='(a)'),'READING input data from input_t'
 !-----Read data from input file.
       open(unit=5, file='input_t', status='old', position='asis') 
       read (unit=5, fmt=900) title 
