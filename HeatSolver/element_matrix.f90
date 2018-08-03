@@ -118,10 +118,7 @@ subroutine element_matrix_heat (n, nl_iter)
         cnst = g_jacobian*wt
         
         do i=1, nodes_per_elem
-
 	        !heat_elem_vec_f(i) = P*kappa*cnst*shape_fcn(i)
-            
-            
             do j = 1, nodes_per_elem
                 !---Steady state A - no density and C_p, only need on 1st iteration 
             	if ( steady_state_flag .eqv. .TRUE.  ) then
@@ -134,9 +131,10 @@ subroutine element_matrix_heat (n, nl_iter)
                          heat_last_elem_vec_f(i) = heat_elem_vec_f(i)
                     end if        
                     
-                    heat_elem_matrix_A(i,j) = heat_elem_matrix_A(i,j) + &
-                        kappa*cnst*global_der_shape_fcn(i)*global_der_shape_fcn(j)
-                    
+                    !heat_elem_matrix_A(i,j) = heat_elem_matrix_A(i,j) + &
+                    !    kappa*cnst*global_der_shape_fcn(i)*global_der_shape_fcn(j)
+                     
+                    heat_elem_matrix_A(i,j) = heat_elem_matrix_A(i,j) + cnst*shape_fcn(i)*global_der_shape_fcn(j) 
                     ! Source 
                     ! Save first element values needed later on for partial currents
                     if( n .eq. 1) then 
@@ -175,10 +173,10 @@ subroutine element_matrix_heat (n, nl_iter)
 
 !   Account for modification to first and last elements
     if( n .eq. 1) then
-        heat_elem_matrix_A = heat_elem_matrix_A - heat_elem1_D_s2
+        !heat_elem_matrix_A = heat_elem_matrix_A - heat_elem1_D_s2
     end if 
     if( n .eq. num_elem) then
-        heat_elem_matrix_A = heat_elem_matrix_A + heat_last_elem_D_s1
+        !heat_elem_matrix_A = heat_elem_matrix_A + heat_last_elem_D_s1
     end if
 
     !heat_elem_matrix_K = heat_elem_matrix_K + elem_matrix_P_minus + elem_matrix_P_plus

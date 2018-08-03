@@ -29,7 +29,7 @@ implicit none
 
     !   Initial conditions 
     center_temp_initial = 900
-    center_power_initial = 5
+    center_power_initial = 100 
     max_nl_iter = 100 
     Area = 5.0
 !   Apply initial guess to solution vector
