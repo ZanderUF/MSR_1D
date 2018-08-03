@@ -1,5 +1,0 @@
-out_ramp_t_.0000_to_.2500tstep_0.000001
-out_ramp_t_.0000_to_.2500tstep_0.000010
-out_ramp_t_.0000_to_.2500tstep_0.000100
-out_ramp_t_.0000_to_.2500tstep_0.001000
-out_ramp_t_.0000_to_.2500tstep_0.010000
