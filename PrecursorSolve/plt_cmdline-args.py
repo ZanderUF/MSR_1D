@@ -73,7 +73,6 @@ while i < len(file_names):
     plt.ylabel('Precursor Concentration',size=14)
     plt.xlabel('Distance',size=14)
 
-
     i=i+1
 
 

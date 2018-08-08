@@ -2,7 +2,12 @@ module parameters_fe
 
     implicit none
 
+!---Gauss pts
+    real , dimension(4)  :: gauspt, gauswt
+    data gauspt /-0.8611363116, -0.3399810435, 0.3399810435, 0.8611363116 /  
+    data gauswt / 0.347854851 ,  0.6521451548, 0.6521451548, 0.347854851 /
     integer, parameter :: dp = selected_real_kind(14)
+
 !---Mesh information
     real , allocatable :: elem_lengths(:) ! length of elements
     real , allocatable :: elem_node_lengths(:)

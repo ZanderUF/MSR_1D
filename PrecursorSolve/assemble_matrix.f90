@@ -56,7 +56,7 @@ subroutine assemble_matrix (n)
             end if
             
             elem_matrix_G(i,j) = -elem_matrix_U(i,j) + &
-                                 (lambda)*elem_matrix_A(i,j) + &
+                                 (log(2.0)/lambda)*elem_matrix_A(i,j) + &
                                  matrix_W_right_face(i,j)
         end do
     end do

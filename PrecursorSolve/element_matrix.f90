@@ -25,12 +25,6 @@ subroutine element_matrix (n, nl_iter)
     integer  :: g, j, i,ii, ni, n, nl_iter
 !---Local variables 
     real , dimension(3) :: elem_coord, velocity, temp_prec,shape_int 
-    real , dimension(3, 3) :: K_integral, M_integral
-    data M_integral / 4 , 2 , -1 , 2 , 16 , 2 , -1 , 2 ,4 / 
-    data K_integral / 7, -8,   1, -8,  16, -8,   1, -8, 7 /
-    real , dimension(4)  :: gauspt, gauswt
-    data gauspt /-0.8611363116, -0.3399810435, 0.3399810435, 0.8611363116 /  
-    data gauswt / 0.347854851 ,  0.6521451548, 0.6521451548, 0.347854851 /
     real  :: xi, wt, cnst, h, s, s2, T, P,  kappa, density, &
              C_p, K_material, F_material, evaluated_amplitude, &
              evaluated_velocity
@@ -53,7 +47,7 @@ subroutine element_matrix (n, nl_iter)
     elem_matrix_F   = 0.0
     elem_vec_f      = 0.0
     elem_vec_q   = 0.0    
-    
+!---Material properties 
     kappa = 0.0
     density = 0.0 
     C_p = 0.0
@@ -123,7 +117,7 @@ subroutine element_matrix (n, nl_iter)
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
         
-            elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*amplitude_fcn(n,j)*total_power_prev
+            elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*amplitude_fcn(n,j)!*total_power_prev
            
         !---Applies for all elements except the first one
             if(n > 1) then !--- n - element #

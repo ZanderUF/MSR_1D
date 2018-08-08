@@ -42,7 +42,6 @@ implicit none
         !---Starting off total power
         
         total_power_initial = total_power_initial/global_coord(num_elem,3)
-        print *,'total pow',total_power_initial
         total_power_prev = total_power_initial
         
         nl_iter = 1 
@@ -58,23 +57,19 @@ implicit none
                 if( i <= non_fuel_start ) then
                     call get_norm_coord(i,j,norm_cos) 
                     cosine_term = cos( (pi/2)*norm_cos )
-                    !if (cosine_term < 1E-10) then
-                    !    cosine_term = 0 
-                    !else
-                        cosine_term = cosine_term 
-                    !end if
+                    cosine_term = cosine_term 
                     !amplitude_fcn(i,j) = cosine_term
-                    !if( i == 1) then
-                    !    amplitude_fcn(i,j)  = 0
-                    !    power_soln_new(i,j) = 0
-                    !else
-                    !    amplitude_fcn(i,j)  = 1.0 
-                    !    power_soln_new(i,j) = 1.0
-                    !end if
+                    if( i == 1) then
+                        amplitude_fcn(i,j)  = 0
+                        power_soln_new(i,j) = 0
+                    else
+                        amplitude_fcn(i,j)  = 1.0 
+                        power_soln_new(i,j) = 1.0
+                    end if
                     !amplitude_fcn(i,j) = cosine_term 
-                    amplitude_fcn(i,j) = 1.0
+                    !amplitude_fcn(i,j) = 1.0
                     !power_soln_new(i,j) = (total_power_initial*cosine_term)
-                    power_soln_new(i,j) =  1.0 
+                    !power_soln_new(i,j) =  1.0 
                     !---Set temperature distribution
                     temperature_soln_new(i,j) = (center_temp_initial*cosine_term)
                     temperature = temperature_soln_new(i,j)
@@ -83,11 +78,10 @@ implicit none
                     density_soln_new(i,j) = density
                     !---Need to get initial velocity distribution
                     !velocity_soln_new(i,j) = mass_flow/(area*density)
-                    velocity_soln_new(i,j) = 150.0
+                    velocity_soln_new(i,j) = 100.0
                     !velocity_soln_new(i,j) = 0
                 !---Inactive region assumed to have zero power 
                 else
-                    print *,'OUT OF ACTIVE'
                     !---Temperature in inactive region same as end of active region ==> no loss
                     temperature_soln_new(i,j) = temperature_soln_new(non_fuel_start ,3)
                     !---Get density to set the velocity
@@ -98,7 +92,7 @@ implicit none
                     !velocity_soln_new(i,j) = 0
                     power_soln_new(i,j) = 0.0
                     amplitude_fcn(i,j) = 0.0
-                    velocity_soln_new(i,j) = 150.0
+                    velocity_soln_new(i,j) = 100.0
                 end if
             end do 
         end do
@@ -212,8 +206,8 @@ implicit none
         end do
     end do
     
-    print *,' sum P over domain', sum(temp_vec_num_elem)
-    print *,'sum prec over domain',lambda*sum(temp_vec_prec)
+    print *,'Sum P over domain', sum(temp_vec_num_elem)
+    print *,'Sum precursors over domain',lambda*sum(temp_vec_prec)
 
     !---write out converged solution for plotting
     write(soln_outfile_unit,fmt='(a)'), 'Position(x) | Precursor Concentration'

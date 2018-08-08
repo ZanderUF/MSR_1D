@@ -39,9 +39,11 @@ implicit none
 
     elem_vol_int(:,:) = 0
 !---Reactor properties
-    lambda = 1 
-    beta = 2.5E-3
-    gen_time = 1E-6
+    lambda = 0.01 
+    beta=1
+    gen_time=1
+    !beta = 2.5E-3
+    !gen_time = 1E-6
     mass_elem = 100.0/num_elem
 
 !---Starting element for non fuel region, subtract off from end of domain
