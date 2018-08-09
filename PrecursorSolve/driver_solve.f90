@@ -21,29 +21,29 @@ implicit none
     open (unit=66, file='last_t_solution_file.txt',status='unknown',form='formatted',position='asis')
 !---Read in problem parameters here
     call datainput_fe
+
 !---Max dimension of the matrices to be computed, including solution vector
     matrix_length = 3*num_elem  
+
 !---Allocate solution vector and global matrices
-    allocate(precursor_soln_new(num_elem,nodes_per_elem),  &
+    allocate(precursor_soln_new(num_isotopes,num_delay_group,num_elem,nodes_per_elem),  &
              power_soln_new(num_elem,nodes_per_elem), &
              temperature_soln_new( num_elem,nodes_per_elem),  &
              density_soln_new( num_elem,nodes_per_elem),  &
              velocity_soln_new( num_elem,nodes_per_elem),  &
-             precursor_soln_prev(num_elem,nodes_per_elem), &
+             precursor_soln_prev(num_isotopes,num_delay_group,num_elem,nodes_per_elem), &
              power_soln_prev(num_elem,nodes_per_elem), &
              temperature_soln_prev( num_elem,nodes_per_elem), &
              density_soln_prev( num_elem,nodes_per_elem),  &
              velocity_soln_prev( num_elem,nodes_per_elem), &
              amplitude_fcn( num_elem, nodes_per_elem) )
+    allocate(elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem)) 
     allocate(elem_vol_int(num_elem,nodes_per_elem))
 
+!---Test integral over volume of element only int_-1^1 f(x)
     elem_vol_int(:,:) = 0
+
 !---Reactor properties
-    lambda = 0.01 
-    beta=1
-    gen_time=1
-    !beta = 2.5E-3
-    !gen_time = 1E-6
     mass_elem = 100.0/num_elem
 
 !---Starting element for non fuel region, subtract off from end of domain

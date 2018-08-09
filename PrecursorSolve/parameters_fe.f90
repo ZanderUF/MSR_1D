@@ -17,18 +17,16 @@ module parameters_fe
     integer  :: ndf ! ndf
     real     :: area   ! cross sectional area 
     integer  :: matrix_length
-    real     :: mass_flow
-    real     :: lambda
-    real     :: beta
-    real     :: gen_time
+    real     :: elem_size
     integer  :: non_fuel_start
     real     :: mass_elem ! mass per element
+    
     real     :: total_power_prev
     integer  :: num_elem_external
     real     :: total_power_initial
-    real     :: elem_size
     real     :: center_power_initial
     real     :: cos_tot
+
 !---Mesh arrays
     integer, allocatable  :: conn_matrix(:,:)
     real , allocatable    :: global_coord(:,:)
@@ -58,7 +56,6 @@ module parameters_fe
     real , dimension(3)   :: H_times_soln_vec
     real , dimension(3)   :: elem_vec_w_left_face
     real , dimension(3)   :: elem_vec_v
-    real , dimension(3)   :: elem_vec_q 
     real , dimension(3)   :: Pu_minus_flux_vec
     real , dimension(3)   :: elem_vec_f 
     real , dimension(3)   :: elem_vec_Pu
@@ -66,6 +63,7 @@ module parameters_fe
     real , dimension(3)   :: last_elem_vec_M_s2
     real , dimension(3)   :: elem1_vec_f
     real , dimension(3)   :: last_elem_vec_f
+    real , dimension(3)   :: elem_vec_q
 
 !---Gauss integration 
     integer  :: num_gaus_pts = 4
@@ -75,14 +73,16 @@ module parameters_fe
     real , dimension(3) :: global_der_shape_fcn 
     real                :: g_jacobian
 !---Solution matrices - global
+    
+    real , allocatable :: elem_vec_q_final(:,:,:) 
     real , allocatable :: elem_vol_int(:,:)
-    real , allocatable :: precursor_soln_new(:,:)
+    real , allocatable :: precursor_soln_new(:,:,:,:) ! isotope,group,node,value
     real , allocatable :: power_soln_new(:,:)
     real , allocatable :: temperature_soln_new(:,:)
     real , allocatable :: density_soln_new(:,:)
     real , allocatable :: velocity_soln_new(:,:)
 
-    real , allocatable :: precursor_soln_prev(:,:)
+    real , allocatable :: precursor_soln_prev(:,:,:,:)! isotope,group,node,value
     real , allocatable :: power_soln_prev(:,:)
     real , allocatable :: temperature_soln_prev(:,:)
     real , allocatable :: density_soln_prev(:,:)
@@ -100,17 +100,23 @@ module parameters_fe
     real   tmax      ! max time 
     real   t_initial ! starting time
 
-!---Material properties 
+!---Material
     !real, dimension(:)  ( kind = 8 ) conductivity
     !real, dimension(:)  ( kind = 8 ) spec_heat
     !real, dimension(:)  ( kind = 8 ) density
+    real, allocatable  :: lamda_i_mat(:,:)
+    real, allocatable  :: beta_i_mat(:,:)
+    real     :: gen_time
+    real     :: mass_flow
+    integer  :: num_isotopes
+    integer  :: num_delay_group
 
 !---File names
     character(60) :: file_name
     integer :: outfile_unit = 11 
     integer :: soln_outfile_unit = 99
 !---Nonlinear variables
-    integer :: max_iter = 1        ! max num of nonlinear iterations to do
+    integer :: max_iter = 1 ! max num of nonlinear iterations to do
     integer :: max_nl_iter  ! numer of nonllinear iterations to do
     real :: residual
     real :: tolerance = 0.001 ! prescribed tolerance

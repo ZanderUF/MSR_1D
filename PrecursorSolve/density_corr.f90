@@ -8,7 +8,7 @@
 ! Input:
 !       T - temperature to evaluate density at 
 ! Output:
-!       density - evaluated conductivity at T [ kg/m^3]
+!       density - evaluated conductivity at T [ g/cm^3]
 ! 
 subroutine density_corr(T, density)
 
@@ -21,8 +21,8 @@ implicit none
     real :: a
     real :: b  
    
-    a = 2603
-    b= -6.69E-1
+    a = 2.603
+    b= -6.69E-4
 
     density = a + b*T
 

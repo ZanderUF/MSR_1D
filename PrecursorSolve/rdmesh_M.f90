@@ -25,7 +25,7 @@
      i3      = 3
      itp     = 1
 !
-     allocate (ielem_lengths(num_elem), )
+     allocate (ielem_lengths(num_elem) )
      do while (iret == 0)
          pn = cread (i2, iret)
          select case (pn)

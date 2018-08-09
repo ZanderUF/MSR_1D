@@ -117,7 +117,7 @@ subroutine element_matrix (n, nl_iter)
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
         
-            elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*amplitude_fcn(n,j)!*total_power_prev
+            elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*power_soln_new(n,j) !amplitude_fcn(n,j)!*total_power_prev
            
         !---Applies for all elements except the first one
             if(n > 1) then !--- n - element #

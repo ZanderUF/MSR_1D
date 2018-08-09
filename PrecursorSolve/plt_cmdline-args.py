@@ -33,46 +33,52 @@ data_file_names="data_file_names.txt"
 file_names = [line.rstrip('\n') for line in open(data_file_names)]
 print  file_names
 i=0
+g=0
 color = ['r','b']
-while i < len(file_names):
-    data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=1)
-    x_coord = data1[:,0]
-    prec_conc = data1[:,1]
-    
-    max_length = len(x_coord)
-    element_length = x_coord[2] - x_coord[0]
-    starting = x_coord[0]
-    ending =   x_coord[max_length-1]
-    elem_interval = 100
-    
-    norm_space = np.linspace(-1,1,elem_interval)
-    x_interval = (ending*elem_interval)/element_length
-    # Break the x coordinate into smaller intervals
-    x_space = np.linspace(starting,ending,x_interval)
-    
-    # evaluate using quadratic interpolation functions
-    nodes_per_elem = 3
-    num_elem = max_length/nodes_per_elem
-    value = 0
-    
-    # array to hold quadratically interpolated solution
-    soln = []
-    # evaluate solution between nodal points
-    for q in range(0, num_elem):
-        ii = (q)*nodes_per_elem 
-        for k in range(0,len(norm_space)):
-            x = norm_space[k]
-            linear_comb = 0
-            for j in range(0,nodes_per_elem):
-                value = shape_fcn(value,x,j)
-                linear_comb = linear_comb + value*prec_conc[j + ii]
-            soln.append(linear_comb)  
-    
-    plt.plot(x_space,soln,color[i], label=file_names[i])
-    #plt.plot(x_coord,prec_conc,'r.', label='test')
-    plt.ylabel('Precursor Concentration',size=14)
-    plt.xlabel('Distance',size=14)
 
+#set number of precursor groups
+num_precursor_groups = 6
+
+while i < len(file_names):
+    while g < num_precursor_groups:
+        data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=2)
+        x_coord = data1[:,0]
+        prec_conc = data1[:,g]
+        
+        max_length = len(x_coord)
+        element_length = x_coord[2] - x_coord[0]
+        starting = x_coord[0]
+        ending =   x_coord[max_length-1]
+        elem_interval = 100
+        
+        norm_space = np.linspace(-1,1,elem_interval)
+        x_interval = (ending*elem_interval)/element_length
+        # Break the x coordinate into smaller intervals
+        x_space = np.linspace(starting,ending,x_interval)
+        
+        # evaluate using quadratic interpolation functions
+        nodes_per_elem = 3
+        num_elem = max_length/nodes_per_elem
+        value = 0
+        
+        # array to hold quadratically interpolated solution
+        soln = []
+        # evaluate solution between nodal points
+        for q in range(0, num_elem):
+            ii = (q)*nodes_per_elem 
+            for k in range(0,len(norm_space)):
+                x = norm_space[k]
+                linear_comb = 0
+                for j in range(0,nodes_per_elem):
+                    value = shape_fcn(value,x,j)
+                    linear_comb = linear_comb + value*prec_conc[j + ii]
+                soln.append(linear_comb)  
+        
+        plt.plot(x_space,soln,color[i], label='Group '+ str(g) )
+        #plt.plot(x_coord,prec_conc,'r.', label='test')
+        plt.ylabel('Precursor Concentration',size=14)
+        plt.xlabel('Distance',size=14)
+        g=g+1
     i=i+1
 
 

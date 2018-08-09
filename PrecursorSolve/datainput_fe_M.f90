@@ -3,6 +3,7 @@
       USE free_form
       USE rdparm_fe_M
       USE rdmesh_M
+      USE rddelay_M
       USE parameters_fe
 
    implicit none
@@ -35,9 +36,12 @@
               block_key = cread(4,iret)
               if( block_key == "parm" ) then
                    call rdparm_fe 
-              elseif( block_key == 'mesh' ) then
+             elseif( block_key =='dela') then
+                   allocate(lamda_i_mat(num_isotopes,num_delay_group), beta_i_mat(num_isotopes,num_delay_group)) 
+                   call rddelay
+               !elseif( block_key == 'mesh' ) then
                    allocate(elem_lengths(num_elem))
-                   call rdmesh ! read 1D mesh interval data in
+              !     call rdmesh ! read 1D mesh interval data in
               endif  
           endif
           if(iret == 1) then

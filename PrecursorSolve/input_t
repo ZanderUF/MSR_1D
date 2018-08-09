@@ -1,18 +1,23 @@
 heat solve sample
 read parm
    time=yes
-   del=0.001
+   del=0.01
    tmax=2
    tin=0.0 
-   nem=4
+   nem=5
    npe=3
    pipe=2
-   area=1.0
-   mflow=100
+   area=10000.0
+   mflow=180000
    tpow=10
-   nitr=1000
+   nitr=100
    elem=2.0
+   ndg=6
+   nmat=1
+   gen=1E-6
 end parm
-read mesh 
-  len= 1.0 1.0 1.0  end
+read delay
+  mat=1
+alam=0.0129 0.05 0.4 0.8 1.2 end
+beta=0.5 0.06 0.7 0.044 0.09 0.3 end
 end delay

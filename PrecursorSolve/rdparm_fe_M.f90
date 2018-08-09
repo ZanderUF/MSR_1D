@@ -16,6 +16,9 @@
       integer :: i0, i2, i3, i4, iret
       character(4) :: dum,duma,pn, read_time, read_step 
 
+
+      write(outfile_unit,fmt='(a)'), 'Reading parms'
+      
       i0 = 0
       i2 = 2
       i3 = 3
@@ -58,6 +61,12 @@
               max_nl_iter = iread(i0,iret)
           case('elem')
               elem_size = fread(i0,iret)
+          case('ndg=')
+              num_delay_group = iread(i0,iret)
+          case('nmat')
+              num_isotopes = iread(i0,iret)
+          case('gen=')
+              gen_time = fread(i0,iret)
           end select
       
       end do

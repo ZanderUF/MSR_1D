@@ -34,7 +34,7 @@ LIB = -llapack -lblas
 main_driver : common_unit.o error_functions.o \
 	vast_kind_param.o y0trns_M.o free_form.o \
 	parameters_fe.o rdmesh_M.o \
-	rdparm_fe_M.o \
+	rdparm_fe_M.o rddelay_M.o\
 	assemble_matrix.o assemble_matrix_transient.o \
     boundary_cond.o cond_corr.o  \
 	datainput_fe_M.o \
@@ -46,7 +46,8 @@ main_driver : common_unit.o error_functions.o \
 	mesh_creation.o steady_state.o \
     solve_soln_transient.o transient_solve_euler.o \
     solve_soln_steady.o     \
-	timestamp_M.o      
+	initialize.o \
+    timestamp_M.o      
 	$(F90) $(FFLAGS) main_driver.f90 *.o -L $(LIBDIR)$(LIB) 
 
 main_driver.o : main_driver.f90
@@ -72,7 +73,10 @@ parameters_fe.o : parameters_fe.f90
 
 rdmesh_M.o : rdmesh_M.f90 free_form.o parameters_fe.o 
 	$(F90) $(FFLAGS) -c rdmesh_M.f90 
-  
+
+rddelay_M.o : rdmesh_M.f90 free_form.o parameters_fe.o 
+	$(F90) $(FFLAGS) -c rddelay_M.f90 
+
 rdparm_fe_M.o : rdparm_fe_M.f90 free_form.o parameters_fe.o        
 	$(F90) $(FFLAGS) -c rdparm_fe_M.f90
 
@@ -88,7 +92,7 @@ boundary_cond.o: boundary_cond.f90 parameters_fe.o
 cond_corr.o: cond_corr.f90       
 	$(F90) $(FFLAGS) -c cond_corr.f90
 
-datainput_fe_M.o:  datainput_fe_M.f90 free_form.o rdparm_fe_M.o rdmesh_M.o parameters_fe.o    
+datainput_fe_M.o:  datainput_fe_M.f90 free_form.o rdparm_fe_M.o rddelay_M.o rdmesh_M.o parameters_fe.o    
 	$(F90) $(FFLAGS) -c datainput_fe_M.f90 
 
 density_corr.o:  density_corr.f90    
@@ -102,6 +106,9 @@ driver_solve.o: driver_solve.f90  parameters_fe.o datainput_fe_M.o
 
 inter_shape_fcns.o: inter_shape_fcns.f90 parameters_fe.o
 	$(F90) $(FFLAGS) -c inter_shape_fcns.f90
+
+initialize.o: initialize.f90 parameters_fe.o
+	$(F90) $(FFLAGS) -c initialize.f90
 
 kappa_corr.o: kappa_corr.f90      
 	$(F90) $(FFLAGS) -c kappa_corr.f90

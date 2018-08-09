@@ -8,7 +8,9 @@
 !  Parameters:
 !  	      conn_matrix(max # elements, nodes per element) 
 ! 	      global_coord(# elements, nodes per element)
-
+!  Units: cm
+!  If element is 1.0 ==> 1.0 cm
+! 
 subroutine mesh_creation ( )
 !
 USE parameters_fe  
@@ -21,7 +23,6 @@ implicit none
 !---allocate arrays
     allocate( conn_matrix(num_elem, nodes_per_elem) , &
               global_coord(num_elem,nodes_per_elem) )  
-
 !---setup connectivity matrix
     do i=1, num_elem
         do j=1,nodes_per_elem
@@ -30,7 +31,6 @@ implicit none
     end do
 
 !---Setup element length array. assume all elements have the same size
-    !elem_size = 2.0
     do i = 1, num_elem
         elem_lengths(i) = elem_size 
     end do
@@ -63,5 +63,4 @@ implicit none
            write(outfile_unit,fmt='(12es14.3)')  &
                 (global_coord(j,i),i=1,nodes_per_elem)              
     end do
-
 end

@@ -13,7 +13,7 @@ implicit none
 !---Dummy
 
 !---Local
-    integer :: n, i , j, nl_iter
+    integer :: f,g,n, i , j, nl_iter
     real   :: t1  ! next time step  
 
 !---Start time-dependent solve
@@ -30,23 +30,31 @@ implicit none
                 do n = 1 , num_elem 
                     !---Generate elemental matrices
                     call element_matrix(n, nl_iter) 
-                    !---Assemble element matrices to solve for elemental coeficients 
-                    call assemble_matrix_transient(n) 
-                    !---Solve for the elemental solution
-                    call solve_soln_transient(n,nl_iter)
-
+                    do f = 1, num_isotopes
+                        do g = 1, num_delay_group
+                            !---Assemble element matrices to solve for elemental coeficients 
+                            call assemble_matrix_transient(f,g,n) 
+                            !---Solve for the elemental solution
+                            call solve_soln_transient(f,g,n,nl_iter)
+                        end do
+                    end do
                 end do ! end loop over num elements
                 
                 !---Write out solution vector
                 write(outfile_unit,fmt='(a)'), ' ' 
                 write(outfile_unit,fmt='(a,12es14.3)'),'Solution Vector at time --> ',t0
                 write(outfile_unit,fmt='(a)'),'Position(x) | Precursor Conc'
-                do i=1, num_elem
-                       do j = 1, nodes_per_elem
-                            write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') &
-                            global_coord(i,j), precursor_soln_new(i,j)             
+                do f = 1, num_isotopes
+                    do g = 1, num_delay_group
+                        do i=1, num_elem
+                            do j = 1, nodes_per_elem
+                                write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') &
+                                global_coord(i,j), precursor_soln_new(f,g,i,j)             
+                            end do
                         end do
+                    end do
                 end do
+                
                 precursor_soln_prev = precursor_soln_new
                 
                 nl_iter = nl_iter + 1 ! nonlinear iteration counter
@@ -69,11 +77,12 @@ implicit none
            t0 = t1
        end do !---end time loop
        write(66, fmt='(a)'), 'Position(x) | Precursor Concentration'
-       do i = 1,  num_elem
-            do j = 1, nodes_per_elem
-                write(66,fmt='(f10.3, 12es14.3)')  global_coord(i,j), precursor_soln_prev(i,j) 
-            end do
-       end do
+       
+       !do i = 1,  num_elem
+       !     do j = 1, nodes_per_elem
+       !         write(66,fmt='(f10.3, 12es14.3)')  global_coord(i,j), precursor_soln_prev(i,j) 
+       !     end do
+       !end do
 end if
 
 end

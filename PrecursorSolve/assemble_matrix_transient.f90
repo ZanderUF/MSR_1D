@@ -9,13 +9,15 @@
 !  Output:
 ! 
 
-subroutine assemble_matrix_transient (n)
+subroutine assemble_matrix_transient (isotope,delay_group,n)
     
     USE parameters_fe  
 
     implicit none
 !---Dummy variables
-    integer :: n
+    integer,intent(in) :: isotope
+    integer,intent(in) :: delay_group
+    integer,intent(in) :: n
 !---Local variables
     integer :: i, j, ii, jj, nr,nc, ncl,length   
     real, dimension(3) ::  elem_prev_soln, flux_rhs, flux_lhs, &
@@ -34,7 +36,7 @@ subroutine assemble_matrix_transient (n)
     elem_matrix_A_times_W = matmul(inverse_A_matrix,matrix_W_left_face)
     !---Calculate H matrix, will be inverted later on
     elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
-                    lambda*identity_matrix - &
+                    lamda_i_mat(1,1)*identity_matrix - &
                     matmul(inverse_A_matrix,matrix_W_right_face)
    
     elem_vec_A_times_q = matmul(inverse_A_matrix,elem_vec_q)
@@ -44,13 +46,13 @@ subroutine assemble_matrix_transient (n)
         !elem_vec_q(i) = (beta/gen_time)*elem_vec_q(i)
         do j = 1, nodes_per_elem
             H_times_soln_vec(i) = H_times_soln_vec(i) + &
-                                  elem_matrix_H(i,j)*precursor_soln_prev(n,j) 
+                                  elem_matrix_H(i,j)*precursor_soln_prev(isotope,delay_group,n,j) 
             if ( n > 1) then
                 A_times_W_times_upwind_elem_vec(i) = A_times_W_times_upwind_elem_vec(i) + &
-                                elem_matrix_A_times_W(i,j)*precursor_soln_prev(n-1,j)
+                                elem_matrix_A_times_W(i,j)*precursor_soln_prev(isotope,delay_group,n-1,j)
             else
                 A_times_W_times_upwind_elem_vec(i) = A_times_W_times_upwind_elem_vec(i) + &
-                                elem_matrix_A_times_W(i,j)*precursor_soln_prev(num_elem,j)
+                                elem_matrix_A_times_W(i,j)*precursor_soln_prev(isotope,delay_group, num_elem,j)
             end if
         end do 
     end do
@@ -87,7 +89,7 @@ subroutine assemble_matrix_transient (n)
     write(outfile_unit,fmt='(a,1I2)'),'-lambda*I Matrix | element --> ',n
     do j=1,nodes_per_elem 
           write(outfile_unit,fmt='(12es14.3)') &
-               (-lambda*identity_matrix(j,i),i=1,nodes_per_elem)             
+               (-lamda_i_mat(1,1)*identity_matrix(j,i),i=1,nodes_per_elem)             
     end do
        
     write(outfile_unit,fmt='(a)'),' '
