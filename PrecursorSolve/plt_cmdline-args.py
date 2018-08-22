@@ -34,17 +34,20 @@ file_names = [line.rstrip('\n') for line in open(data_file_names)]
 print  file_names
 i=0
 g=0
-color = ['r','b']
+color = ['r--','b-','g^','y--','m*','k,']
 
 #set number of precursor groups
-num_precursor_groups = 6
+num_precursor_groups =1 
 
 while i < len(file_names):
     while g < num_precursor_groups:
         data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=2)
         x_coord = data1[:,0]
-        prec_conc = data1[:,g]
-        
+        print g
+
+        prec_conc = data1[:,g+1]
+        print prec_conc
+
         max_length = len(x_coord)
         element_length = x_coord[2] - x_coord[0]
         starting = x_coord[0]
@@ -74,16 +77,16 @@ while i < len(file_names):
                     linear_comb = linear_comb + value*prec_conc[j + ii]
                 soln.append(linear_comb)  
         
-        plt.plot(x_space,soln,color[i], label='Group '+ str(g) )
+        plt.plot(x_space,soln,color[g], label='Group '+ str(g+1) )
         #plt.plot(x_coord,prec_conc,'r.', label='test')
         plt.ylabel('Precursor Concentration',size=14)
-        plt.xlabel('Distance',size=14)
+        plt.xlabel('Distance [cm]',size=14)
         g=g+1
     i=i+1
 
 
 ## Name of saved image
-name = 'power_sample'
+name = 'precursor_concentration'
 
 ##------Configure the legend --- ##
 plt.legend(loc='lower left',prop={'size':14},numpoints=1)

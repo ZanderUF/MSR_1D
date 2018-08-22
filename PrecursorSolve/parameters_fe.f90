@@ -31,6 +31,8 @@ module parameters_fe
     integer, allocatable  :: conn_matrix(:,:)
     real , allocatable    :: global_coord(:,:)
 
+    real, allocatable :: power_soln_test(:)
+    
 !---Elemental matrices
     real , dimension(3,3) :: elem_matrix_A_times_W
     real , dimension(3,3) :: identity_matrix
@@ -87,7 +89,7 @@ module parameters_fe
     real , allocatable :: temperature_soln_prev(:,:)
     real , allocatable :: density_soln_prev(:,:)
     real , allocatable :: velocity_soln_prev(:,:) 
-    real , allocatable :: amplitude_fcn(:,:)
+    real , allocatable :: spatial_power_fcn(:,:)
     
     real , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
     real , allocatable :: previous_elem_soln_vec(:,:)  ! previous solution vector
@@ -100,10 +102,13 @@ module parameters_fe
     real   tmax      ! max time 
     real   t_initial ! starting time
 
+    real :: power_amplitude
+    real :: reactivity = 0.0
 !---Material
     !real, dimension(:)  ( kind = 8 ) conductivity
     !real, dimension(:)  ( kind = 8 ) spec_heat
     !real, dimension(:)  ( kind = 8 ) density
+    real, allocatable  :: beta_i_correction(:,:)
     real, allocatable  :: lamda_i_mat(:,:)
     real, allocatable  :: beta_i_mat(:,:)
     real     :: gen_time

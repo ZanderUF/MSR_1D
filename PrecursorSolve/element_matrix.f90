@@ -26,7 +26,7 @@ subroutine element_matrix (n, nl_iter)
 !---Local variables 
     real , dimension(3) :: elem_coord, velocity, temp_prec,shape_int 
     real  :: xi, wt, cnst, h, s, s2, T, P,  kappa, density, &
-             C_p, K_material, F_material, evaluated_amplitude, &
+             C_p, K_material, F_material, evaluated_spatial, &
              evaluated_velocity
     !---Inversion routine parameters
     integer :: lda, info, lwork,length
@@ -63,13 +63,12 @@ subroutine element_matrix (n, nl_iter)
         cnst = g_jacobian*wt
         !---Evaluate velocity at gauss pt
         evaluated_velocity = 0.0
-        evaluated_amplitude = 0.0
-        
+        evaluated_spatial = 0.0
         do i = 1, nodes_per_elem
             evaluated_velocity = evaluated_velocity + &
                                  shape_fcn(i)*velocity_soln_prev(n,i)
-            evaluated_amplitude = evaluated_amplitude + &
-                                 shape_fcn(i)*amplitude_fcn(n,i)*total_power_prev
+            evaluated_spatial = evaluated_spatial + &
+                                 shape_fcn(i)*spatial_power_fcn(n,i)*power_amplitude
         end do
     
         !---Normal calculation flow
@@ -79,7 +78,7 @@ subroutine element_matrix (n, nl_iter)
                 elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
                 !---Assemble q vector
                 !elem_vec_q(i) = elem_vec_q(i) + &
-                !                cnst*shape_fcn(i)*evaluated_amplitude!*total_power_prev 
+                !                cnst*shape_fcn(i)*evaluated_spatial!*total_power_prev 
                 !elem_vol_int(n,i) = elem_vol_int(n,i) +elem_vec_q(i)
                 do j = 1, nodes_per_elem
                     
@@ -117,7 +116,7 @@ subroutine element_matrix (n, nl_iter)
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
         
-            elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*power_soln_new(n,j) !amplitude_fcn(n,j)!*total_power_prev
+            elem_vec_q(i) = elem_vec_q(i) + elem_matrix_A(i,j)*power_soln_new(n,j) 
            
         !---Applies for all elements except the first one
             if(n > 1) then !--- n - element #

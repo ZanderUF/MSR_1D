@@ -37,7 +37,9 @@
               if( block_key == "parm" ) then
                    call rdparm_fe 
              elseif( block_key =='dela') then
-                   allocate(lamda_i_mat(num_isotopes,num_delay_group), beta_i_mat(num_isotopes,num_delay_group)) 
+                   allocate(lamda_i_mat(num_isotopes,num_delay_group), &
+                            beta_i_mat(num_isotopes,num_delay_group), &
+                            beta_i_correction(num_isotopes,num_delay_group)) 
                    call rddelay
                !elseif( block_key == 'mesh' ) then
                    allocate(elem_lengths(num_elem))

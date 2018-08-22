@@ -1,6 +1,7 @@
 ! Transient solver
+! Notes: Solves precursor and power equations using foward Euler
 !
-! Input:
+! Input: none
 !
 ! Output:
 ! 
@@ -14,18 +15,16 @@ implicit none
 
 !---Local
     integer :: f,g,n, i , j, nl_iter
-    real   :: t1  ! next time step  
+    real    :: t1  !---next time step  
 
 !---Start time-dependent solve
     transient = .TRUE.
     if ( transient .eqv. .TRUE.) then
         write(outfile_unit, fmt='(a)'), ' ' 
         write(outfile_unit, fmt='(a)'), 'In transient loop'
-        !---Loop over time steps until end of transient
-        do 
+        do!---Time loop 
             nl_iter = 1 
-            !---Nonlinear iterations until residual converges to prescribed value
-            do  
+            do!---Nonlinear loop  
                 !---Create element matrices and assemble
                 do n = 1 , num_elem 
                     !---Generate elemental matrices
@@ -38,32 +37,21 @@ implicit none
                             call solve_soln_transient(f,g,n,nl_iter)
                         end do
                     end do
-                end do ! end loop over num elements
-                
-                !---Write out solution vector
-                write(outfile_unit,fmt='(a)'), ' ' 
-                write(outfile_unit,fmt='(a,12es14.3)'),'Solution Vector at time --> ',t0
-                write(outfile_unit,fmt='(a)'),'Position(x) | Precursor Conc'
-                do f = 1, num_isotopes
-                    do g = 1, num_delay_group
-                        do i=1, num_elem
-                            do j = 1, nodes_per_elem
-                                write(outfile_unit,fmt='( 12es14.3, 12es14.3 )') &
-                                global_coord(i,j), precursor_soln_new(f,g,i,j)             
-                            end do
-                        end do
-                    end do
-                end do
-                
+                end do !---End loop over num elements
+                !---Solve for total power after spatial sweep through precursors
+                call solve_power_transient(nl_iter) 
+
+                call write_out_soln(outfile_unit,num_elem)
+
                 precursor_soln_prev = precursor_soln_new
                 
-                nl_iter = nl_iter + 1 ! nonlinear iteration counter
-                !---Check if we have done too many nonlinear iterations and still not converging
+                nl_iter = nl_iter + 1 !---Nonlinear iteration counter
+                !---Check if too many nonlinear iterations and not converging
                 if ( nl_iter > max_nl_iter) then
                     exit
                 end if 
                 
-            end do ! end nonlinear loop
+            end do !---End nonlinear loop
             precursor_soln_prev = precursor_soln_new 
            
            !---Stop if we've exceeded TMAX.
@@ -73,16 +61,8 @@ implicit none
            
            t1 = t0 + delta_t
 
-           !---Shift the data to prepare for another step.
            t0 = t1
-       end do !---end time loop
-       write(66, fmt='(a)'), 'Position(x) | Precursor Concentration'
-       
-       !do i = 1,  num_elem
-       !     do j = 1, nodes_per_elem
-       !         write(66,fmt='(f10.3, 12es14.3)')  global_coord(i,j), precursor_soln_prev(i,j) 
-       !     end do
-       !end do
-end if
+       end do !---End time loop
+    end if!---End transient if
 
-end
+end subroutine transient_solve_euler

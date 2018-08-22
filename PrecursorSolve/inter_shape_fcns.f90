@@ -35,7 +35,6 @@ subroutine inter_shape_fcns (xi, h)
     	!do i = 1, nodes_per_elem
         !    g_jacobian = g_jacobian + der_shape_fcn(i)/elem_coord(i)
     	!end do
-    	
         ! Compute global derivative
     	do i = 1, nodes_per_elem
     	    global_der_shape_fcn(i) = der_shape_fcn(i)/g_jacobian 

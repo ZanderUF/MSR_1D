@@ -55,6 +55,7 @@ subroutine solve_soln_steady(isotope, delay_group, n, nl_iter )
     do j=1,nodes_per_elem 
           write(outfile_unit,fmt='(12es14.3)') rhs_final_vec(j)             
     end do
+    
     !---Factorize G matrix matrix
     call dgetrf ( length, length, inverse_matrix, lda, ipiv, info )
     !---Compute the inverse matrix.
@@ -70,7 +71,8 @@ subroutine solve_soln_steady(isotope, delay_group, n, nl_iter )
            write(outfile_unit,fmt='(12es14.3)') &
                 ( inverse_matrix(j,i) ,i=1,nodes_per_elem )             
     end do
-!---END PRECURSOR SOLVE    
+!---END PRECURSOR SOLVE   
+
     write(outfile_unit,fmt='(a)'), ' '
     write(outfile_unit,fmt='(a,1I3,a,1I3,a,1I3)'),&
         'Solution | element --> ', n, ' Isotope ',isotope, ' Delayed Group ',delay_group

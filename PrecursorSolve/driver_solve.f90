@@ -16,8 +16,7 @@ implicit none
 
 !---Open file for writing out debug information
     open (unit=outfile_unit, file="outfile.txt",status='unknown',form='formatted',position='asis')
-!---Open file for writing out solution
-    open (unit=soln_outfile_unit, file='ss_solution_file.txt',status='unknown',form='formatted',position='asis')
+    open (unit=soln_outfile_unit, file='ss_soln_file.txt',status='unknown',form='formatted',position='asis')
     open (unit=66, file='last_t_solution_file.txt',status='unknown',form='formatted',position='asis')
 !---Read in problem parameters here
     call datainput_fe
@@ -36,9 +35,10 @@ implicit none
              temperature_soln_prev( num_elem,nodes_per_elem), &
              density_soln_prev( num_elem,nodes_per_elem),  &
              velocity_soln_prev( num_elem,nodes_per_elem), &
-             amplitude_fcn( num_elem, nodes_per_elem) )
+             spatial_power_fcn( num_elem, nodes_per_elem) )
     allocate(elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem)) 
     allocate(elem_vol_int(num_elem,nodes_per_elem))
+    allocate(power_soln_test(num_elem))
 
 !---Test integral over volume of element only int_-1^1 f(x)
     elem_vol_int(:,:) = 0
