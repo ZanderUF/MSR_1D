@@ -22,7 +22,6 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     integer :: i, j, ii, jj, nr,nc, ncl,length   
     real, dimension(3) ::  elem_prev_soln, flux_rhs, flux_lhs, &
                           temp_vec, basis_at_lhs, basis_at_rhs, rhs_final_vec
-                          
     real, dimension(3,3) :: inverse_matrix,temp_matrix
    
 !---Initialize
@@ -36,14 +35,12 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     elem_matrix_A_times_W = matmul(inverse_A_matrix,matrix_W_left_face)
     !---Calculate H matrix, will be inverted later on
     elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
-                    lamda_i_mat(1,1)*identity_matrix - &
+                    lamda_i_mat(isotope,delay_group)*identity_matrix - &
                     matmul(inverse_A_matrix,matrix_W_right_face)
    
     elem_vec_A_times_q = matmul(inverse_A_matrix,elem_vec_q)
     !---Multiply H matrix by previous soln vec
     do i = 1, nodes_per_elem
-        !---Calculate q vector
-        !elem_vec_q(i) = (beta/gen_time)*elem_vec_q(i)
         do j = 1, nodes_per_elem
             H_times_soln_vec(i) = H_times_soln_vec(i) + &
                                   elem_matrix_H(i,j)*precursor_soln_prev(isotope,delay_group,n,j) 

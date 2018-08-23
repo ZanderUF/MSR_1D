@@ -14,12 +14,12 @@ implicit none
 !---Dummy
 
 !---Local
-    integer :: f,g,n, i , j, nl_iter
-    real    :: t1  !---next time step  
+    integer :: f,g,n,i,j,nl_iter
+    real    :: t1  !---Next time step  
 
 !---Start time-dependent solve
     transient = .TRUE.
-    if ( transient .eqv. .TRUE.) then
+    if ( transient .eqv. .TRUE. ) then
         write(outfile_unit, fmt='(a)'), ' ' 
         write(outfile_unit, fmt='(a)'), 'In transient loop'
         do!---Time loop 
@@ -31,20 +31,22 @@ implicit none
                     call element_matrix(n, nl_iter) 
                     do f = 1, num_isotopes
                         do g = 1, num_delay_group
-                            !---Assemble element matrices to solve for elemental coeficients 
+                            !---Assemble element matrices to solve for elemental coefficients 
                             call assemble_matrix_transient(f,g,n) 
                             !---Solve for the elemental solution
                             call solve_soln_transient(f,g,n,nl_iter)
-                        end do
-                    end do
+                        end do !---End over delay groups
+                    end do !---End over isotops
                 end do !---End loop over num elements
+                
                 !---Solve for total power after spatial sweep through precursors
-                call solve_power_transient(nl_iter) 
+                call solve_power_transient(nl_iter,t0) 
 
                 call write_out_soln(outfile_unit,num_elem)
 
                 precursor_soln_prev = precursor_soln_new
-                
+                power_amplitude_prev = power_amplitude_new
+
                 nl_iter = nl_iter + 1 !---Nonlinear iteration counter
                 !---Check if too many nonlinear iterations and not converging
                 if ( nl_iter > max_nl_iter) then
@@ -53,7 +55,8 @@ implicit none
                 
             end do !---End nonlinear loop
             precursor_soln_prev = precursor_soln_new 
-           
+            power_amplitude_prev = power_amplitude_new
+
            !---Stop if we've exceeded TMAX.
            if ( tmax <= t0 ) then
                exit

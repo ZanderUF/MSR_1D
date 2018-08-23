@@ -59,6 +59,6 @@ implicit none
     call steady_state
 
 !---Transient solve Euler method 
-!    call transient_solve_euler
+    call transient_solve_euler
 
 end 

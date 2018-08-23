@@ -26,7 +26,8 @@ implicit none
     power_soln_new(:,:) = 0 
    
     !---Power amplitude set
-    power_amplitude = 1.0
+    power_amplitude_new = 1.0
+    power_amplitude_prev = power_amplitude_new 
     steady_state_flag = .TRUE.
     nonlinear_ss_flag = .TRUE.
      
@@ -57,7 +58,7 @@ implicit none
         do j = 1, nodes_per_elem
             !---Apply to active fuel region
             if( i <= non_fuel_start ) then
-                power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude
+                power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new
                 !---Set temperature distribution
                 temperature_soln_new(i,j) = (center_temp_initial*spatial_power_fcn(i,j))
                 temperature = temperature_soln_new(i,j)
@@ -87,11 +88,12 @@ implicit none
 !-------------------------------------------------------------------------------
 !---Write out initial solution
     write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit,fmt='(a)'), 'Initial Power distribution '
+    write(outfile_unit,fmt='(a)'), 'Initial Spatial Power distribution '
+    write(outfile_unit,fmt='(a,12es14.3)'),'Initial power amplitude', power_amplitude_new
     write(outfile_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
     do i = 1,num_elem
         do j = 1, nodes_per_elem
-            write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), power_soln_new(i,j)
+            write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), spatial_power_fcn(i,j)
         end do
     end do
 !-------------------------------------------------------------------------------

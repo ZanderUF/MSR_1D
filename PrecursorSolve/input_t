@@ -6,7 +6,7 @@ read parm
    tin=0.0 
    nem=5
    npe=3
-   pipe=2
+   pipe=0
    area=10000.0
    mflow=18000
    tpow=10

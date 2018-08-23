@@ -16,6 +16,8 @@ implicit none
     integer :: f,i,j,g
 
 !---Write to solution file
+    write(file_unit,fmt='(a)'), ' '
+    write(file_unit,fmt='(a)'), 'Precursor concentration'
     write(file_unit,fmt='(a,6I10)'), 'Position(x) ',&
                                     (i, i=1,num_delay_group)
     do f = 1, num_isotopes ! isotope family

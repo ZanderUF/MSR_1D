@@ -102,13 +102,14 @@ module parameters_fe
     real   tmax      ! max time 
     real   t_initial ! starting time
 
-    real :: power_amplitude
+    real :: power_amplitude_prev
+    real :: power_amplitude_new
     real :: reactivity = 0.0
 !---Material
     !real, dimension(:)  ( kind = 8 ) conductivity
     !real, dimension(:)  ( kind = 8 ) spec_heat
     !real, dimension(:)  ( kind = 8 ) density
-    real, allocatable  :: beta_i_correction(:,:)
+    real :: beta_correction
     real, allocatable  :: lamda_i_mat(:,:)
     real, allocatable  :: beta_i_mat(:,:)
     real     :: gen_time

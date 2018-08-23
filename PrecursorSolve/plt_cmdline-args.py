@@ -41,7 +41,7 @@ num_precursor_groups =1
 
 while i < len(file_names):
     while g < num_precursor_groups:
-        data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=2)
+        data1 = np.loadtxt(current_dir + "/" + file_names[i] , skiprows=1)
         x_coord = data1[:,0]
         print g
 
