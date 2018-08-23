@@ -102,6 +102,7 @@ module parameters_fe
     real   tmax      ! max time 
     real   t_initial ! starting time
 
+    real :: power_amplitude_start
     real :: power_amplitude_prev
     real :: power_amplitude_new
     real :: reactivity = 0.0

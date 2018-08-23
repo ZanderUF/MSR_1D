@@ -50,15 +50,15 @@ subroutine solve_power_transient(nl_iter, current_time)
             total_fuel_length = total_fuel_length + spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
-    print *,'non fuel start', non_fuel_start
+    
     total_precursor_ref   = sum(precursors_lambda_vec)
     total_precursors_fuel = sum(precursors_lambda_vec(1:non_fuel_start))
     beta_correction       = gen_time*((total_precursor_ref - &
-                            total_precursors_fuel)/power_amplitude_prev)
+                            total_precursors_fuel)/(power_amplitude_start*total_fuel_length))
     
-    print *,'total prec fuel transient',total_precursors_fuel
-    print *,'total beta',sum(beta_i_mat)
-    print *,'beta correction',beta_correction
+    print *,'total prec fuel transient', total_precursors_fuel
+    print *,'total beta', sum(beta_i_mat)
+    print *,'beta correction', beta_correction
 
 !---Power Solve
     power_amplitude_new = power_amplitude_prev + delta_t*( (reactivity - ( (sum(beta_i_mat) &

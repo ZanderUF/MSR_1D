@@ -28,6 +28,8 @@ implicit none
     !---Power amplitude set
     power_amplitude_new = 1.0
     power_amplitude_prev = power_amplitude_new 
+    power_amplitude_start = power_amplitude_new 
+    
     steady_state_flag = .TRUE.
     nonlinear_ss_flag = .TRUE.
      
