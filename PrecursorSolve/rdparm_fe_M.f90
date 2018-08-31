@@ -66,7 +66,7 @@
           case('nmat')
               num_isotopes = iread(i0,iret)
           case('gen=')
-              gen_time = fread(i0,iret)
+              gen_time = dread(i0,iret)
           end select
       
       end do

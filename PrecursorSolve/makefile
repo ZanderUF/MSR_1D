@@ -6,7 +6,7 @@
 
 F90 = gfortran
 
-FFLAGS = -g -fbounds-check  -fdefault-real-8
+FFLAGS = -g -fbounds-check -fdefault-real-8
 LIBDIR = ../lapack-3.8.0/ 
 LIB = -llapack -lblas
 

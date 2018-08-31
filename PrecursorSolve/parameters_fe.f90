@@ -102,9 +102,9 @@ module parameters_fe
     real   tmax      ! max time 
     real   t_initial ! starting time
 
-    real :: power_amplitude_start
-    real :: power_amplitude_prev
-    real :: power_amplitude_new
+    real(kind=16) :: power_amplitude_start
+    real(kind=16) :: power_amplitude_prev
+    real(kind=16) :: power_amplitude_new
     real :: reactivity = 0.0
 !---Material
     !real, dimension(:)  ( kind = 8 ) conductivity
@@ -113,7 +113,7 @@ module parameters_fe
     real :: beta_correction
     real, allocatable  :: lamda_i_mat(:,:)
     real, allocatable  :: beta_i_mat(:,:)
-    real     :: gen_time
+    real (kind=16)     :: gen_time
     real     :: mass_flow
     integer  :: num_isotopes
     integer  :: num_delay_group
@@ -122,6 +122,7 @@ module parameters_fe
     character(60) :: file_name
     integer :: outfile_unit = 11 
     integer :: soln_outfile_unit = 99
+    integer :: soln_last_t_unit = 66
 !---Nonlinear variables
     integer :: max_iter = 1 ! max num of nonlinear iterations to do
     integer :: max_nl_iter  ! numer of nonllinear iterations to do

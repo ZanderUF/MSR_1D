@@ -19,16 +19,19 @@ subroutine solve_power_transient(nl_iter, current_time)
 
 !---Local
     integer :: i,j,f,g
-    real, dimension(num_elem) :: temp_vec_num_elem, precursors_lambda_vec
-    real :: power_new_total, total_precursor_ref,&
+    real (kind=16), dimension(num_elem) :: temp_vec_num_elem, precursors_lambda_vec
+    real (kind=16):: power_new_total, total_precursor_ref,&
             total_precursors_fuel
-    real, dimension(num_elem) :: power_soln_new_temp 
-    real :: total_fuel_length
+    real(kind=16), dimension(num_elem) :: power_soln_new_temp 
+    real (kind=16):: total_fuel_length
+    real(kind=16) :: total_precursor_ref_sum
+    real (kind=16):: delta_t_test
 
+    delta_t_test = 0.01
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
     temp_vec_num_elem(:) = 0.0
-
+    total_precursor_ref = 0.0
 !---Calculate total precursor concentration*lamda over system 
     do f = 1, num_isotopes 
        do g = 1, num_delay_group
@@ -38,9 +41,15 @@ subroutine solve_power_transient(nl_iter, current_time)
                                       lamda_i_mat(f,g)*&
                                       elem_vol_int(i,j)*&
                                       precursor_soln_prev(f,g,i,j)
+                   
+                   total_precursor_ref = total_precursor_ref + &
+                                      lamda_i_mat(f,g)*&
+                                      elem_vol_int(i,j)*&
+                                      precursor_soln_prev(f,g,i,j)
                 end do
             end do
        end do
+
     end do
     
     !---Get total length of the fuel element
@@ -50,21 +59,25 @@ subroutine solve_power_transient(nl_iter, current_time)
             total_fuel_length = total_fuel_length + spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
-    
-    total_precursor_ref   = sum(precursors_lambda_vec)
-    total_precursors_fuel = sum(precursors_lambda_vec(1:non_fuel_start))
-    beta_correction       = gen_time*((total_precursor_ref - &
+   
+    print *,'gen_time',gen_time
+    total_precursor_ref_sum   = sum(precursors_lambda_vec)
+    total_precursors_fuel     = sum(precursors_lambda_vec(1:non_fuel_start))
+    beta_correction           = gen_time*((total_precursor_ref - &
                             total_precursors_fuel)/(power_amplitude_start*total_fuel_length))
-    
+   
+    print *,'total precursors', total_precursor_ref
+    print *,'total precursors sum routing', total_precursor_ref_sum
     print *,'total prec fuel transient', total_precursors_fuel
     print *,'total beta', sum(beta_i_mat)
     print *,'beta correction', beta_correction
 
 !---Power Solve
-    power_amplitude_new = power_amplitude_prev + delta_t*( (reactivity - ( (sum(beta_i_mat) &
+    power_amplitude_new = power_amplitude_prev + &
+                          delta_t_test*( (reactivity - ( (sum(beta_i_mat) &
                           - beta_correction) ))/gen_time)*power_amplitude_prev + &
-                            delta_t*(1.0/total_fuel_length)*total_precursors_fuel
-    
+                          delta_t_test*(1.0/total_fuel_length)*total_precursors_fuel
+    print *,'delta_t diff', delta_t_test - delta_t 
     print *,'power amplitude new ', power_amplitude_new
     print *,'first part', delta_t*( (reactivity - ( (sum(beta_i_mat) &
                     - beta_correction)))/gen_time)*power_amplitude_prev

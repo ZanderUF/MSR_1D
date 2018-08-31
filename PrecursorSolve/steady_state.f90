@@ -71,7 +71,7 @@ implicit none
                 
                 !---Write out the solution
                 call write_out_soln(outfile_unit,num_elem) 
-                
+                   
                 nl_iter = nl_iter + 1
     
                 ! If we've gone thru too many nonlinear iterations exit
@@ -84,7 +84,9 @@ implicit none
             end do !---end nonlinear iteration loop
         end if !---end nonlinear if 
     end if !---end normal calculation if 
-    
+
+!    precursor_soln_prev = precursor_soln_new
+
     !---Make the final converged solution the 'previous' solution
     do f = 1, num_isotopes 
         do g = 1, num_delay_group
@@ -129,8 +131,8 @@ implicit none
     beta_correction = gen_time*((total_precursor_ref - &
                                  total_precursors_fuel)/(power_amplitude_prev*total_fuel_length))
 
-    print *,'Total precursor', (1.0/total_fuel_length)*total_precursor_ref
-    print *,'Total precursor fuel', (1.0/total_fuel_length)*total_precursors_fuel
+    print *,'Total precursor', total_precursor_ref
+    print *,'Total precursor fuel', total_precursors_fuel
     print *,'Prec  match', power_amplitude_prev*( (sum(beta_i_mat) - beta_correction)/gen_time )
     print *,'Beta  correction', beta_correction
     print *,' '  

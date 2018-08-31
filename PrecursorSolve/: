@@ -1,0 +1,23 @@
+heat solve sample
+read parm
+   time=yes
+   del=0.1
+   tmax=0.2
+   tin=0.0 
+   nem=5
+   npe=3
+   pipe=2
+   area=10000.0
+   mflow=18000
+   tpow=10
+   nitr=1
+   elem=1.0
+   ndg=2
+   nmat=1
+   gen=1E-4
+end parm
+read delay
+  mat=1
+alam=0.5 0.25 end
+beta=0.007 0.005 end 
+end delay

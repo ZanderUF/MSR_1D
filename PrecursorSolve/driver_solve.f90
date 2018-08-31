@@ -17,7 +17,7 @@ implicit none
 !---Open file for writing out debug information
     open (unit=outfile_unit, file="outfile.txt",status='unknown',form='formatted',position='asis')
     open (unit=soln_outfile_unit, file='ss_soln_file.txt',status='unknown',form='formatted',position='asis')
-    open (unit=66, file='last_t_solution_file.txt',status='unknown',form='formatted',position='asis')
+    open (unit=soln_last_t_unit, file='last_t_solution_file.txt',status='unknown',form='formatted',position='asis')
 !---Read in problem parameters here
     call datainput_fe
 

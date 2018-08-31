@@ -26,7 +26,7 @@ implicit none
     power_soln_new(:,:) = 0 
    
     !---Power amplitude set
-    power_amplitude_new = 1.0
+    power_amplitude_new = 10.0
     power_amplitude_prev = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
     
@@ -36,21 +36,25 @@ implicit none
     !---Initial guesses 
     center_temp_initial  = 800
     !---Constant velocity for testing
-    constant_velocity = 0.0 ! [cm/s]
+    constant_velocity = 0.5! [cm/s]
     
     !---Flag for testing, use a flat power function or not
     constant_flag = .TRUE.
     !---Create spatial power function
     do i = 1, num_elem
         do j = 1, nodes_per_elem
-            !---Flat spatial shape 
-            if(constant_flag .eqv. .TRUE.) then
-                spatial_power_fcn(i,j) = 1.0
+            if( i <= non_fuel_start) then
+                !---Flat spatial shape 
+                if(constant_flag .eqv. .TRUE.) then
+                    spatial_power_fcn(i,j) = 1.0
+                else
+                    !---Cosine spatial shape 
+                    call get_norm_coord(i,j,norm_cos) 
+                    cosine_term = cos( (pi/2)*norm_cos )
+                    spatial_power_fcn(i,j) = cosine_term
+                end if
             else
-                !---Cosine spatial shape 
-                call get_norm_coord(i,j,norm_cos) 
-                cosine_term = cos( (pi/2)*norm_cos )
-                spatial_power_fcn(i,j) = cosine_term
+                spatial_power_fcn(i,j) = 0.0
             end if
         end do
     end do
@@ -68,21 +72,20 @@ implicit none
                 call density_corr(temperature,density)
                 density_soln_new(i,j) = density
                 !---Need to get initial velocity distribution
-                !velocity_soln_new(i,j) = mass_flow/(area*density)
-                velocity_soln_new(i,j) = constant_velocity 
-                !velocity_soln_new(i,j) = 0
+                velocity_soln_new(i,j) = mass_flow/(area*density)
+                !velocity_soln_new(i,j) = constant_velocity 
             !---Inactive region assumed to have zero power 
             else
-                power_soln_new(i,j)=0.0
+                power_soln_new(i,j) = 0.0
                 !---Temperature in inactive region same as end of active region ==> no loss
                 temperature_soln_new(i,j) = temperature_soln_new(non_fuel_start ,3)
                 !---Get density to set the velocity
                 call density_corr(temperature_soln_new(i,j),density)
                 density_soln_new = density
                 !---Need to get initial velocity distribution
-                !velocity_soln_new(i,j) = mass_flow/(area*density)
+                velocity_soln_new(i,j) = mass_flow/(area*density)
                 !velocity_soln_new(i,j) = 0
-                velocity_soln_new(i,j) = constant_velocity 
+                !velocity_soln_new(i,j) = constant_velocity 
             end if
         end do 
     end do

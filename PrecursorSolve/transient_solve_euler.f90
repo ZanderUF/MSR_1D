@@ -17,6 +17,7 @@ implicit none
     integer :: f,g,n,i,j,nl_iter
     real    :: t1  !---Next time step  
 
+    max_nl_iter = 1 
 !---Start time-dependent solve
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
@@ -38,14 +39,11 @@ implicit none
                         end do !---End over delay groups
                     end do !---End over isotops
                 end do !---End loop over num elements
-                
-                !---Solve for total power after spatial sweep through precursors
-                call solve_power_transient(nl_iter,t0) 
-
+                write(outfile_unit,fmt='(a,12es14.3)'),'time: ',t0 
                 call write_out_soln(outfile_unit,num_elem)
 
                 precursor_soln_prev = precursor_soln_new
-                power_amplitude_prev = power_amplitude_new
+           !    power_amplitude_prev = power_amplitude_new
 
                 nl_iter = nl_iter + 1 !---Nonlinear iteration counter
                 !---Check if too many nonlinear iterations and not converging
@@ -54,6 +52,9 @@ implicit none
                 end if 
                 
             end do !---End nonlinear loop
+            !---Solve for total power after spatial sweep through precursors
+            call solve_power_transient(nl_iter,t0) 
+            
             precursor_soln_prev = precursor_soln_new 
             power_amplitude_prev = power_amplitude_new
 
@@ -67,5 +68,7 @@ implicit none
            t0 = t1
        end do !---End time loop
     end if!---End transient if
+
+    call write_out_soln(soln_last_t_unit,num_elem)
 
 end subroutine transient_solve_euler

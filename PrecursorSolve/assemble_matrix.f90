@@ -33,7 +33,6 @@ subroutine assemble_matrix (isotope,delay_group,n)
     lda =   length
     lwork = length
 
-    elem_matrix_H = 0
     elem_matrix_G = 0
     elem_vec_w_left_face = 0
     
@@ -74,7 +73,7 @@ subroutine assemble_matrix (isotope,delay_group,n)
     end do
     
     write(outfile_unit,fmt='(a)'),' '
-    write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
+    write(outfile_unit,fmt='(a,1I2)'),'beta/gen time *{q} element source vector | element --> ',n
     write(outfile_unit,fmt='(12es14.3)') (elem_vec_q_final(isotope,delay_group,i),i=1,nodes_per_elem)             
 
 end 

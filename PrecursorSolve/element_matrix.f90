@@ -113,7 +113,6 @@ subroutine element_matrix (n, nl_iter)
     !---END Unit Test 
     
     end do !---end do over gauss pts 
-    print *,'power_amplitude_prev',power_amplitude_prev
 !---Create source vector 'q', and W - 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
@@ -136,7 +135,6 @@ subroutine element_matrix (n, nl_iter)
         end do
     end do
     
-    print *,' elem vec q', elem_vec_q
 !---Invert A matrix
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
