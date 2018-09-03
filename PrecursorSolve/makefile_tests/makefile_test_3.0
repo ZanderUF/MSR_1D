@@ -1,0 +1,81 @@
+# This is a makefile for GNU make.
+
+# This makefile builds MSR 1D 
+
+# 1. Source files
+
+# Directory containing the main makefile, used by "VPATH":
+makefile_dir = .
+
+# (this variable should be overriden on the command line when "make"
+# is invoked from a directory other than the main source directory)
+# (Define "makefile_dir" before using it in a target.)
+
+# Write paths relative to makefile_dir, separated by blanks (do not
+# include ${makefile_dir} in the list):
+VPATH := ${makefile_dir} $(addprefix ${makefile_dir}/src,bin)
+
+# Write source file names, without path, separated by blanks, not
+# commas. Only .f* files, not included files. Also the file
+# containinig the main program unit.
+sources := $(sort ${makefile_dir}/src/*.f90)
+
+# 2. Objects and executable file
+
+# Or, if all the source files have the same suffix, more simply:
+objects := $(sources:.f90=.o)
+
+execut = msr1d 
+
+# 3. Compiler-dependent part
+F90 = gfortran
+FFLAGS = -g -founds-check -fdefault-real-8
+LIB = -llapack -lblas
+
+# 4. Rules
+
+SHELL = /bin/sh
+# for echo in log commands
+
+# Extend known suffixes:
+# (if the suffixes are not ".f" or ".F")
+
+%.o: %.f90
+	$(F90) $(FFLAGS)  $<
+
+.DELETE_ON_ERROR:
+.PHONY: all clean clobber depend
+
+all: ${execut} log
+# (should be the first rule)
+
+# Do not include TAGS in "all" because, with make.sh, TAGS would use
+# absolute paths.
+
+${execut}: ${objects}
+	$(F90) $(FFLAGS) $^ -o $@
+
+#depend ${makefile_dir}/depend.mk:
+#	makedepend $(addprefix -D, ${cpp_macros}) -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , ...) ${sources} >${makefile_dir}/depend.mk
+## (See whether you need the "-D", "-free" and "-u" options.)
+
+TAGS: ${sources}
+	ctags -e --language-force=fortran $^
+# Or, on barren machines:
+##	etags --language=fortran $^
+
+clean:
+	rm -f ${execut} ${objects} log
+
+clobber: clean
+	rm -f *.mod ${makefile_dir}/depend.mk TAGS
+
+log:
+	hostname >$@
+	${FC} ${version_flag} >>$@ 2>&1
+	echo -e "\nFC = ${FC}\n\nCPPFLAGS = ${CPPFLAGS}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}" >>$@
+
+#ifneq ($(MAKECMDGOALS), clobber)
+## Dependencies among object files and included files:
+#include ${makefile_dir}/depend.mk
+#endif
