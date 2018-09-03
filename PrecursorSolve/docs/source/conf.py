@@ -92,10 +92,9 @@ html_static_path = ['_static']
 #
 # The default sidebars (for documents that don't match any pattern) are
 # defined by theme itself.  Builtin themes are using these templates by
-# default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
-# 'searchbox.html']``.
+#default: ``['globaltoc.html', 'relations.html', 'sourcelink.html','searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = {'**': ['globaltoc.html', 'relations.html', 'sourcelink.html','searchbox.html']}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

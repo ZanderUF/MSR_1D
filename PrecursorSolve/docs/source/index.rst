@@ -6,9 +6,16 @@ Documentation for MSR Simulation Project
 Guide
 ^^^^^
 
+.. only:: html
+
+   --------
+   Contents
+   --------
+
 .. toctree::
    :maxdepth: 2 
 
+   installation
    license
    help
 
