@@ -7,6 +7,8 @@ SHELL = /bin/sh
 # GNU
 F90 = gfortran
 
+#FFLAGS = -g -fbounds-check 
+
 FFLAGS = -g -fbounds-check -fdefault-real-8
 LIBDIR = ../../lapack-3.8.0/ 
 LIB = -llapack -lblas
@@ -16,11 +18,11 @@ msr1d : common_unit.o error_functions.o \
 	vast_kind_param.o y0trns_M.o free_form.o \
 	parameters_fe_M.o rdmesh_M.o \
 	rdparm_fe_M.o rddelay_M.o\
-	assemble_matrix.o assemble_matrix_transient.o \
+	assemble_matrix_ss.o assemble_matrix_transient.o \
     	boundary_cond.o cond_corr.o  \
 	datainput_fe_M.o \
 	density_corr.o   \
-	element_matrix.o \
+	spatial_matrices.o \
 	driver_solve.o     \
 	inter_shape_fcns.o \
 	mesh_creation.o steady_state.o \
@@ -62,8 +64,8 @@ rddelay_M.o : rdmesh_M.f90 free_form.o parameters_fe_M.o
 rdparm_fe_M.o : rdparm_fe_M.f90 free_form.o parameters_fe_M.o        
 	$(F90) $(FFLAGS) -c rdparm_fe_M.f90
 
-assemble_matrix.o: assemble_matrix.f90 parameters_fe_M.o
-	$(F90) $(FFLAGS) -c assemble_matrix.f90 
+assemble_matrix_ss.o: assemble_matrix_ss.f90 parameters_fe_M.o
+	$(F90) $(FFLAGS) -c assemble_matrix_ss.f90 
 
 assemble_matrix_transient.o: assemble_matrix_transient.f90 parameters_fe_M.o
 	$(F90) $(FFLAGS) -c assemble_matrix_transient.f90 
@@ -80,8 +82,8 @@ datainput_fe_M.o:  datainput_fe_M.f90 free_form.o rdparm_fe_M.o rddelay_M.o rdme
 density_corr.o:  density_corr.f90    
 	$(F90) $(FFLAGS) -c density_corr.f90
 
-element_matrix.o:  element_matrix.f90 parameters_fe_M.o datainput_fe_M.o  
-	$(F90) $(FFLAGS) -c element_matrix.f90
+spatial_matrices.o:  spatial_matrices.f90 parameters_fe_M.o datainput_fe_M.o  
+	$(F90) $(FFLAGS) -c spatial_matrices.f90
 
 driver_solve.o: driver_solve.f90  parameters_fe_M.o datainput_fe_M.o 
 	$(F90) $(FFLAGS) -c driver_solve.f90

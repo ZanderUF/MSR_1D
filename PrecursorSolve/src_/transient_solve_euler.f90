@@ -28,8 +28,8 @@ implicit none
             do!---Nonlinear loop  
                 !---Create element matrices and assemble
                 do n = 1 , num_elem 
-                    !---Generate elemental matrices
-                    call element_matrix(n, nl_iter) 
+                    !---Generate spatial matrices
+                    call spatial_matrices(n,nl_iter)
                     do f = 1, num_isotopes
                         do g = 1, num_delay_group
                             !---Assemble element matrices to solve for elemental coefficients 
@@ -39,8 +39,8 @@ implicit none
                         end do !---End over delay groups
                     end do !---End over isotops
                 end do !---End loop over num elements
-                write(outfile_unit,fmt='(a,12es14.3)'),'time: ',t0 
-                call write_out_soln(outfile_unit,num_elem)
+                !write(outfile_unit,fmt='(a,12es14.3)'),'time: ',t0 
+                !call write_out_soln(outfile_unit,num_elem)
 
                 precursor_soln_prev = precursor_soln_new
            !    power_amplitude_prev = power_amplitude_new

@@ -40,7 +40,7 @@
                   time_solve  = .TRUE.
               endif
           case ('del=')
-              delta_t = fread(i0, iret)
+              delta_t = dread(i0, iret)
           case ('tmax')
               tmax  = fread(i0, iret)
           case ('tin=')

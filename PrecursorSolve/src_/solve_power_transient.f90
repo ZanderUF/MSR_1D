@@ -25,9 +25,8 @@ subroutine solve_power_transient(nl_iter, current_time)
     real(kind=16), dimension(num_elem) :: power_soln_new_temp 
     real (kind=16):: total_fuel_length
     real(kind=16) :: total_precursor_ref_sum
-    real (kind=16):: delta_t_test
-
-    delta_t_test = 0.01
+    real :: step_time
+    
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
     temp_vec_num_elem(:) = 0.0
@@ -60,29 +59,38 @@ subroutine solve_power_transient(nl_iter, current_time)
         end do
     end do
    
-    print *,'gen_time',gen_time
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(1:non_fuel_start))
     beta_correction           = gen_time*((total_precursor_ref - &
                             total_precursors_fuel)/(power_amplitude_start*total_fuel_length))
    
-    print *,'total precursors', total_precursor_ref
-    print *,'total precursors sum routing', total_precursor_ref_sum
-    print *,'total prec fuel transient', total_precursors_fuel
-    print *,'total beta', sum(beta_i_mat)
-    print *,'beta correction', beta_correction
+    !print *,'total precursors', total_precursor_ref
+    !print *,'total precursors sum routing', total_precursor_ref_sum
+    !print *,'total prec fuel transient', total_precursors_fuel
+    !print *,'total beta', sum(beta_i_mat)
+    !print *,'beta correction', beta_correction
+
+    step_time = 0.1
+!---STEP perturbation
+    if(current_time > step_time) then
+    	reactivity = 1E-4 
+    end if
 
 !---Power Solve
     power_amplitude_new = power_amplitude_prev + &
-                          delta_t_test*( (reactivity - ( (sum(beta_i_mat) &
+                          delta_t*( (reactivity - ( (sum(beta_i_mat) &
                           - beta_correction) ))/gen_time)*power_amplitude_prev + &
-                          delta_t_test*(1.0/total_fuel_length)*total_precursors_fuel
-    print *,'delta_t diff', delta_t_test - delta_t 
-    print *,'power amplitude new ', power_amplitude_new
-    print *,'first part', delta_t*( (reactivity - ( (sum(beta_i_mat) &
-                    - beta_correction)))/gen_time)*power_amplitude_prev
-    print *,'second part', delta_t*(1.0/total_fuel_length)*total_precursors_fuel
-    print *,' ' 
+                          delta_t*(1.0_dp/total_fuel_length)*total_precursors_fuel
+    !print *, ' '
+    !print *,'sum_beta',sum(beta_i_mat)
+    !print *,'beta cor',beta_correction
+    !print *,'power_amp prev',power_amplitude_prev
+    !print *,' ' 
+    !print *,'power amplitude new ', power_amplitude_new
+    !print *,'first part', delta_t*( (reactivity - ( (sum(beta_i_mat) &
+    !                - beta_correction)))/gen_time)*power_amplitude_prev
+    !print *,'second part', delta_t*(1.0/total_fuel_length)*total_precursors_fuel
+    !print *,' ' 
 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
@@ -93,14 +101,14 @@ subroutine solve_power_transient(nl_iter, current_time)
     end do
 
 !---Write out power solution 
-    write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit,fmt='(a,12es14.3)'), 'Power distribution at time:', current_time  
-    write(outfile_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
-    do i = 1,num_elem
-        do j = 1, nodes_per_elem
-            write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), power_soln_new(i,j)
-        end do
-    end do
+    !write(outfile_unit,fmt='(a)'), ' '
+    !write(outfile_unit,fmt='(a,12es14.3)'), 'Power distribution at time:', current_time  
+    !write(outfile_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
+    !do i = 1,num_elem
+    !    do j = 1, nodes_per_elem
+    !        write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), power_soln_new(i,j)
+    !    end do
+    !end do
 
 !---End power solve
 

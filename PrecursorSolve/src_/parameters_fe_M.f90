@@ -97,23 +97,23 @@ module parameters_fe
 !---Time information 
     logical :: time_solve       ! decide if we are doing time solve or not  
     real   alpha     ! time solve 
-    real   t0        ! starting time
-    real   delta_t        ! time step 
-    real   tmax      ! max time 
-    real   t_initial ! starting time
+    double precision   t0        ! starting time
+    double precision   delta_t        ! time step 
+    double precision     tmax      ! max time 
+     double precision  t_initial ! starting time
 
-    real(kind=16) :: power_amplitude_start
-    real(kind=16) :: power_amplitude_prev
-    real(kind=16) :: power_amplitude_new
+    double precision :: power_amplitude_start
+    double precision :: power_amplitude_prev
+    double precision :: power_amplitude_new
     real :: reactivity = 0.0
 !---Material
     !real, dimension(:)  ( kind = 8 ) conductivity
     !real, dimension(:)  ( kind = 8 ) spec_heat
     !real, dimension(:)  ( kind = 8 ) density
-    real :: beta_correction
+    double precision :: beta_correction
     real, allocatable  :: lamda_i_mat(:,:)
     real, allocatable  :: beta_i_mat(:,:)
-    real (kind=16)     :: gen_time
+    double precision     :: gen_time
     real     :: mass_flow
     integer  :: num_isotopes
     integer  :: num_delay_group

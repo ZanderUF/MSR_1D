@@ -4,7 +4,7 @@
 !
 !  Discussion:
 !             Generates the elemental matrices K_ij, M_ij, S_ij 
-!     	      calculates coefficients in this suboutine 
+!             calculates coefficients in this suboutine 
 !  Input: 
 !       n - element number
 !       nl_iter - nonlinear iteration counter
@@ -15,7 +15,7 @@
 !         elem_vec_Q
 !*****************************************************************************80
 
-subroutine element_matrix (n, nl_iter)
+subroutine spatial_matrices (n, nl_iter)
 !
   USE parameters_fe  
 
@@ -44,7 +44,6 @@ subroutine element_matrix (n, nl_iter)
     matrix_W_right_face = 0
     matrix_W_left_face = 0
     elem_matrix_U = 0.0
-    elem_matrix_A = 0.0 
     elem_matrix_F   = 0.0
     elem_vec_f      = 0.0
     elem_vec_q   = 0.0    
@@ -64,14 +63,14 @@ subroutine element_matrix (n, nl_iter)
         call inter_shape_fcns(xi,h)
         cnst = g_jacobian*wt
         !---Evaluate velocity and power at gauss pt
-        !evaluated_velocity = 0.0
-        !evaluated_spatial_power = 0.0
-        !do i = 1, nodes_per_elem
-        !    evaluated_velocity = evaluated_velocity + &
-        !                         shape_fcn(i)*velocity_soln_prev(n,i)
-        !    evaluated_spatial_power = evaluated_spatial_power + &
-        !                         shape_fcn(i)*spatial_power_fcn(n,i)*power_amplitude_prev
-        !end do
+        evaluated_velocity = 0.0
+        evaluated_spatial_power = 0.0
+        do i = 1, nodes_per_elem
+            evaluated_velocity = evaluated_velocity + &
+                                 shape_fcn(i)*velocity_soln_prev(n,i)
+            evaluated_spatial_power = evaluated_spatial_power + &
+                                 shape_fcn(i)*spatial_power_fcn(n,i)*power_amplitude_prev
+        end do
     
         !---Normal calculation flow
         if(unit_test .eqv. .FALSE.) then
@@ -80,32 +79,60 @@ subroutine element_matrix (n, nl_iter)
                 elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
                 
                 do j = 1, nodes_per_elem
-                    
-                    !---Assemble A matrix - only needs to be done once
-                    elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
+                    if(n < 2 .and. nl_iter < 2) then 
+                        !---Assemble A matrix - only needs to be done once
+                        elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                          cnst*shape_fcn(i)*shape_fcn(j)
+                    end if
                     !---Assemble P matrix
                     elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
-                                        cnst*shape_fcn(j)*global_der_shape_fcn(i)
+                                        evaluated_velocity*cnst*shape_fcn(j)*global_der_shape_fcn(i)
+                    !---Transient calculation
+                    if ( steady_state_flag .eqv. .FALSE.) then 
+                        
+                    end if!---end transient case if 
                 
-		end do !---End loop over j matrix entries
+                end do !---End loop over j matrix entries
             end do !---End loop over i matrix entries
         end if !---end unit test if 
     
     end do !---end do over gauss pts 
-   
-!---Invert A matrix
+!---Create source vector 'q', and W - 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
-            inverse_A_matrix(i,j) = elem_matrix_A(i,j)
+            elem_vec_q(i) = elem_vec_q(i) + &
+                            elem_matrix_A(i,j)*spatial_power_fcn(n,j)*power_amplitude_prev
+            !---Applies for all elements except the first one
+            if(n > 1) then !--- n - element #
+                !---Grab previous precursor conc. + velocity at 
+                !---rhs of previous element
+                 matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
+                                            interp_fcn_rhs(i)*interp_fcn_rhs(j)  
+                 matrix_W_left_face(i,j)  = velocity_soln_prev(n,i)*&
+                                            interp_fcn_lhs(i)*interp_fcn_lhs(j)
+            else!---First element case, need to connect with end element 
+                 matrix_W_right_face(i,j) = velocity_soln_prev(num_elem,i)*&
+                                            interp_fcn_rhs(i)*interp_fcn_rhs(j)  
+                 matrix_W_left_face(i,j)  = velocity_soln_prev(num_elem,i)*&
+                                            interp_fcn_lhs(i)*interp_fcn_lhs(j)
+            end if!---End flux calculation
         end do
     end do
-    
-    !---Factorize matrix
-    call dgetrf ( length, length, inverse_A_matrix, lda, ipiv, info )
-    !---Compute the inverse matrix.
-    call dgetri ( length, inverse_A_matrix, lda, ipiv, work, lwork, info ) 
-    
+   
+    !---Invert A matrix, only needs to be done once
+    if ( n < 2 .and. nl_iter < 2) then
+        do i = 1, nodes_per_elem
+            do j = 1, nodes_per_elem
+                inverse_A_matrix(i,j) = elem_matrix_A(i,j)
+            end do
+        end do
+        
+        !---Factorize matrix
+        call dgetrf ( length, length, inverse_A_matrix, lda, ipiv, info )
+        !---Compute the inverse matrix.
+        call dgetri ( length, inverse_A_matrix, lda, ipiv, work, lwork, info ) 
+    end if
+
 !-------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE. ) then
         write(outfile_unit,fmt='(a)'),' '
@@ -145,4 +172,5 @@ subroutine element_matrix (n, nl_iter)
    end if !---End matrix write out
 !------------------------------------------------------------------------------
 
-end subroutine element_matrix 
+end subroutine spatial_matrices 
+

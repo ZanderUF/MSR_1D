@@ -24,33 +24,20 @@ implicit none
     real :: total_fuel_length
 
 !---------------------------------------------------------------
-!---BEGIN Unit Test 
-    if(unit_test .eqv. .TRUE.) then
-    !---Have sinusodial initial condition
-        nl_iter = 1
-        max_nl_iter = 1 ! this unit test is linear 
-        do i = 1, nodes_per_elem 
-            do j = 1, nodes_per_elem
-                norm_sin = real(global_coord(i,j))/real(global_coord(i,j))
-                previous_elem_soln_vec(i,j) = sin(2.0*pi*norm_sin)
-            end do
-        end do
-    end if
-!---END Unit Test
-!---------------------------------------------------------------
 
 !---Normal calculation flow - no need if doing unit test
     if (unit_test .eqv. .FALSE.) then
         !---Set starting values for power, velocity, temperature 
         call initialize
-        
+                
         do i = 1,num_elem 
             do j = 1,nodes_per_elem
                 velocity_soln_prev(i,j) = velocity_soln_new(i,j) 
             end do
         end do 
         nl_iter=1 
-        !-----------------------------------------------------------------------
+        
+	!-----------------------------------------------------------------------
         !---Steady state solver for nonlinear ss problems
         if(nonlinear_ss_flag .eqv. .TRUE.) then 
             write(outfile_unit, fmt='(a)'), ' ' 
@@ -58,12 +45,12 @@ implicit none
             do !---Nonlinear loop
                 do n = 1, num_elem
                     !---Computer spatial matrices 
-                    call element_matrix(n,nl_iter) 
+	                call spatial_matrices(n,nl_iter)
                     !---Solve steady state system 
                     do f = 1, num_isotopes
                         do g = 1, num_delay_group
                             !---Assemble K, F
-                            call assemble_matrix(f,g,n)
+                            call assemble_matrix_ss(f,g,n)
                             call solve_soln_steady(f,g,n,nl_iter)
                         end do !---Over delayed groups
                     end do !---Over isotopes

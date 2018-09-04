@@ -46,7 +46,7 @@
             material = iread(i0,iret) 
             i = i+1
          case ('alam')
-            call yread(lamda_i_mat(i,:), ialamda, num_delay_group, itp, lerr)
+	    call yread(lamda_i_mat(i,:), ialamda, num_delay_group, itp, lerr)
             dum = aread(i3, iret)
          case ('beta')
             call yread(beta_i_mat(i,:), ibeta, num_delay_group, itp, lerr)
