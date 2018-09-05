@@ -59,41 +59,42 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     
 !****************************************************************
 !---Write out    
-    write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0
-    write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit,fmt='(a,1I2)'),'H Matrix | element --> ',n
-    do i=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)') &
-               (elem_matrix_H(i,j),j=1,nodes_per_elem)             
-    end do
-    
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),' [H]*{c_e} | element --> ', n
-    do j=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)')H_times_soln_vec(j)             
-    end do
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),' [A-1]*[W_l] | element --> ', n
-    do i=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)') &
-               (elem_matrix_A_times_W(i,j),j=1,nodes_per_elem)             
-    end do
-    
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),' [A^-1][W_l]*{c_e-1} | element --> ', n
-    do j=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)')A_times_W_times_upwind_elem_vec(j)             
-    end do
-    
-    write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit,fmt='(a,1I2)'),'-lambda*I Matrix | element --> ',n
-    do j=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)') &
-               (-lamda_i_mat(1,1)*identity_matrix(j,i),i=1,nodes_per_elem)             
-    end do
-       
-    write(outfile_unit,fmt='(a)'),' '
-    write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
-    write(outfile_unit,fmt='(12es14.3)') (elem_vec_q(i),i=1,nodes_per_elem)             
-
+    if (DEBUG .eqv. .TRUE.) then
+        write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0
+        write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a,1I2)'),'H Matrix | element --> ',n
+        do i=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)') &
+                   (elem_matrix_H(i,j),j=1,nodes_per_elem)             
+        end do
+        
+        write(outfile_unit,fmt='(a)'), ' ' 
+        write(outfile_unit,fmt='(a,1I3)'),' [H]*{c_e} | element --> ', n
+        do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)')H_times_soln_vec(j)             
+        end do
+        write(outfile_unit,fmt='(a)'), ' ' 
+        write(outfile_unit,fmt='(a,1I3)'),' [A-1]*[W_l] | element --> ', n
+        do i=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)') &
+                   (elem_matrix_A_times_W(i,j),j=1,nodes_per_elem)             
+        end do
+        
+        write(outfile_unit,fmt='(a)'), ' ' 
+        write(outfile_unit,fmt='(a,1I3)'),' [A^-1][W_l]*{c_e-1} | element --> ', n
+        do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)')A_times_W_times_upwind_elem_vec(j)             
+        end do
+        
+        write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a,1I2)'),'-lambda*I Matrix | element --> ',n
+        do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)') &
+                   (-lamda_i_mat(1,1)*identity_matrix(j,i),i=1,nodes_per_elem)             
+        end do
+           
+        write(outfile_unit,fmt='(a)'),' '
+        write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
+        write(outfile_unit,fmt='(12es14.3)') (elem_vec_q(i),i=1,nodes_per_elem)             
+    end if
 end 

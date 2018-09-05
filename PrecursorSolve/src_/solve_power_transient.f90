@@ -73,7 +73,7 @@ subroutine solve_power_transient(nl_iter, current_time)
     step_time = 0.1
 !---STEP perturbation
     if(current_time > step_time) then
-    	reactivity = 1E-4 
+    	reactivity = 1E-3 
     end if
 
 !---Power Solve
@@ -100,6 +100,7 @@ subroutine solve_power_transient(nl_iter, current_time)
         end do
     end do
 
+    !write(outfile_unit, fmt='(a,12es14.3)'),'Reactivity: ', reactivity
 !---Write out power solution 
     !write(outfile_unit,fmt='(a)'), ' '
     !write(outfile_unit,fmt='(a,12es14.3)'), 'Power distribution at time:', current_time  

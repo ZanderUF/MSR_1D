@@ -49,13 +49,6 @@ subroutine solve_soln_steady(isotope, delay_group, n, nl_iter )
         rhs_final_vec(i) = elem_vec_q_final(isotope,delay_group,i) + elem_vec_w_left_face(i)
     end do
     
-    !---Write out
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),'RHS final vector | element --> ', n
-    do j=1,nodes_per_elem 
-          write(outfile_unit,fmt='(12es14.3)') rhs_final_vec(j)             
-    end do
-    
     !---Factorize G matrix matrix
     call dgetrf ( length, length, inverse_matrix, lda, ipiv, info )
     !---Compute the inverse matrix.
@@ -63,25 +56,32 @@ subroutine solve_soln_steady(isotope, delay_group, n, nl_iter )
      
     !---CALCULATE SOLUTION for a given element
     precursor_soln_new(isotope,delay_group,n,:) = matmul(inverse_matrix,rhs_final_vec)
-    
-    !---Write out inverse matrix
-    write(outfile_unit,fmt='(a)'), ' ' 
-    write(outfile_unit,fmt='(a,1I3)'),'inverse G precursor matrix matrix | element --> ',n
-    do j=1,nodes_per_elem
-           write(outfile_unit,fmt='(12es14.3)') &
-                ( inverse_matrix(j,i) ,i=1,nodes_per_elem )             
-    end do
-!---END PRECURSOR SOLVE   
 
-    write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit,fmt='(a,1I3,a,1I3,a,1I3)'),&
-        'Solution | element --> ', n, ' Isotope ',isotope, ' Delayed Group ',delay_group
+    if (DEBUG .eqv. .TRUE.) then
+        !---Write out
+        write(outfile_unit,fmt='(a)'), ' ' 
+        write(outfile_unit,fmt='(a,1I3)'),'RHS final vector | element --> ', n
         do j=1,nodes_per_elem 
-            write(outfile_unit,fmt='(a,1I2,12es14.3)'), 'Node -->', n-1+j,&
-              precursor_soln_new(isotope,delay_group,n,j)         
-     
-    end do
-      
-    write(outfile_unit,fmt='(a)'), '********************************'
-   
+              write(outfile_unit,fmt='(12es14.3)') rhs_final_vec(j)             
+        end do
+        !---Write out inverse matrix
+        write(outfile_unit,fmt='(a)'), ' ' 
+        write(outfile_unit,fmt='(a,1I3)'),'inverse G precursor matrix matrix | element --> ',n
+        do j=1,nodes_per_elem
+               write(outfile_unit,fmt='(12es14.3)') &
+                    ( inverse_matrix(j,i) ,i=1,nodes_per_elem )             
+        end do
+!---    END PRECURSOR SOLVE   
+
+        write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a,1I3,a,1I3,a,1I3)'),&
+            'Solution | element --> ', n, ' Isotope ',isotope, ' Delayed Group ',delay_group
+            do j=1,nodes_per_elem 
+                write(outfile_unit,fmt='(a,1I2,12es14.3)'), 'Node -->', n-1+j,&
+                  precursor_soln_new(isotope,delay_group,n,j)         
+         
+        end do
+          
+        write(outfile_unit,fmt='(a)'), '********************************'
+    end if   
 end 

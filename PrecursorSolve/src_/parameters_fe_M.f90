@@ -99,8 +99,8 @@ module parameters_fe
     real   alpha     ! time solve 
     double precision   t0        ! starting time
     double precision   delta_t        ! time step 
-    double precision     tmax      ! max time 
-     double precision  t_initial ! starting time
+    double precision   tmax      ! max time 
+    double precision   t_initial ! starting time
 
     double precision :: power_amplitude_start
     double precision :: power_amplitude_prev
@@ -138,4 +138,5 @@ module parameters_fe
     logical :: lagrange = .FALSE.
     logical :: hermite = .TRUE.
     logical :: transient
+    logical :: transient_save_flag = .FALSE. 
 end module parameters_fe 

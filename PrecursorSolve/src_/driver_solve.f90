@@ -30,8 +30,8 @@ implicit none
     	  form='formatted',position='asis')
     open (unit=soln_outfile_unit, file=steady_state_soln_file_name,&
     	  status='unknown',form='formatted',position='asis')
-    open (unit=soln_last_t_unit, file=last_time_file_name,&
-    	  status='unknown',form='formatted',position='asis')
+    
+    
 !---Read in problem parameters here
     call datainput_fe(input_file)
 
@@ -69,10 +69,11 @@ implicit none
 !---Create 1D mesh
     call mesh_creation
 
+    DEBUG = .FALSE.
 !---Steady state solve for temperature 
     call steady_state
 
 !---Transient solve Euler method 
-!    call transient_solve_euler
+    call transient_solve_euler
 
 end 

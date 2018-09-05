@@ -57,8 +57,10 @@ implicit none
                 end do !---Over nodes
                 
                 !---Write out the solution
-                call write_out_soln(outfile_unit,num_elem) 
-                   
+                if(DEBUG .eqv. .TRUE.) then
+                    call write_out_soln(outfile_unit,num_elem,transient_save_flag) 
+                end if
+
                 nl_iter = nl_iter + 1
     
                 ! If we've gone thru too many nonlinear iterations exit
@@ -72,7 +74,6 @@ implicit none
         end if !---end nonlinear if 
     end if !---end normal calculation if 
 
-!    precursor_soln_prev = precursor_soln_new
 
     !---Make the final converged solution the 'previous' solution
     do f = 1, num_isotopes 
@@ -86,6 +87,9 @@ implicit none
     end do
     !---Set power 'previous' to new
     power_amplitude_prev = power_amplitude_new
+
+    !---Write to outfile
+    call write_out_soln(outfile_unit,num_elem,transient_save_flag)
 
 !---Calculate adjustment to beta
     temp_vec_prec = 0
@@ -125,7 +129,7 @@ implicit none
     print *,' '  
     ! write(ss_file_name, '(a,5f.2)'), 'ss_soln_vel_',velocity_soln_new(1,1)
 
-    call write_out_soln(soln_outfile_unit,num_elem) 
+    call write_out_soln(soln_outfile_unit,num_elem,transient_save_flag) 
 
 !---Set steady state flag off
     steady_state_flag = .FALSE.
