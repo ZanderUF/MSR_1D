@@ -17,13 +17,13 @@ implicit none
     integer :: f,g,n,i,j,nl_iter
     real    :: t1  !---Next time step  
     real :: save_time_interval
-    max_nl_iter = 1 
+    max_nl_iter = 10 
 !---Start time-dependent solve
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
         write(outfile_unit, fmt='(a)'), ' ' 
         write(outfile_unit, fmt='(a)'), 'In transient loop'
-        do!---Time loop 
+        timeloop: do!---Time loop 
             nl_iter = 1 
             do!---Nonlinear loop  
                 !---Create element matrices and assemble
@@ -58,13 +58,13 @@ implicit none
             transient_save_flag = .TRUE.
             !---Write solution to a file periodically
             if( modulo(t0,save_time_interval) < delta_t) then
-                write(outfile_unit,fmt='(a,12es14.3)'),'time: ',t0 
-                call write_out_soln(outfile_unit, num_elem, transient_save_flag )
+                !write(outfile_unit,fmt='(a,12es14.3)'),'time: ',t0 
+                call write_out_soln(12, num_elem, transient_save_flag )
             end if
             transient_save_flag = .FALSE.
 
             !---Swap solutions
-            precursor_soln_prev = precursor_soln_new 
+            precursor_soln_prev  = precursor_soln_new 
             power_amplitude_prev = power_amplitude_new
 
            !---Stop if we've exceeded TMAX.
@@ -75,9 +75,7 @@ implicit none
            t1 = t0 + delta_t
 
            t0 = t1
-       end do !---End time loop
+       enddo timeloop
     end if!---End transient if
-
-    call write_out_soln(soln_last_t_unit,num_elem,transient_save_flag)
 
 end subroutine transient_solve_euler

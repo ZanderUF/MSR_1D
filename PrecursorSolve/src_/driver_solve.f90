@@ -17,12 +17,14 @@ implicit none
     character(len=20) :: outfile_name
     character(len=20) :: steady_state_soln_file_name
     character(len=20) :: last_time_file_name
+    character(len=20) :: power_soln_file_name
     character(len=7) :: input_file
 
     status = getcwd(current_path)
     outfile_name = 'outfile.txt'
     steady_state_soln_file_name = 'ss_soln.txt'
     last_time_file_name = 'last_t_soln.txt'
+    power_soln_file_name = 'power_amp_soln.txt'
     input_file = 'input_t'
 
 !---Open file for writing out debug information
@@ -30,7 +32,8 @@ implicit none
     	  form='formatted',position='asis')
     open (unit=soln_outfile_unit, file=steady_state_soln_file_name,&
     	  status='unknown',form='formatted',position='asis')
-    
+    open (unit=power_outfile_unit, file=power_soln_file_name,&
+    	  status='unknown',form='formatted',position='asis')
     
 !---Read in problem parameters here
     call datainput_fe(input_file)

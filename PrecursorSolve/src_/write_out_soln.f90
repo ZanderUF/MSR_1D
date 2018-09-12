@@ -20,13 +20,11 @@ implicit none
     character(len=28) :: time_soln_name
     character(len=10)  :: time_characters
     real(kind=4) :: temp_time
-    integer :: counter
    
     temp_time = t0
 !---If writing to a new file for a given time step
     if(transient_save .eqv. .TRUE.) then 
         !file_unit = 15
-        counter = counter + 1
         time_soln_name = 'precursor_soln_at_time_step_'      
         write(time_characters,'(f10.2)' ) temp_time 
         time_characters = adjustl(time_characters) 

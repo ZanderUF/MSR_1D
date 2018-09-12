@@ -105,7 +105,8 @@ module parameters_fe
     double precision :: power_amplitude_start
     double precision :: power_amplitude_prev
     double precision :: power_amplitude_new
-    real :: reactivity = 0.0
+    double precision :: reactivity = 0.0
+    double precision :: reactivity_input = 0.0
 !---Material
     !real, dimension(:)  ( kind = 8 ) conductivity
     !real, dimension(:)  ( kind = 8 ) spec_heat
@@ -120,9 +121,10 @@ module parameters_fe
 
 !---File names
     character(60) :: file_name
-    integer :: outfile_unit = 11 
+    integer :: outfile_unit = 15 
     integer :: soln_outfile_unit = 99
     integer :: soln_last_t_unit = 66
+    integer :: power_outfile_unit = 20
 !---Nonlinear variables
     integer :: max_iter = 1 ! max num of nonlinear iterations to do
     integer :: max_nl_iter  ! numer of nonllinear iterations to do
@@ -139,4 +141,7 @@ module parameters_fe
     logical :: hermite = .TRUE.
     logical :: transient
     logical :: transient_save_flag = .FALSE. 
+    logical :: ramp_flag = .FALSE.
+    logical :: step_flag = .TRUE.
+
 end module parameters_fe 

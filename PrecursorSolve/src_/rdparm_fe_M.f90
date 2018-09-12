@@ -14,7 +14,7 @@
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: i0, i2, i3, i4, iret
-      character(4) :: dum,duma,pn, read_time, read_step 
+      character(4) :: dum,duma,pn, read_time, read_ramp, read_step 
 
 
       write(outfile_unit,fmt='(a)'), 'Reading parms'
@@ -39,6 +39,25 @@
               if ( read_time == 'yes ' ) then
                   time_solve  = .TRUE.
               endif
+          
+          case('step')
+              read_step = aread(i4, iret) 
+              if ( read_step == 'no ' ) then
+                  step_flag = .FALSE.
+              end if
+              if ( read_step == 'yes ' ) then
+                  step_flag = .TRUE.
+              end if
+          
+          case('ramp')
+              read_ramp = aread(i4, iret)
+              if( read_ramp == 'no ') then
+                  ramp_flag = .FALSE.
+              end if
+              if( read_ramp == 'yes' ) then
+                  ramp_flag = .TRUE.
+              end if
+          
           case ('del=')
               delta_t = dread(i0, iret)
           case ('tmax')
@@ -67,6 +86,9 @@
               num_isotopes = iread(i0,iret)
           case('gen=')
               gen_time = dread(i0,iret)
+          case('reac')
+              reactivity_input = dread(i0,iret)
+          
           end select
       
       end do

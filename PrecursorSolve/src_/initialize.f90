@@ -36,7 +36,7 @@ implicit none
     !---Initial guesses 
     center_temp_initial  = 800
     !---Constant velocity for testing
-    constant_velocity = 0.5! [cm/s]
+    constant_velocity = 1.5! [cm/s]
     
     !---Flag for testing, use a flat power function or not
     constant_flag = .TRUE.
@@ -96,6 +96,7 @@ implicit none
     write(outfile_unit,fmt='(a)'), 'Initial Spatial Power distribution '
     write(outfile_unit,fmt='(a,12es14.3)'),'Initial power amplitude', power_amplitude_new
     write(outfile_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
+    write(outfile_unit,fmt='(a)'), '------------------------------------'
     do i = 1,num_elem
         do j = 1, nodes_per_elem
             write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), spatial_power_fcn(i,j)
@@ -106,6 +107,7 @@ implicit none
     write(outfile_unit,fmt='(a)'), ' '
     write(outfile_unit,fmt='(a)'), 'Initial temperature distribution '
     write(outfile_unit,fmt='(a)'), 'Position(x) Temperature [K]'
+    write(outfile_unit,fmt='(a)'), '------------------------------------'
     do i = 1, num_elem 
         do j = 1, nodes_per_elem
             write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), temperature_soln_new(i,j)
@@ -115,6 +117,7 @@ implicit none
     write(outfile_unit,fmt='(a)'), ' '
     write(outfile_unit,fmt='(a)'), 'Initial velocity distribution '
     write(outfile_unit,fmt='(a)'), 'Position(x) Velocity [cm/s]'
+    write(outfile_unit,fmt='(a)'), '------------------------------------'
     do i = 1, num_elem 
         do j = 1, nodes_per_elem
             write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), velocity_soln_new(i,j)
@@ -124,6 +127,7 @@ implicit none
     write(outfile_unit,fmt='(a)'), ' '
     write(outfile_unit,fmt='(a)'), 'Initial density distribition '
     write(outfile_unit,fmt='(a)'), 'Position(x) Density [g/cm^3]'
+    write(outfile_unit,fmt='(a)'), '------------------------------------'
     do i = 1, num_elem 
         do j = 1, nodes_per_elem
             write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), density_soln_new(i,j)

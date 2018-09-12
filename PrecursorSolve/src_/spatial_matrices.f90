@@ -73,8 +73,6 @@ subroutine spatial_matrices (n, nl_iter)
         end do
     
         !---Normal calculation flow
-        if(unit_test .eqv. .FALSE.) then
-            
             do i=1, nodes_per_elem
                 elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
                 
@@ -94,7 +92,6 @@ subroutine spatial_matrices (n, nl_iter)
                 
                 end do !---End loop over j matrix entries
             end do !---End loop over i matrix entries
-        end if !---end unit test if 
     
     end do !---end do over gauss pts 
 !---Create source vector 'q', and W - 
