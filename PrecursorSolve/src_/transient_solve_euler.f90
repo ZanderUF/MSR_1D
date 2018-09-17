@@ -17,7 +17,7 @@ implicit none
     integer :: f,g,n,i,j,nl_iter
     real    :: t1  !---Next time step  
     real :: save_time_interval
-    max_nl_iter = 10 
+    max_nl_iter = 1 
 !---Start time-dependent solve
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
@@ -25,20 +25,20 @@ implicit none
         write(outfile_unit, fmt='(a)'), 'In transient loop'
         timeloop: do!---Time loop 
             nl_iter = 1 
-            do!---Nonlinear loop  
+            nonlinearloop: do!---Nonlinear loop  
                 !---Create element matrices and assemble
-                do n = 1 , num_elem 
+                elements_loop: do n = 1 , num_elem 
                     !---Generate spatial matrices
                     call spatial_matrices(n,nl_iter)
-                    do f = 1, num_isotopes
-                        do g = 1, num_delay_group
-                            !---Assemble element matrices to solve for elemental coefficients 
+                    isotope_loop: do f = 1, num_isotopes
+                        delay_loop: do g = 1, num_delay_group
+                            !---Assemble matrices solve elemental coefficients 
                             call assemble_matrix_transient(f,g,n) 
                             !---Solve for the elemental solution
                             call solve_soln_transient(f,g,n,nl_iter)
-                        end do !---End over delay groups
-                    end do !---End over isotops
-                end do !---End loop over num elements
+                        enddo delay_loop 
+                    enddo isotope_loop 
+                enddo elements_loop 
                 
                 precursor_soln_prev = precursor_soln_new
                 power_amplitude_prev = power_amplitude_new
@@ -49,7 +49,7 @@ implicit none
                     exit
                 end if 
                 
-            end do !---End nonlinear loop
+            enddo nonlinearloop 
             
             !---Solve for total power after spatial sweep through precursors
             call solve_power_transient(nl_iter,t0) 

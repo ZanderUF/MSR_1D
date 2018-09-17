@@ -31,7 +31,7 @@ subroutine solve_power_transient(nl_iter, current_time)
     character(len=10) :: time_characters
     real(kind=4) :: temp_time
     real :: ramp_time
- 
+
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
     temp_vec_num_elem(:) = 0.0
@@ -73,7 +73,7 @@ subroutine solve_power_transient(nl_iter, current_time)
 
 !---Hardcoded times to start perturbation - should read from input
     step_time = 0.5
-    ramp_time = .2 
+    ramp_time = 0.2 
 
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then

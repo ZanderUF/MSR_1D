@@ -26,8 +26,8 @@ subroutine spatial_matrices (n, nl_iter)
 !---Local variables 
     real , dimension(3) :: elem_coord, velocity, temp_prec,shape_int 
     real  :: xi, wt, cnst, h, s, s2, T, P,  kappa, density, &
-             C_p, K_material, F_material, evaluated_spatial_power, &
-             evaluated_velocity
+             C_p, K_material, F_material, evaluated_spatial_power
+    double precision ::         evaluated_velocity
     !---Inversion routine parameters
     integer :: lda, info, lwork,length
     integer, dimension(3) :: ipiv
@@ -93,7 +93,8 @@ subroutine spatial_matrices (n, nl_iter)
                 end do !---End loop over j matrix entries
             end do !---End loop over i matrix entries
     
-    end do !---end do over gauss pts 
+    end do !---end do over gauss pts
+
 !---Create source vector 'q', and W - 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
