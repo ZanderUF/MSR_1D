@@ -22,8 +22,16 @@ implicit none
     real, dimension(num_elem) :: temp_vec_prec
     real :: total_precursor_ref, total_precursors_fuel
     real :: total_fuel_length
+    real, dimension(num_isotopes,num_delay_group) :: L2_norm_current,L2_norm_prev 
+    real :: nl_iter_tolerance, difference_L2    
+    integer :: difference_counter
 
 !---------------------------------------------------------------
+   
+    L2_norm_prev = 0.0
+    L2_norm_current = 0.0
+    difference_counter = 0
+    nl_iter_tolerance = 1E-12
 
 !---Normal calculation flow - no need if doing unit test
     if (unit_test .eqv. .FALSE.) then
@@ -61,20 +69,53 @@ implicit none
                     call write_out_soln(outfile_unit,num_elem,transient_save_flag) 
                 end if
 
+                !---Swap for for next iteration
+                precursor_soln_prev = precursor_soln_new
+               
+                !---Calculate L2 norm to decide when enough iterations are complete 
+                if(nl_iter > 1) then
+                    do f = 1, num_isotopes
+                        do g = 1, num_delay_group
+                            L2_norm_current(f,g) = sqrt ( sum ( precursor_soln_new(f,g,:,:)*&
+                                                   precursor_soln_new(f,g,:,:) ))   ! L2 norm
+                        end do
+                    end do
+
+                    !---Calculate the difference in the L2 norms between iterations 
+                    do f = 1, num_isotopes
+                        do g = 1, num_delay_group
+                            difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
+                            
+                            if( difference_L2 < nl_iter_tolerance) then
+                                difference_counter = difference_counter + 1
+                            end if
+                        end do
+                    end do
+                    
+                    !---Need to make sure the L2 norm converges for all precursor groups
+                    if ( difference_counter == num_isotopes) then
+                        max_nl_iter = nl_iter - 1 
+                    end if
+                    !---Swap for next iteration
+                    L2_norm_prev = L2_norm_current
+                end if
+                
                 nl_iter = nl_iter + 1
     
                 ! If we've gone thru too many nonlinear iterations exit
-                if (nl_iter > max_nl_iter) then
-                    exit
-                end if
-                
-                precursor_soln_prev = precursor_soln_new
-
+                 if (nl_iter > max_nl_iter) then
+                     exit
+                 end if
+            
             end do !---end nonlinear iteration loop
         end if !---end nonlinear if 
+         
     end if !---end normal calculation if 
-
-
+    
+    write(outfile_unit, fmt=('(a)') ) ' ' 
+    write(outfile_unit, fmt=('(a, 100I2)')) 'Number of nonlinear iterations: ', nl_iter
+    write(outfile_unit, fmt=('(a)') ) ' ' 
+    
     !---Make the final converged solution the 'previous' solution
     do f = 1, num_isotopes 
         do g = 1, num_delay_group

@@ -142,6 +142,7 @@ module parameters_fe
     logical :: transient
     logical :: transient_save_flag = .FALSE. 
     logical :: ramp_flag = .FALSE.
-    logical :: step_flag = .TRUE.
+    logical :: step_flag = .FALSE.
+    logical :: zag_flag = .FALSE.
 
 end module parameters_fe 

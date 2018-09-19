@@ -30,7 +30,8 @@ subroutine solve_power_transient(nl_iter, current_time)
     character(len=24) :: time_soln_name
     character(len=10) :: time_characters
     real(kind=4) :: temp_time
-    real :: ramp_time
+    real :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
+    real :: first_zag, second_zag, third_zag, reactivity_zag
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
@@ -72,30 +73,55 @@ subroutine solve_power_transient(nl_iter, current_time)
                                 (power_amplitude_start*total_fuel_length))
 
 !---Hardcoded times to start perturbation - should read from input
-    step_time = 0.5
-    ramp_time = 0.2 
+    step_start_time = 0.0 
+    step_end_time = 0.2 
+    
+    ramp_start_time = 0.0 
+    ramp_end_time = 0.5
 
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then
-        if(t0 > step_time) then
-            !write(outfile_unit, ('(a,12es14.3)')), 'STEP perturbation at: ',t0
+        if(step_start_time < t0 .and. t0 < step_end_time ) then
+            reactivity = reactivity_input 
+        elseif ( t0 > step_end_time) then
             reactivity = reactivity_input 
         end if
     end if !---End STEP perturbation
 
 !---RAMP perturbation 
     if(ramp_flag .eqv. .TRUE.) then
-        if(t0 < ramp_time) then   
-            !write(outfile_unit, ('(a,12es14.3)')),&
-            !     'RAMP perturbation at time: ', t0
+        if(ramp_start_time < t0 .and. t0 < ramp_end_time) then   
             rho_initial = 0.0 
             reactivity = rho_initial + &
               ((reactivity_input - rho_initial)*&
-               (t0-t_initial))/(ramp_time - t_initial)
-        elseif ( t0 > ramp_time) then
-            reactivity = reactivity_input
+               (t0-t_initial))/(ramp_end_time - t_initial)
+        elseif ( t0 > ramp_end_time) then
+            reactivity = 0.0 
         end if
     end if !---End RAMP perturbation 
+!---Zig zag perturbation
+    reactivity_zag = 7.5E-3
+    first_zag  = 0.5
+    second_zag = 1.0
+    third_zag  = 1.5
+
+    if(zag_flag .eqv. .TRUE.) then
+        if( t0 < first_zag ) then
+            reactivity = rho_initial + &
+               ((reactivity_zag )*&
+               (t0-t_initial))/(1.0_dp - t_initial)
+        elseif( t0 < second_zag) then
+            reactivity = reactivity_zag/2.0_dp + &
+               (( - reactivity_zag/2.0_dp )*&
+               (t0-first_zag) )/(second_zag - first_zag)
+        elseif ( t0 < third_zag ) then
+            reactivity = &  
+               (( reactivity_zag/2.0_dp )*&
+               (t0-second_zag))/(third_zag - second_zag )
+        else
+            reactivity = reactivity
+        end if
+    end if
 
 !---Power Solve
     power_amplitude_new = power_amplitude_prev + &
@@ -106,11 +132,11 @@ subroutine solve_power_transient(nl_iter, current_time)
 
 !---Write power amp out @ every time step
     if(t0 == 0.0) then
-        write(power_outfile_unit, ('(a)')), 'Time (s) | Power Amp | Reactivity'
+        write(power_outfile_unit, ('(a)')), 'Time (s) | Power Amp | Norm Power | Reactivity'
     end if
 
-    write(power_outfile_unit, ('(12es14.6,12es14.5,12es14.5)')), &
-          t0,power_amplitude_new,reactivity
+    write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5)')), &
+          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,reactivity
 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
@@ -121,7 +147,7 @@ subroutine solve_power_transient(nl_iter, current_time)
     end do
 
 !---Write out power solution 
-    save_time_interval = 0.25 
+    save_time_interval = 10.0 
     if( modulo(t0,save_time_interval) < delta_t) then
         power_write_unit = 17
         temp_time=t0 

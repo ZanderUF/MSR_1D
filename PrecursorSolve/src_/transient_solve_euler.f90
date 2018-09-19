@@ -54,7 +54,7 @@ implicit none
             !---Solve for total power after spatial sweep through precursors
             call solve_power_transient(nl_iter,t0) 
             
-            save_time_interval = 0.25
+            save_time_interval = 10.0 
             transient_save_flag = .TRUE.
             !---Write solution to a file periodically
             if( modulo(t0,save_time_interval) < delta_t) then
