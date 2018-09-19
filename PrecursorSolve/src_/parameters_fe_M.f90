@@ -76,6 +76,9 @@ module parameters_fe
     real                :: g_jacobian
 !---Solution matrices - global
     
+    real , allocatable :: precursor_soln_last_time(:,:,:,:)
+    real , allocatable :: power_soln_last_time(:,:)
+
     real , allocatable :: elem_vec_q_final(:,:,:) 
     real , allocatable :: elem_vol_int(:,:)
     real , allocatable :: precursor_soln_new(:,:,:,:) ! isotope,group,node,value
@@ -102,9 +105,11 @@ module parameters_fe
     double precision   tmax      ! max time 
     double precision   t_initial ! starting time
 
+    double precision :: power_amplitude_last_time
     double precision :: power_amplitude_start
     double precision :: power_amplitude_prev
     double precision :: power_amplitude_new
+    
     double precision :: reactivity = 0.0
     double precision :: reactivity_input = 0.0
 !---Material

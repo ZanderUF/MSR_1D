@@ -113,7 +113,7 @@ implicit none
     end if !---end normal calculation if 
     
     write(outfile_unit, fmt=('(a)') ) ' ' 
-    write(outfile_unit, fmt=('(a, 100I2)')) 'Number of nonlinear iterations: ', nl_iter
+    write(outfile_unit, fmt=('(a, 100I4)')) 'Number of nonlinear iterations: ', nl_iter
     write(outfile_unit, fmt=('(a)') ) ' ' 
     
     !---Make the final converged solution the 'previous' solution
@@ -128,6 +128,9 @@ implicit none
     end do
     !---Set power 'previous' to new
     power_amplitude_prev = power_amplitude_new
+    power_amplitude_last_time = power_amplitude_new
+
+    precursor_soln_last_time = precursor_soln_new
 
     !---Write to outfile
     call write_out_soln(outfile_unit,num_elem,transient_save_flag)

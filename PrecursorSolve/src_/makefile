@@ -27,8 +27,9 @@ msr1d : common_unit.o error_functions.o \
 	inter_shape_fcns.o \
 	mesh_creation.o steady_state.o \
     	solve_soln_transient.o transient_solve_euler.o \
-    	solve_power_transient.o \
-    	solve_soln_steady.o     \
+    	solve_power_backward_euler.o \
+        solve_power_transient.o solve_backward_euler.o \
+    	solve_soln_steady.o transient_backward_euler.o \
 	initialize.o \
     	write_out_soln.o \
     	timestamp_M.o      
@@ -103,6 +104,12 @@ solve_soln_steady.o:   solve_soln_steady.f90 parameters_fe_M.o
 solve_power_transient.o:   solve_power_transient.f90 parameters_fe_M.o 
 	$(F90) $(FFLAGS) -c solve_power_transient.f90
 
+solve_power_backward_euler.o:   solve_power_backward_euler.f90 parameters_fe_M.o 
+	$(F90) $(FFLAGS) -c solve_power_backward_euler.f90
+
+solve_backward_euler.o:   solve_backward_euler.f90 parameters_fe_M.o 
+	$(F90) $(FFLAGS) -c solve_backward_euler.f90
+
 solve_soln_transient.o:   solve_soln_steady.f90 parameters_fe_M.o 
 	$(F90) $(FFLAGS) -c solve_soln_transient.f90
 
@@ -111,6 +118,9 @@ steady_state.o : steady_state.f90 parameters_fe_M.o
 
 transient_solve_euler.o : transient_solve_euler.f90 parameters_fe_M.o
 	$(F90) $(FFLAGS) -c transient_solve_euler.f90
+
+transient_backward_euler.o : transient_backward_euler.f90 parameters_fe_M.o
+	$(F90) $(FFLAGS) -c transient_backward_euler.f90
  
 write_out_soln.o: write_out_soln.f90
 	$(F90) $(FFLAGS) -c write_out_soln.f90

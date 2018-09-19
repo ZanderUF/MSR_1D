@@ -55,7 +55,8 @@ implicit none
              spatial_power_fcn( num_elem, nodes_per_elem) )
     allocate(elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem)) 
     allocate(elem_vol_int(num_elem,nodes_per_elem))
-    allocate(power_soln_test(num_elem))
+    allocate(precursor_soln_last_time( num_isotopes,num_delay_group,num_elem,nodes_per_elem),&
+             power_soln_last_time(num_elem,nodes_per_elem) )
 
 !---Test integral over volume of element only int_-1^1 f(x)
     elem_vol_int(:,:) = 0
@@ -76,7 +77,10 @@ implicit none
 !---Steady state solve for temperature 
     call steady_state
 
-!---Transient solve Euler method 
-    call transient_solve_euler
+!---Transient solve forward Euler method 
+!    call transient_solve_euler
+
+!---Transient solve backward Euler method
+    call transient_backward_euler
 
 end 
