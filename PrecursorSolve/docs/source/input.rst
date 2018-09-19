@@ -26,14 +26,14 @@ tin        Double       Beginning point of the perturbation
 nem        Integer      Number of equal spaced elements in the model
 npe        Integer      Number of nodes per element 
 pipe       Integer      Number of elements in the outer circuit
-area       Real         Area of the fuel core [cm^2] 
-mflow      Real         Mass flow rate [gm/cm^3]
-tpow       Real         Total axial power [n/cm]
+area       Real         Area of the fuel core [:math:`cm^2`] 
+mflow      Real         Mass flow rate [:math:`g/cm^3`]
+tpow       Real         Total axial power [:math:`n/s-cm`]
 nitr       Real         Set number of maximum nonlinear iterations 
-elem       Real         Element length [cm]
+elem       Real         Element length [:math:`cm`]
 ndg        Integer      Number of delayed neutron groups
 nmat       Integer      Number of fissional materials
-gen        Real         Neutron generation time [s^-2]
+gen        Real         Neutron generation time [:math:`s^-2`]
 reac       Real         Reactivity insertion for step and ramp
 =========  ===========  ================================================
 
