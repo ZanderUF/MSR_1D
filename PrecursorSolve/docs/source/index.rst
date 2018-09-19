@@ -16,6 +16,7 @@ Guide
    :maxdepth: 2 
 
    installation
+   input
    license
    help
 

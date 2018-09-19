@@ -16,7 +16,7 @@
     <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="License" href="license.html" />
+    <link rel="next" title="Input File Guide" href="input.html" />
     <link rel="prev" title="Documentation for MSR Simulation Project" href="index.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="license.html" title="License"
+          <a href="input.html" title="Input File Guide"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Documentation for MSR Simulation Project"
@@ -43,19 +43,21 @@
 <h3><a href="index.html">Table Of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#install-with-make-on-mac">Install with make on Mac</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#access-to-code">Access to Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-on-mac">Install on Mac</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">Input File Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="help.html">HELP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Documentation for MSR Simulation Project</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="license.html"
-                        title="next chapter">License</a></p>
+  <p class="topless"><a href="input.html"
+                        title="next chapter">Input File Guide</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -85,9 +87,40 @@
             
   <div class="section" id="installation-guide">
 <span id="installation"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="install-with-make-on-mac">
-<h2>Install with make on Mac<a class="headerlink" href="#install-with-make-on-mac" title="Permalink to this headline">¶</a></h2>
-<p>To install use the makefile</p>
+<p>Installation has only been tested on a Mac to date</p>
+<div class="section" id="access-to-code">
+<h2>Access to Code<a class="headerlink" href="#access-to-code" title="Permalink to this headline">¶</a></h2>
+<p>All relevant code is located on Github and managed on there.  Simple go to</p>
+<p><a class="reference external" href="https://github.com/ZanderUF/MSR_1D">https://github.com/ZanderUF/MSR_1D</a></p>
+<p>You can clone a version of the repo with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/ZanderUF/MSR_1D.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="install-on-mac">
+<h2>Install on Mac<a class="headerlink" href="#install-on-mac" title="Permalink to this headline">¶</a></h2>
+<p>Installation has only been tested with GNU Fortran version 5.4.0
+Requires LAPACK, tested with version 3.8.0
+<a class="reference external" href="http://www.netlib.org/lapack/#_lapack_version_3_8_0_2">http://www.netlib.org/lapack/#_lapack_version_3_8_0_2</a></p>
+<p>If you change the install location of LAPACK be sure to update the makefile in the MSR1D install directory.  Right now LAPACK is assumed to be two directories up from the <em>src</em> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">../../</span><span class="n">lapack</span><span class="o">-</span><span class="mf">3.8</span><span class="o">.</span><span class="mi">0</span>
+</pre></div>
+</div>
+<p>All of the source code is locate in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">MSR_1D</span><span class="o">/</span><span class="n">PrecursorSolve</span><span class="o">/</span><span class="n">src</span>
+</pre></div>
+</div>
+<p>A simple makefile is used to build an exectuable in the <em>src</em> directory.</p>
+<p>To install just use make in the <em>src</em> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make
+</pre></div>
+</div>
+<p>Note, only tested with GNU Make 3.81</p>
+<p>This will make an executable <strong>a.out</strong> by default</p>
+<p>To clean up the installation directory simple execute the folling in the <em>src</em> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make clean
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -104,7 +137,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="license.html" title="License"
+          <a href="input.html" title="Input File Guide"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Documentation for MSR Simulation Project"

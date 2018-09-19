@@ -1,4 +1,4 @@
 License
 =======
 
-This is some info about the license. Don't steal
+Don't steal this please.

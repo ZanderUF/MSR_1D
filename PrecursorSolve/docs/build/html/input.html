@@ -1,0 +1,279 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Input File Guide &#8212; MSR_1D 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="Installation Guide" href="installation.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="license.html" title="License"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation Guide"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MSR_1D 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Input File Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#parameter-block">Parameter Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#delay-block">Delay Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sample-input-file">Sample Input File</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="license.html"
+                        title="next chapter">License</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/input.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="input-file-guide">
+<span id="input"></span><h1>Input File Guide<a class="headerlink" href="#input-file-guide" title="Permalink to this headline">¶</a></h1>
+<p>The structure of the input files is broken up into blocks with character sequences seperating the blocks
+The first line in the file is a comment, this should be something meaningful to distinguish the problem from others</p>
+<div class="section" id="parameter-block">
+<h2>Parameter Block<a class="headerlink" href="#parameter-block" title="Permalink to this headline">¶</a></h2>
+<p>Begins with <strong>read parm</strong> and ends with <strong>end parm</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="16%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>time</td>
+<td>yes or no</td>
+<td>Perform a time dependent calculation</td>
+</tr>
+<tr class="row-odd"><td>step</td>
+<td>yes or no</td>
+<td>Perform a step perturbation or not</td>
+</tr>
+<tr class="row-even"><td>ramp</td>
+<td>yes or no</td>
+<td>Perform a ramp perturbation or not</td>
+</tr>
+<tr class="row-odd"><td>zag</td>
+<td>yes or no</td>
+<td>Perform a zig-zag perturbation or not</td>
+</tr>
+<tr class="row-even"><td>del</td>
+<td>Double</td>
+<td>Indicate fixed time step size, ex: 1E-5</td>
+</tr>
+<tr class="row-odd"><td>tmax</td>
+<td>Real</td>
+<td>Indicate the total length of the simulation</td>
+</tr>
+<tr class="row-even"><td>tin</td>
+<td>Double</td>
+<td>Beginning point of the perturbation</td>
+</tr>
+<tr class="row-odd"><td>nem</td>
+<td>Integer</td>
+<td>Number of equal spaced elements in the model</td>
+</tr>
+<tr class="row-even"><td>npe</td>
+<td>Integer</td>
+<td>Number of nodes per element</td>
+</tr>
+<tr class="row-odd"><td>pipe</td>
+<td>Integer</td>
+<td>Number of elements in the outer circuit</td>
+</tr>
+<tr class="row-even"><td>area</td>
+<td>Real</td>
+<td>Area of the fuel core [cm^2]</td>
+</tr>
+<tr class="row-odd"><td>mflow</td>
+<td>Real</td>
+<td>Mass flow rate [gm/cm^3]</td>
+</tr>
+<tr class="row-even"><td>tpow</td>
+<td>Real</td>
+<td>Total axial power [n/cm]</td>
+</tr>
+<tr class="row-odd"><td>nitr</td>
+<td>Real</td>
+<td>Set number of maximum nonlinear iterations</td>
+</tr>
+<tr class="row-even"><td>elem</td>
+<td>Real</td>
+<td>Element length [cm]</td>
+</tr>
+<tr class="row-odd"><td>ndg</td>
+<td>Integer</td>
+<td>Number of delayed neutron groups</td>
+</tr>
+<tr class="row-even"><td>nmat</td>
+<td>Integer</td>
+<td>Number of fissional materials</td>
+</tr>
+<tr class="row-odd"><td>gen</td>
+<td>Real</td>
+<td>Neutron generation time [s^-2]</td>
+</tr>
+<tr class="row-even"><td>reac</td>
+<td>Real</td>
+<td>Reactivity insertion for step and ramp</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="delay-block">
+<h2>Delay Block<a class="headerlink" href="#delay-block" title="Permalink to this headline">¶</a></h2>
+<p>Begins with <strong>read delay</strong> and ends with <strong>end delay</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="16%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>mat</td>
+<td>Integer</td>
+<td>Material identifier, not be greater than nmat</td>
+</tr>
+<tr class="row-odd"><td>alam</td>
+<td>Real(ndg)</td>
+<td>Decay constant for each delayed group</td>
+</tr>
+<tr class="row-even"><td>beta</td>
+<td>Real(ndg)</td>
+<td>Delayed neutron fraction for each delayed group</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="sample-input-file">
+<h2>Sample Input File<a class="headerlink" href="#sample-input-file" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>This is a comment line
+read parm
+   time=yes
+   step=no
+   ramp=no
+   zag=yes
+   del=1E-4
+   tmax=10
+   tin=0.0
+   nem=10
+   npe=3
+   pipe=6
+   area=10000.0
+   mflow=000
+   tpow=20
+   nitr=300
+   elem=1.0
+   ndg=6
+   nmat=1
+   gen=5E-4
+   reac=0.0
+end parm
+read delay
+  mat=1
+alam=0.0127 0.0317 0.115 0.311 1.4 3.87 end
+beta=2.85E-4 1.5975E-3 1.41E-3 3.0525E-3 9.6E-4 1.95E-4  end
+end delay
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="license.html" title="License"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation Guide"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MSR_1D 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Zander Mausolff.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.8.
+    </div>
+  </body>
+</html>
