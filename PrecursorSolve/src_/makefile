@@ -19,20 +19,20 @@ msr1d : common_unit.o error_functions.o \
 	parameters_fe_M.o rdmesh_M.o \
 	rdparm_fe_M.o rddelay_M.o\
 	assemble_matrix_ss.o assemble_matrix_transient.o \
-    	boundary_cond.o cond_corr.o  \
+    boundary_cond.o cond_corr.o  \
 	datainput_fe_M.o \
 	density_corr.o   \
 	spatial_matrices.o \
 	driver_solve.o     \
 	inter_shape_fcns.o \
 	mesh_creation.o steady_state.o \
-    	solve_soln_transient.o transient_solve_euler.o \
-    	solve_power_backward_euler.o \
-        solve_power_transient.o solve_backward_euler.o \
-    	solve_soln_steady.o transient_backward_euler.o \
+    solve_soln_steady.o  \
+    solve_power_backward_euler.o solve_power_forward_euler.o \
+    solve_precursor_forward_euler.o solve_precursor_backward_euler.o \
+    transient_forward_euler.o transient_backward_euler.o \
 	initialize.o \
-    	write_out_soln.o \
-    	timestamp_M.o      
+    write_out_soln.o \
+    timestamp_M.o      
 	$(F90) $(FFLAGS) main_driver.f90 *.o -L $(LIBDIR)$(LIB) 
 
 main_driver.o : main_driver.f90
@@ -101,23 +101,23 @@ mesh_creation.o: mesh_creation.f90 parameters_fe_M.o
 solve_soln_steady.o:   solve_soln_steady.f90 parameters_fe_M.o 
 	$(F90) $(FFLAGS) -c solve_soln_steady.f90
 
-solve_power_transient.o:   solve_power_transient.f90 parameters_fe_M.o 
-	$(F90) $(FFLAGS) -c solve_power_transient.f90
+solve_power_forward_euler.o:   solve_power_forward_euler.f90 parameters_fe_M.o 
+	$(F90) $(FFLAGS) -c solve_power_forward_euler.f90
 
 solve_power_backward_euler.o:   solve_power_backward_euler.f90 parameters_fe_M.o 
 	$(F90) $(FFLAGS) -c solve_power_backward_euler.f90
 
-solve_backward_euler.o:   solve_backward_euler.f90 parameters_fe_M.o 
-	$(F90) $(FFLAGS) -c solve_backward_euler.f90
+solve_precursor_backward_euler.o:   solve_precursor_backward_euler.f90 parameters_fe_M.o 
+	$(F90) $(FFLAGS) -c solve_precursor_backward_euler.f90
 
-solve_soln_transient.o:   solve_soln_steady.f90 parameters_fe_M.o 
-	$(F90) $(FFLAGS) -c solve_soln_transient.f90
+solve_precursor_forward_euler.o:   solve_precursor_forward_euler.f90 parameters_fe_M.o 
+	$(F90) $(FFLAGS) -c solve_precursor_forward_euler.f90
 
 steady_state.o : steady_state.f90 parameters_fe_M.o
 	$(F90) $(FFLAGS) -c steady_state.f90
 
-transient_solve_euler.o : transient_solve_euler.f90 parameters_fe_M.o
-	$(F90) $(FFLAGS) -c transient_solve_euler.f90
+transient_forward_euler.o : transient_forward_euler.f90 parameters_fe_M.o
+	$(F90) $(FFLAGS) -c transient_forward_euler.f90
 
 transient_backward_euler.o : transient_backward_euler.f90 parameters_fe_M.o
 	$(F90) $(FFLAGS) -c transient_backward_euler.f90

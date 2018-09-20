@@ -22,9 +22,9 @@ implicit none
     real, dimension(num_isotopes, num_delay_group) :: L2_norm_current, L2_norm_prev
     real :: nl_iter_tolerance, difference_L2
     integer :: difference_counter, abs_max_nl_iter    
- 
-    abs_max_nl_iter = 1000
-    
+
+!---Set to make sure we don't iterate forever if we are not converging
+    abs_max_nl_iter = 500 
     nl_iter_tolerance = 1E-12
 
 !---Start time-dependent solve
@@ -46,7 +46,7 @@ implicit none
                             !---Assemble matrices solve elemental coefficients 
                             call assemble_matrix_transient(f,g,n) 
                             !---Solve for the elemental solution
-                            call solve_backward_euler(f,g,n,nl_iter)
+                            call solve_precursor_backward_euler(f,g,n,nl_iter)
                         enddo delay_loop 
                     enddo isotope_loop 
                 enddo elements_loop 
@@ -91,13 +91,17 @@ implicit none
                 
                 !---Check if too many nonlinear iterations and not converging
                 if ( nl_iter > max_nl_iter) then
+                    
                     if(nl_iter > abs_max_nl_iter) then
+                        print *,'nl_iter', nl_iter
                         write(outfile_unit,fmt=('(a)')) 'Gone past max amount of nonlinear iterations &
                                      and might have a problem'
                     else
-                        
-                        write(outfile_unit,fmt=('(a,I3,a,12es14.3)')) &
-                        'Took this # of iterations to converge --> ',nl_iter, '<-- at time step -->', t0
+                        if (DEBUG .eqv. .TRUE.) then 
+                            write(outfile_unit,fmt=('(a,I3,a,8es14.3)')) &
+                            'Took this # of iterations to converge --> ',nl_iter,&
+                            '  <-- at time step -->', t0
+                        end if
                     end if
                     
                     exit
