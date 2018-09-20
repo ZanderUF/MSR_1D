@@ -25,14 +25,14 @@ implicit none
     real, dimension(num_isotopes,num_delay_group) :: L2_norm_current,L2_norm_prev 
     real :: nl_iter_tolerance, difference_L2    
     integer :: difference_counter
-
+    integer :: abs_max_nl_iter
 !---------------------------------------------------------------
    
     L2_norm_prev = 0.0
     L2_norm_current = 0.0
     difference_counter = 0
     nl_iter_tolerance = 1E-12
-
+    abs_max_nl_iter = 1000
 !---Normal calculation flow - no need if doing unit test
     if (unit_test .eqv. .FALSE.) then
         !---Set starting values for power, velocity, temperature 
@@ -74,7 +74,8 @@ implicit none
                
                 !---Calculate L2 norm to decide when enough iterations are complete 
                 if(nl_iter > 1) then
-                    do f = 1, num_isotopes
+                     
+                     do f = 1, num_isotopes
                         do g = 1, num_delay_group
                             L2_norm_current(f,g) = sqrt ( sum ( precursor_soln_new(f,g,:,:)*&
                                                    precursor_soln_new(f,g,:,:) ))   ! L2 norm
@@ -93,9 +94,10 @@ implicit none
                     end do
                     
                     !---Need to make sure the L2 norm converges for all precursor groups
-                    if ( difference_counter == num_isotopes) then
+                    if ( difference_counter == num_delay_group) then
                         max_nl_iter = nl_iter - 1 
                     end if
+
                     !---Swap for next iteration
                     L2_norm_prev = L2_norm_current
                 end if
@@ -104,6 +106,11 @@ implicit none
     
                 ! If we've gone thru too many nonlinear iterations exit
                  if (nl_iter > max_nl_iter) then
+                     exit
+                 !---If we've gone through a max prescribed and still not converged
+                 elseif( nl_iter> abs_max_nl_iter) then
+                     write(outfile_unit,('(a)')) 'We have gone through the max &
+                           iterations andstill not converged, something may be wrong'
                      exit
                  end if
             
