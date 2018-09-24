@@ -24,6 +24,5 @@ implicit none
     b = 10.487
     C_p = a + b*T
 
-!   Test nonlinear correlation
 
 end

@@ -16,39 +16,70 @@ implicit none
     logical, intent(in) :: transient_save
 
 !---Local
-    integer :: f,i,j,g
-    character(len=28) :: time_soln_name
-    character(len=10)  :: time_characters
+    integer :: f,i,j,g, temp_unit, vel_unit
+    character(len=28) :: time_precursor_name
+    character(len=30) :: time_temperature_name
+    character(len=27) :: time_velocity_name
+    character(len=10) :: name_precursor_file, name_temperature_file,name_velocity_file
     real(kind=4) :: temp_time
-   
     temp_time = t0
+    
+    temp_unit = 18
+    vel_unit  = 23
 !---If writing to a new file for a given time step
     if(transient_save .eqv. .TRUE.) then 
         !file_unit = 15
-        time_soln_name = 'precursor_soln_at_time_step_'      
-        write(time_characters,'(f10.2)' ) temp_time 
-        time_characters = adjustl(time_characters) 
+        time_precursor_name   = 'precursor_soln_at_time_step_'      
+        time_temperature_name = 'temperature_soln_at_time_step_'
+        time_velocity_name    = 'velocity_soln_at_time_step_'
+        write(name_precursor_file,'(f10.2)' ) temp_time 
+        write(name_temperature_file, '(f10.2)') temp_time
+        write(name_velocity_file, '(f10.2)' ) temp_time
         
-        open (unit=file_unit, file= time_soln_name//time_characters,&
+        name_precursor_file   = adjustl(name_precursor_file) 
+        name_temperature_file = adjustl(name_temperature_file)
+        name_velocity_file    = adjustl(name_velocity_file)
+        
+        open (unit=file_unit, file= time_precursor_name//name_precursor_file,&
     	  status='unknown',form='formatted',position='asis')
+        open (unit=temp_unit, file= time_temperature_name//name_temperature_file,&
+           status='unknown',form='formatted',position='asis')
+        open (unit=vel_unit, file = time_velocity_name//name_velocity_file, &
+           status='unknown',form='formatted',position='asis')
+    
     end if
 
 !---Write to solution file
     write(file_unit,fmt='(a)'), 'Precursor concentration'
     write(file_unit,fmt='(a,6I10)'), 'Position(x) ',&
                                     (i, i=1,num_delay_group)
+
+    write(temp_unit,fmt='(a)'), 'Temperature [K] | Position (x) [cm]'
+    write(vel_unit, fmt='(a)'), 'Velocity [cm/s]   | Position (x) [cm] ' 
     
     do f = 1, num_isotopes ! isotope family
-            do i = 1, range_elem  
-                do j = 1, nodes_per_elem
-                    write(file_unit, fmt='(12es14.3, 12es14.3)')  global_coord(i,j), &
-                    ( precursor_soln_new(f,g,i,j), g=1,num_delay_group)
-                end do
+        do i = 1, range_elem  
+            do j = 1, nodes_per_elem
+                write(file_unit, fmt='(12es14.3, 12es14.3)')  global_coord(i,j), &
+                ( precursor_soln_new(f,g,i,j), g=1,num_delay_group)
             end do
+        end do
+    end do
+    
+    do i = 1, range_elem
+        do j = 1, nodes_per_elem
+            write(temp_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
+                  temperature_soln_new(i,j)
+            write(vel_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
+                  velocity_soln_new(i,j)
+        end do
     end do
 
 !---Close unit so we can move onto new one in future 
     if(transient_save .eqv. .TRUE.) then
         close(file_unit)
+        close(temp_unit)
+        close(vel_unit)
     end if
+
 end subroutine write_out_soln

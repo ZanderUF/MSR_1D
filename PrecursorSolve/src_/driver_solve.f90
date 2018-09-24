@@ -78,7 +78,7 @@ implicit none
     call steady_state
 
 !---Transient solve forward Euler method 
-!    call transient_solve_euler
+!    call transient_forward_euler
 
 !---Transient solve backward Euler method
     call transient_backward_euler

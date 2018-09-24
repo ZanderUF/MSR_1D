@@ -93,7 +93,6 @@ implicit none
                 if ( nl_iter > max_nl_iter) then
                     
                     if(nl_iter > abs_max_nl_iter) then
-                        print *,'nl_iter', nl_iter
                         write(outfile_unit,fmt=('(a)')) 'Gone past max amount of nonlinear iterations &
                                      and might have a problem'
                     else

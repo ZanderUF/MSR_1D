@@ -136,8 +136,12 @@ implicit none
     !---Set power 'previous' to new
     power_amplitude_prev = power_amplitude_new
     power_amplitude_last_time = power_amplitude_new
-
+   
+    
     precursor_soln_last_time = precursor_soln_new
+    power_soln_prev = power_soln_new
+    temperature_soln_prev = temperature_soln_new
+    velocity_soln_prev = velocity_soln_new
 
     !---Write to outfile
     call write_out_soln(outfile_unit,num_elem,transient_save_flag)
@@ -169,16 +173,9 @@ implicit none
     total_precursor_ref   = sum(temp_vec_prec)
     total_precursors_fuel = sum(temp_vec_prec(1:non_fuel_start))
    
-    print *,'Spatial fuel total',total_fuel_length 
     beta_correction = gen_time*((total_precursor_ref - &
                                  total_precursors_fuel)/(power_amplitude_prev*total_fuel_length))
 
-    print *,'Total precursor', total_precursor_ref
-    print *,'Total precursor fuel', total_precursors_fuel
-    print *,'Prec  match', power_amplitude_prev*( (sum(beta_i_mat) - beta_correction)/gen_time )
-    print *,'Beta  correction', beta_correction
-    print *,' '  
-    ! write(ss_file_name, '(a,5f.2)'), 'ss_soln_vel_',velocity_soln_new(1,1)
 
     call write_out_soln(soln_outfile_unit,num_elem,transient_save_flag) 
 

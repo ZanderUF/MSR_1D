@@ -130,13 +130,7 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
 
-!---Write power amp out @ every time step
-    if(t0 == 0.0) then
-        write(power_outfile_unit, ('(a)')), 'Time (s) | Power Amp | Norm Power | Reactivity'
-    end if
 
-    write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5)')), &
-          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,reactivity
 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
@@ -147,7 +141,7 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
     end do
 
 !---Write out power solution 
-    save_time_interval = 10.0 
+    save_time_interval = 1.0 
     if( modulo(t0,save_time_interval) < delta_t) then
         power_write_unit = 17
         temp_time=t0 

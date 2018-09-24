@@ -136,7 +136,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     end do
 
 
-
 !---End power solve
 
 end subroutine solve_power_backward_euler
