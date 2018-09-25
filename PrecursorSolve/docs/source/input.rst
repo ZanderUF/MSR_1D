@@ -17,6 +17,8 @@ Begins with **read parm** and ends with **end parm**
 Parameter  Value        Description
 =========  ===========  ================================================
 time       yes or no    Perform a time dependent calculation
+dbg        yes or no    Turn on DEBUG printing - prints a lot of stuff
+meth       integer      0 - forward Euler 1 - backward Euler       
 step       yes or no    Perform a step perturbation or not
 ramp       yes or no    Perform a ramp perturbation or not
 zag        yes or no    Perform a zig-zag perturbation or not
@@ -35,6 +37,7 @@ ndg        Integer      Number of delayed neutron groups
 nmat       Integer      Number of fissional materials
 gen        Real         Neutron generation time [:math:`s^-2`]
 reac       Real         Reactivity insertion for step and ramp
+save       Real         Interval to write out spatial solution files to
 =========  ===========  ================================================
 
 .. Delay Block::
