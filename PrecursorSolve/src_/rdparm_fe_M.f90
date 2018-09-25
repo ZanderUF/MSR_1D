@@ -15,7 +15,7 @@
 !-----------------------------------------------
       integer :: i0, i2, i3, i4, iret
       character(4) :: dum,duma,pn, read_time, read_zag,&
-        read_ramp, read_step 
+        read_debug, read_ramp, read_step 
 
 
       write(outfile_unit,fmt='(a)'), 'Reading parms'
@@ -40,7 +40,18 @@
               if ( read_time == 'yes ' ) then
                   time_solve  = .TRUE.
               endif
-          
+          case('dbug') ! DEBUG option
+              read_debug = aread(i4, iret)
+              if (read_debug == 'no ') then
+                  DEBUG = .FALSE.
+              end if
+              if (read_debug == 'yes ') then
+                  DEBUG = .TRUE.
+              end if
+              
+          case('meth') ! which time dependent method
+              td_method_type = iread(i0,iret)
+
           case('step')
               read_step = aread(i4, iret) 
               if ( read_step == 'no ' ) then
@@ -97,7 +108,8 @@
               gen_time = dread(i0,iret)
           case('reac')
               reactivity_input = dread(i0,iret)
-          
+          case('save') ! time intervale to write spatial solutions out
+              save_time_interval = fread(i0,iret)
           end select
       
       end do

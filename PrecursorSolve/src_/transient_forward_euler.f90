@@ -16,9 +16,14 @@ implicit none
 !---Local
     integer :: f,g,n,i,j
     real    :: t1 
-    real :: save_time_interval
+    integer :: power_write_unit
+    character(len=24) :: time_soln_name
+    character(len=10) :: time_characters
+    real(kind=4) :: temp_time
 
 !---Start time-dependent solve
+    temperature_soln_prev = temperature_soln_new
+
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
         write(outfile_unit, fmt='(a)'), ' ' 
@@ -38,24 +43,46 @@ implicit none
                 enddo isotope_loop 
             
                 !---Solve for temperature
-                call solve_temperature(n)
+                !call solve_temperature(n)
                 !---Solve for velocity
-                call solve_velocity(n)
+                !call solve_velocity(n)
 
             enddo elements_loop 
             
             !---Swap solutions
-            !precursor_soln_prev   = precursor_soln_new
-            !power_amplitude_prev  = power_amplitude_new
+            precursor_soln_prev   = precursor_soln_new
+            power_amplitude_prev  = power_amplitude_new
             !---Solve for total power after spatial sweep through precursors
             call solve_power_forward_euler(1,t0) 
             
-            save_time_interval = 1.0 
-            transient_save_flag = .TRUE.
             !---Write solution to a file periodically
+            transient_save_flag = .TRUE.
             if( modulo(t0,save_time_interval) < delta_t) then
                 call write_out_soln(12, num_elem, transient_save_flag )
-            end if
+                !---Write out power solution 
+                power_write_unit = 17
+                temp_time=t0 
+                time_soln_name = 'power_soln_at_time_step_'
+                write(time_characters,'(f10.2)' ) temp_time
+                time_characters = adjustl(time_characters)
+
+                open (unit=power_write_unit, file= time_soln_name//time_characters,&
+                status='unknown',form='formatted',position='asis')
+ 
+                write(power_write_unit,fmt='(a,12es14.3)'), 'Power distribution at time:',&
+                      t0  
+                write(power_write_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
+                do i = 1,num_elem
+                    do j = 1, nodes_per_elem
+                        write(power_write_unit, fmt='(f6.3, 12es14.3)') &
+                              global_coord(i,j), power_soln_new(i,j)
+                    end do
+                end do
+
+                close(power_write_unit)
+
+            end if !---End write out solution
+            
             transient_save_flag = .FALSE.
 	        !---Write power amp out @ every time step
 	        if(t0 == 0.0) then
@@ -69,8 +96,8 @@ implicit none
             precursor_soln_prev  = precursor_soln_new 
             power_soln_prev = power_soln_new
             power_amplitude_prev = power_amplitude_new
-            temperature_soln_prev = temperature_soln_new
-            velocity_soln_prev    = velocity_soln_new
+            !temperature_soln_prev = temperature_soln_new
+            !velocity_soln_prev    = velocity_soln_new
 
             !---Stop if we've exceeded TMAX.
             if ( tmax <= t0 ) then

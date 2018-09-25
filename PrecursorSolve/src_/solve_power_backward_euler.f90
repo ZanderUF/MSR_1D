@@ -25,7 +25,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     real (kind=16):: power_new_total, total_precursor_ref,&
                      total_precursor_ref_sum, total_fuel_length,&
                      total_precursors_fuel, &
-                     save_time_interval, rho_initial, step_time
+                     rho_initial, step_time
     
     real :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     real :: first_zag, second_zag, third_zag, reactivity_zag
@@ -91,17 +91,20 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
             rho_initial = 0.0 
             reactivity = rho_initial + &
               ((reactivity_input - rho_initial)*&
-               (t0-t_initial))/(ramp_end_time - t_initial)
+               (t0 - t_initial))/(ramp_end_time - t_initial)
         elseif ( t0 > ramp_end_time) then
             reactivity = 0.0 
         end if
-    end if !---End RAMP perturbation 
-!---Zig zag perturbation
+    end if  
+!---End RAMP perturbation
+
+!---Zig-zag perturbation
+    
     reactivity_zag = 7.5E-3
     first_zag  = 0.5
     second_zag = 1.0
     third_zag  = 1.5
-
+    rho_initial = 0.0
     if(zag_flag .eqv. .TRUE.) then
         if( t0 < first_zag ) then
             reactivity = rho_initial + &

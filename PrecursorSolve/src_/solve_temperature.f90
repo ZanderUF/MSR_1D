@@ -23,7 +23,7 @@ implicit none
         !---Get thermal heat_capacity value
         temperature = temperature_soln_prev(n,j)
         call heat_capacity_corr(temperature, heat_capacity)
-        call cond_corr(temperature,heat_capacity)
+        !call cond_corr(temperature,heat_capacity)
         !---This should work for forward Euler
         temperature_soln_new(n,j) = (power_soln_prev(n,j)/(mass_flow*heat_capacity) )&
                                     + temperature_soln_prev(n,j) 

@@ -73,14 +73,20 @@ implicit none
 !---Create 1D mesh
     call mesh_creation
 
-    DEBUG = .FALSE.
 !---Steady state solve for temperature 
     call steady_state
 
-!---Transient solve forward Euler method 
-!    call transient_forward_euler
-
-!---Transient solve backward Euler method
-    call transient_backward_euler
+    if( td_method_type == 0) then
+        write(outfile_unit, fmt=('(a)')) 'Performing forward Euler time integration' 
+        print *,'FORWARD'
+        !---Transient solve forward Euler method 
+        call transient_forward_euler
+    end if
+    
+    if( td_method_type == 1) then
+        write(outfile_unit, fmt=('(a)')) 'Performing backward Euler time integration'
+        !---Transient solve backward Euler method
+        call transient_backward_euler
+    end if
 
 end 

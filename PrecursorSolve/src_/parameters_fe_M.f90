@@ -137,7 +137,9 @@ module parameters_fe
     real :: tolerance = 0.001 ! prescribed tolerance
     
 !---Flags
-    logical :: DEBUG = .TRUE.
+    real :: save_time_interval
+    integer :: td_method_type = 0
+    logical :: DEBUG = .FALSE.
     logical :: steady_state_flag = .TRUE.    
     logical :: unit_test = .FALSE. 
     logical :: unit_test_2 = .FALSE. 

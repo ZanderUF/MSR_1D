@@ -21,23 +21,30 @@ subroutine solve_precursor_forward_euler(isotope,delay_group,n, nl_iter )
     integer :: i,j,f,g
 
 !---PRECURSOR SOLVE
-    do i = 1, nodes_per_elem
-    precursor_soln_new(isotope,delay_group, n,i) = &
-            precursor_soln_prev(isotope, delay_group, n,i) + &
-            delta_t*(H_times_soln_vec(i) + &
-            (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
-            A_times_W_times_upwind_elem_vec(i)) 
-    
-    !---test to make sure values are not too small
-    if(precursor_soln_new(isotope, delay_group, n, i) < 1E-8_dp) then
-        precursor_soln_new(isotope, delay_group, n, i) = 0.0
+    if( n < non_fuel_start) then  
+        do i = 1, nodes_per_elem
+        precursor_soln_new(isotope,delay_group, n,i) = &
+                precursor_soln_prev(isotope, delay_group, n,i) + &
+                delta_t*(H_times_soln_vec(i) + &
+                (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
+                A_times_W_times_upwind_elem_vec(i)) 
+        end do
+    else
+        do i = 1, nodes_per_elem
+        precursor_soln_new(isotope,delay_group, n,i) = &
+                precursor_soln_prev(isotope, delay_group, n,i) + &
+                delta_t*(H_times_soln_vec(i) + &
+                A_times_W_times_upwind_elem_vec(i))
+        end do
     end if
 
-
-    end do
 !---END PRECURSOR SOLVE    
-   
-
+        !!---test to make sure values are not too small
+        do i = 1, nodes_per_elem
+        if(precursor_soln_new(isotope, delay_group, n, i) < 1E-8_dp) then
+            precursor_soln_new(isotope, delay_group, n, i) = 0.0
+        end if  
+        end do
     if (DEBUG .eqv. .TRUE.) then
     !---Write out solution for current element 
         write(outfile_unit,fmt='(a)'), ' ' 

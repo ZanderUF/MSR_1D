@@ -15,7 +15,7 @@ implicit none
 
 !---Local
     integer :: f,g,n,i,j,nl_iter, power_write_unit
-    real    :: t1, save_time_interval  
+    real    :: t1
     character(len=24) :: time_soln_name
     character(len=10) :: time_characters
     real(kind=4) :: temp_time
@@ -51,8 +51,8 @@ implicit none
                     enddo isotope_loop 
                 enddo elements_loop 
                 
-                precursor_soln_prev = precursor_soln_new
-                power_amplitude_prev = power_amplitude_new
+                !precursor_soln_prev = precursor_soln_new
+                !power_amplitude_prev = power_amplitude_new
                 
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_backward_euler(nl_iter,t0) 
@@ -108,7 +108,7 @@ implicit none
             
             enddo nonlinearloop 
            
-            save_time_interval = 10.0 
+            save_time_interval = 1.0 
             transient_save_flag = .TRUE.
             
             !---Write solution to a file periodically
