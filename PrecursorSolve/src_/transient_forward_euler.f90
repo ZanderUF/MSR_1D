@@ -50,8 +50,8 @@ implicit none
             enddo elements_loop 
             
             !---Swap solutions
-            precursor_soln_prev   = precursor_soln_new
-            power_amplitude_prev  = power_amplitude_new
+            !precursor_soln_prev   = precursor_soln_new
+            !power_amplitude_prev  = power_amplitude_new
             !---Solve for total power after spatial sweep through precursors
             call solve_power_forward_euler(1,t0) 
             
@@ -87,10 +87,10 @@ implicit none
 	        !---Write power amp out @ every time step
 	        if(t0 == 0.0) then
 	            write(power_outfile_unit, ('(a)')), &
-				'Time (s) | Power Amp | Norm Power | Reactivity'
+				'Time (s) | Power Amp | Norm Power | Reactivity | Beta Correction'
 	        end if
-	        write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5)')), &
-	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,reactivity
+	        write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5, 12es14.5)')), &
+	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,reactivity, beta_correction
             
 	        !---Swap solutions
             precursor_soln_prev  = precursor_soln_new 

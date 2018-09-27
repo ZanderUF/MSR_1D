@@ -52,12 +52,12 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
                 A_times_W_times_upwind_elem_vec(i) = &
                     A_times_W_times_upwind_elem_vec(i) + &
                     elem_matrix_A_times_W(i,j)*&
-                    precursor_soln_prev(isotope,delay_group,n-1,3)
+                    precursor_soln_prev(isotope,delay_group,n-1,j)
             else
                 A_times_W_times_upwind_elem_vec(i) = &
                     A_times_W_times_upwind_elem_vec(i) + &
                     elem_matrix_A_times_W(i,j)*&
-                    precursor_soln_prev(isotope,delay_group, num_elem,3)
+                    precursor_soln_prev(isotope,delay_group, num_elem,j)
             end if
         end do 
     end do

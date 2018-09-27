@@ -44,6 +44,7 @@ subroutine spatial_matrices (n, nl_iter)
     matrix_W_right_face = 0
     matrix_W_left_face = 0
     elem_matrix_U = 0.0
+    elem_matrix_A = 0.0
     elem_matrix_F   = 0.0
     elem_vec_f      = 0.0
     elem_vec_q   = 0.0    
@@ -77,11 +78,9 @@ subroutine spatial_matrices (n, nl_iter)
                 elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
                 
                 do j = 1, nodes_per_elem
-                    if(n < 2 .and. nl_iter < 2) then 
-                        !---Assemble A matrix - only needs to be done once
-                        elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
-                                         cnst*shape_fcn(i)*shape_fcn(j)
-                    end if
+                     !---Assemble A matrix - only needs to be done once
+                    elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
+                                      cnst*shape_fcn(i)*shape_fcn(j)
                     !---Assemble P matrix
                     elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                         evaluated_velocity*cnst*shape_fcn(j)*global_der_shape_fcn(i)

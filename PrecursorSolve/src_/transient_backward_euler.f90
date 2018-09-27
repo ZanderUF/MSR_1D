@@ -108,7 +108,6 @@ implicit none
             
             enddo nonlinearloop 
            
-            save_time_interval = 1.0 
             transient_save_flag = .TRUE.
             
             !---Write solution to a file periodically

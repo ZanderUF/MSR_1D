@@ -84,6 +84,7 @@ implicit none
     end if
     
     if( td_method_type == 1) then
+        print *,'BACKWARD'
         write(outfile_unit, fmt=('(a)')) 'Performing backward Euler time integration'
         !---Transient solve backward Euler method
         call transient_backward_euler
