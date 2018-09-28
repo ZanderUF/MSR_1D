@@ -97,6 +97,7 @@ subroutine spatial_matrices (n, nl_iter)
 !---Create source vector 'q', and W - 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
+            !print *,'spatial_power_fcn * amp', spatial_power_fcn(n,j)*power_amplitude_prev
             elem_vec_q(i) = elem_vec_q(i) + &
                             elem_matrix_A(i,j)*spatial_power_fcn(n,j)*power_amplitude_prev
             !---Applies for all elements except the first one

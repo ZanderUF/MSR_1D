@@ -52,9 +52,11 @@ module parameters_fe
     data identity_matrix /1,0,0,&
                          0,1,0,&
                          0,0,1/
-    
+   
+    real , dimension(3)   :: elem_matrix_A_times_W_RHS
     real , dimension(3)   :: elem_vec_A_times_q
     real , dimension(3)   :: A_times_W_times_upwind_elem_vec 
+    real , dimension(3,3)   :: A_times_W_times_RHS_elem_vec
     real , dimension(3)   :: H_times_soln_vec
     real , dimension(3)   :: elem_vec_w_left_face
     real , dimension(3)   :: elem_vec_v

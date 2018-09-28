@@ -29,6 +29,8 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     elem_matrix_G = 0
     rhs_final_vec = 0
     A_times_W_times_upwind_elem_vec = 0
+    A_times_W_times_RHS_elem_vec = 0
+    elem_matrix_A_times_W_RHS = 0
     elem_matrix_A_times_W = 0
     H_times_soln_vec = 0
     elem_vec_A_times_q = 0
@@ -37,8 +39,10 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     
     !---Calculate H matrix, will be inverted later on
     elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
-                    lamda_i_mat(isotope,delay_group)*identity_matrix - &
-                    matmul(inverse_A_matrix,matrix_W_right_face)
+                    lamda_i_mat(isotope,delay_group)*identity_matrix !- &
+    !                matmul(inverse_A_matrix,matrix_W_right_face)
+    
+    A_times_W_times_RHS_elem_vec = matmul(inverse_A_matrix,matrix_W_right_face)
     
     elem_vec_A_times_q = matmul(inverse_A_matrix,elem_vec_q)
      
@@ -48,7 +52,10 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
             H_times_soln_vec(i) = H_times_soln_vec(i) + &
                     elem_matrix_H(i,j)*&
                     precursor_soln_prev(isotope,delay_group,n,j) 
-            
+            elem_matrix_A_times_W_RHS(i) = elem_matrix_A_times_W_RHS(i) + &
+                    A_times_W_times_RHS_elem_vec(i,j)*&
+                    precursor_soln_prev(isotope,delay_group,n,1)
+
             if ( n > 1) then
                 A_times_W_times_upwind_elem_vec(i) = &
                     A_times_W_times_upwind_elem_vec(i) + &

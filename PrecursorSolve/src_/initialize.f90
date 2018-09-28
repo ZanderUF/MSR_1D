@@ -26,7 +26,7 @@ implicit none
     power_soln_new(:,:) = 0 
    
     !---Power amplitude set
-    power_amplitude_new = 10.0
+    power_amplitude_new = 1.0
     power_amplitude_prev = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
     

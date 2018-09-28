@@ -19,6 +19,9 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Local
     integer :: i,j,f,g
+    real (kind=16), dimension(num_delay_group,num_elem) :: precursors_vec
+    real (kind=16), dimension(num_delay_group) :: test_fuel_prec, test_total_prec
+
     real (kind=16), dimension(num_elem) :: temp_vec_num_elem, &
                                            precursors_lambda_vec, &
                                            power_soln_new_temp 
@@ -35,6 +38,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     temp_vec_num_elem(:) = 0.0
     total_precursor_ref = 0.0
 
+    precursors_vec = 0.0
+
 !---Calculate total precursor concentration*lamda over system 
     do f = 1, num_isotopes 
        do g = 1, num_delay_group
@@ -45,6 +50,10 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                                       elem_vol_int(i,j)*&
                                       precursor_soln_prev(f,g,i,j)
                    
+                   precursors_vec(g,i) = precursors_vec(g,i) + &
+                                       elem_vol_int(i,j)*  &
+                                       precursor_soln_prev(f,g,i,j)
+    
                    total_precursor_ref = total_precursor_ref + &
                                       lamda_i_mat(f,g)*&
                                       elem_vol_int(i,j)*&
@@ -53,7 +62,17 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
             end do
        end do
     end do
-    
+    beta_correction = 0.0 
+    do g = 1, num_delay_group
+        test_total_prec(g) = sum(precursors_vec(g,:))
+        test_fuel_prec(g)  = sum(precursors_vec(g,1:non_fuel_start))
+        
+        beta_correction = beta_correction + &
+            ((gen_time*lamda_i_mat(1,g))*( test_fuel_prec(g)/&
+            test_total_prec(g) ))*40.0_dp 
+        
+    end do
+    print *,' '  
     !---Get total length of the fuel element
     total_fuel_length = 0.0
     do i = 1, num_elem
@@ -62,12 +81,18 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                                 spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
-   
+    
+    beta_correction = 0.0  
+    print *,'power amp start',power_amplitude_start
+
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(1:non_fuel_start))
-    beta_correction           = gen_time*((total_precursor_ref - &
-                                total_precursors_fuel) / &
-                                (power_amplitude_start*total_fuel_length))
+    ! Calc beta correction per delay group
+    beta_correction           = (gen_time*(total_precursors_fuel))/40.0_dp 
+    
+    !beta_correction = gen_time*(total_precursors_fuel/total_precursor_ref)
+    !!beta_correction = 0.0
+    print *,'beta corre',beta_correction
 
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
@@ -122,13 +147,19 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
             reactivity = reactivity
         end if
     end if
-
+    print *,'power amp',power_amplitude_prev
 !---Power Solve
     power_amplitude_new = power_amplitude_last_time + &
-                          delta_t*( (reactivity - ( (sum(beta_i_mat) &
-                          - beta_correction) ) )/gen_time)*power_amplitude_prev &
+                          delta_t*( (reactivity  &
+                          - beta_correction  )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
+
+      print *,' FFirst',  delta_t*( (reactivity & 
+        - beta_correction)  /gen_time)*power_amplitude_prev 
+
+      print *,'Second', delta_t*(1.0_dp/total_fuel_length)*&
+        total_precursors_fuel
 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0

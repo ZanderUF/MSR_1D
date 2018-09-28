@@ -20,12 +20,14 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
 !---Local
     integer :: i,j,f,g
 
+    !print *,'elem_matrix_', elem_matrix_A_times_W_RHS
 !---PRECURSOR SOLVE
     do i = 1, nodes_per_elem
     precursor_soln_new(isotope,delay_group, n,i) = &
             precursor_soln_last_time(isotope, delay_group, n,i) + &
             delta_t*(H_times_soln_vec(i) + &
             (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
+            elem_matrix_A_times_W_RHS(i) + &
             A_times_W_times_upwind_elem_vec(i)) 
     !---test to make sure values are not too small
     !if(precursor_soln_new(isotope, delay_group, n, i) < 1E-8_dp) then
