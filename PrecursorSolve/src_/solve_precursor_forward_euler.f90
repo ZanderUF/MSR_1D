@@ -24,7 +24,7 @@ subroutine solve_precursor_forward_euler(isotope,delay_group,n, nl_iter )
 
     if( n < non_fuel_start) then  
         do i = 1, nodes_per_elem
-        precursor_soln_new(isotope,delay_group, n,i) = &
+            precursor_soln_new(isotope,delay_group, n,i) = &
                 precursor_soln_prev(isotope, delay_group, n,i) + &
                 delta_t*(H_times_soln_vec(i) + &
                 (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
@@ -42,7 +42,7 @@ subroutine solve_precursor_forward_euler(isotope,delay_group,n, nl_iter )
 !---END PRECURSOR SOLVE    
         !!---test to make sure values are not too small
         do i = 1, nodes_per_elem
-            if(precursor_soln_new(isotope, delay_group, n, i) < 1E-8_dp) then
+            if(precursor_soln_new(isotope, delay_group, n, i) < 1E-16_dp) then
                 precursor_soln_new(isotope, delay_group, n, i) = 0.0
             end if  
         end do

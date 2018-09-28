@@ -41,23 +41,24 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
                     matmul(inverse_A_matrix,matrix_W_right_face)
     
     elem_vec_A_times_q = matmul(inverse_A_matrix,elem_vec_q)
-    
+     
     !---Multiply H matrix by previous soln vec
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
             H_times_soln_vec(i) = H_times_soln_vec(i) + &
                     elem_matrix_H(i,j)*&
                     precursor_soln_prev(isotope,delay_group,n,j) 
+            
             if ( n > 1) then
                 A_times_W_times_upwind_elem_vec(i) = &
                     A_times_W_times_upwind_elem_vec(i) + &
                     elem_matrix_A_times_W(i,j)*&
-                    precursor_soln_prev(isotope,delay_group,n-1,j)
+                    precursor_soln_prev(isotope,delay_group,n-1,3)
             else
                 A_times_W_times_upwind_elem_vec(i) = &
                     A_times_W_times_upwind_elem_vec(i) + &
                     elem_matrix_A_times_W(i,j)*&
-                    precursor_soln_prev(isotope,delay_group, num_elem,j)
+                    precursor_soln_prev(isotope,delay_group, num_elem,3)
             end if
         end do 
     end do

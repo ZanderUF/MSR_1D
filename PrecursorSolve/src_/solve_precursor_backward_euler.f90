@@ -33,6 +33,7 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
     !end if
 
     end do
+    !print *,'n ',n, ' ', 'q', elem_vec_A_times_q
 !---END PRECURSOR SOLVE    
    
 

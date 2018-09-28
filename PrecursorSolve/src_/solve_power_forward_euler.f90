@@ -68,8 +68,9 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
                                 total_precursors_fuel) / &
                                 (power_amplitude_start*total_fuel_length))
 
+   ! print *,' beta correction', beta_correction
     !beta_correction = 0.0
-    
+
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
     step_end_time = 0.5
@@ -131,6 +132,12 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
 
+    print *, 'First part ', delta_t*( (reactivity - ( (sum(beta_i_mat) &
+                          - beta_correction) ) )/gen_time)*power_amplitude_prev 
+    
+    print *, 'Second part ', delta_t*(1.0_dp/total_fuel_length)*&
+                             total_precursors_fuel
+    print *,' ' 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
     do i = 1, non_fuel_start 
