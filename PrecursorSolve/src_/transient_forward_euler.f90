@@ -41,17 +41,19 @@ implicit none
                         call solve_precursor_forward_euler(f,g,n,1)
                     enddo delay_loop 
                 enddo isotope_loop 
-            
-                !---Solve for temperature
-                !call solve_temperature(n)
-                !---Solve for velocity
-                !call solve_velocity(n)
+                
+                if( mass_flow > 0.0 ) then
+                    !---Solve for temperature
+                    call solve_temperature(n)
+                    !---Solve for velocity
+                    call solve_velocity(n)
+                end if
 
             enddo elements_loop 
             
             !---Swap solutions
-            !precursor_soln_prev   = precursor_soln_new
-            !power_amplitude_prev  = power_amplitude_new
+            precursor_soln_prev   = precursor_soln_new
+            power_amplitude_prev  = power_amplitude_new
             !---Solve for total power after spatial sweep through precursors
             call solve_power_forward_euler(1,t0) 
             
@@ -96,9 +98,11 @@ implicit none
             precursor_soln_prev  = precursor_soln_new 
             power_soln_prev = power_soln_new
             power_amplitude_prev = power_amplitude_new
-            !temperature_soln_prev = temperature_soln_new
-            !velocity_soln_prev    = velocity_soln_new
-
+            if( mass_flow > 0.0 ) then
+                temperature_soln_prev = temperature_soln_new
+                velocity_soln_prev    = velocity_soln_new
+            end if
+            
             !---Stop if we've exceeded TMAX.
             if ( tmax <= t0 ) then
                 exit

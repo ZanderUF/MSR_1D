@@ -28,6 +28,7 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
                      rho_initial, step_time
     real :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     real :: first_zag, second_zag, third_zag, reactivity_zag
+    real :: total_power
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
@@ -55,21 +56,23 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
     
     !---Get total length of the fuel element
     total_fuel_length = 0.0
+    total_power = 0.0
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_fuel_length = total_fuel_length + &
                                 spatial_power_fcn(i,j)*elem_vol_int(i,j)
+            total_power = total_power + &
+                           elem_vol_int(i,j)*power_amplitude_prev*&
+                           spatial_power_fcn(i,j)
         end do
     end do
    
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(1:non_fuel_start))
-    beta_correction           = gen_time*((total_precursor_ref - &
-                                total_precursors_fuel) / &
-                                (power_amplitude_start*total_fuel_length))
 
-   ! print *,' beta correction', beta_correction
-    !beta_correction = 0.0
+    if(t0 == 0.0) then
+        beta_correction = (gen_time*(total_precursors_fuel))/total_power
+    end if
 
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
@@ -124,20 +127,23 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
             reactivity = reactivity
         end if
     end if
+    
+    print *,'power amp prev',power_amplitude_prev
 
 !---Power Solve
     power_amplitude_new = power_amplitude_prev + &
-                          delta_t*( (reactivity - ( (sum(beta_i_mat) &
-                          - beta_correction) ) )/gen_time)*power_amplitude_prev &
+                          delta_t*( (reactivity & 
+                          - beta_correction ) /gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
 
-    print *, 'First part ', delta_t*( (reactivity - ( (sum(beta_i_mat) &
-                          - beta_correction) ) )/gen_time)*power_amplitude_prev 
+    print *, 'First part ', delta_t*( (reactivity  &
+                          - beta_correction) ) /gen_time*power_amplitude_prev 
     
     print *, 'Second part ', delta_t*(1.0_dp/total_fuel_length)*&
                              total_precursors_fuel
     print *,' ' 
+
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
     do i = 1, non_fuel_start 

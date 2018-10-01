@@ -172,11 +172,11 @@ implicit none
     !--- 
     total_precursor_ref   = sum(temp_vec_prec)
     total_precursors_fuel = sum(temp_vec_prec(1:non_fuel_start))
-   
-    beta_correction = gen_time*((total_precursor_ref - &
-                                 total_precursors_fuel)/(power_amplitude_prev*total_fuel_length))
-
-
+     
+!    beta_correction = gen_time*((total_precursor_ref - &
+!                                 total_precursors_fuel)/(power_amplitude_prev*total_fuel_length))
+!
+    
     call write_out_soln(soln_outfile_unit,num_elem,transient_save_flag) 
     
 !---Set steady state flag off

@@ -39,8 +39,8 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     
     !---Calculate H matrix, will be inverted later on
     elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
-                    lamda_i_mat(isotope,delay_group)*identity_matrix !- &
-    !                matmul(inverse_A_matrix,matrix_W_right_face)
+                    lamda_i_mat(isotope,delay_group)*identity_matrix - &
+                    matmul(inverse_A_matrix,matrix_W_right_face)
     
     A_times_W_times_RHS_elem_vec = matmul(inverse_A_matrix,matrix_W_right_face)
     
@@ -52,6 +52,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
             H_times_soln_vec(i) = H_times_soln_vec(i) + &
                     elem_matrix_H(i,j)*&
                     precursor_soln_prev(isotope,delay_group,n,j) 
+            
             elem_matrix_A_times_W_RHS(i) = elem_matrix_A_times_W_RHS(i) + &
                     A_times_W_times_RHS_elem_vec(i,j)*&
                     precursor_soln_prev(isotope,delay_group,n,1)

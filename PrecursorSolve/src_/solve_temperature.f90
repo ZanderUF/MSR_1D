@@ -25,7 +25,9 @@ implicit none
         call heat_capacity_corr(temperature, heat_capacity)
         !call cond_corr(temperature,heat_capacity)
         !---This should work for forward Euler
-        temperature_soln_new(n,j) = (power_soln_prev(n,j)/(mass_flow*heat_capacity) )&
+        temperature_soln_new(n,j) = (( (total_power_initial/sum(spatial_power_fcn) )*&   
+                                     power_soln_prev(n,j) ) &
+                                    /( (mass_flow*heat_capacity) )) &
                                     + temperature_soln_prev(n,j) 
     end do
     

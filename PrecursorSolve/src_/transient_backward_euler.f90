@@ -49,6 +49,10 @@ implicit none
                             call solve_precursor_backward_euler(f,g,n,nl_iter)
                         enddo delay_loop 
                     enddo isotope_loop 
+                
+                    call solve_temperature(n)
+                    call solve_velocity(n)
+            
                 enddo elements_loop 
                 
                 precursor_soln_prev = precursor_soln_new
@@ -56,7 +60,7 @@ implicit none
                 
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_backward_euler(nl_iter,t0) 
-               
+                
                 !---Calculate L2 norm of precursor solution
                 if(nl_iter > 1) then
                     do f = 1, num_isotopes
@@ -140,21 +144,26 @@ implicit none
                 close(power_write_unit)
 
             end if !---End write out solution
-            
             !---Write power amp out @ every time step
             if(t0 == 0.0) then
                 write(power_outfile_unit, ('(a)')),&
                       'Time (s) | Power Amp | Norm Power | Reactivity'
             end if
 
-            write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5)')), &
-                  t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,reactivity
+            write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5,12es14.5)')), &
+            t0, power_amplitude_new, power_amplitude_new,&
+                  reactivity, beta_correction
 
             !---Swap solutions
             precursor_soln_prev       = precursor_soln_new 
             power_amplitude_prev      = power_amplitude_new
             precursor_soln_last_time  = precursor_soln_new
             power_amplitude_last_time = power_amplitude_new
+            
+            if(mass_flow > 0.0 ) then
+                temperature_soln_prev = temperature_soln_new
+                velocity_soln_prev    = velocity_soln_new
+            end if
 
            !---Stop if we've exceeded TMAX.
            if ( tmax <= t0 ) then

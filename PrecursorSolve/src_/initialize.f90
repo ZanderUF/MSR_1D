@@ -26,6 +26,7 @@ implicit none
     power_soln_new(:,:) = 0 
    
     !---Power amplitude set
+    
     power_amplitude_new = 1.0
     power_amplitude_prev = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
@@ -59,11 +60,14 @@ implicit none
         end do
     end do
 
+    print *,'totalpowerinitial', total_power_initial
+    
     !---Apply to every node point within an element
     do i = 1,num_elem
         do j = 1, nodes_per_elem
             !---Apply to active fuel region
             if( i <= non_fuel_start ) then
+                !print *,'total_power/fuel',total_power_initial/non_fuel_start 
                 power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new
                 !---Set temperature distribution
                 temperature_soln_new(i,j) = (center_temp_initial*spatial_power_fcn(i,j))
@@ -99,7 +103,7 @@ implicit none
     write(outfile_unit,fmt='(a)'), '------------------------------------'
     do i = 1,num_elem
         do j = 1, nodes_per_elem
-            write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), spatial_power_fcn(i,j)
+            write(outfile_unit, fmt='(f6.3, 12es14.3)')  global_coord(i,j), power_soln_new(i,j)
         end do
     end do
 !-------------------------------------------------------------------------------
