@@ -25,8 +25,7 @@ implicit none
         !---Evaluate density based on temperature
         call density_corr(temperature,density)
         density_soln_new(n,j) = density
-        velocity_soln_new(n,j) = mass_flow/(area*density)
+        velocity_soln_new(n,j) = mass_flow/(area_variation(n,j)*density)
     end do
-
 
 end subroutine solve_velocity

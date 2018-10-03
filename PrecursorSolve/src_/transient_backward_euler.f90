@@ -49,7 +49,7 @@ implicit none
                             call solve_precursor_backward_euler(f,g,n,nl_iter)
                         enddo delay_loop 
                     enddo isotope_loop 
-                
+                    
                     call solve_temperature(n)
                     call solve_velocity(n)
             
@@ -147,12 +147,14 @@ implicit none
             !---Write power amp out @ every time step
             if(t0 == 0.0) then
                 write(power_outfile_unit, ('(a)')),&
-                      'Time (s) | Power Amp | Norm Power | Reactivity'
+                      'Time (s) | Power Amp | Norm Power | Reactivity | &
+                       Beta Correction | Reactivity Feedback'
             end if
 
             write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5,12es14.5)')), &
             t0, power_amplitude_new, power_amplitude_new,&
-                  reactivity, beta_correction
+                  reactivity, beta_correction, reactivity_feedback
+
 
             !---Swap solutions
             precursor_soln_prev       = precursor_soln_new 

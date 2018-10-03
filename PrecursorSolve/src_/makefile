@@ -31,7 +31,7 @@ msr1d : common_unit.o error_functions.o \
     solve_precursor_forward_euler.o solve_precursor_backward_euler.o \
     transient_forward_euler.o transient_backward_euler.o \
     solve_temperature.o solve_velocity.o \
-    initialize.o \
+    reactivity_feedback.o initialize.o \
     write_out_soln.o \
     timestamp_M.o      
 	$(F90) $(FFLAGS) main_driver.f90 *.o -L $(LIBDIR)$(LIB) 
@@ -101,6 +101,9 @@ heat_capacity_corr.o: heat_capacity_corr.f90 parameters_fe_M.o
 
 mesh_creation.o: mesh_creation.f90 parameters_fe_M.o   
 	$(F90) $(FFLAGS) -c mesh_creation.f90
+
+reactivity_feedback.o: reactivity_feedback.f90 parameters_fe_M.o 
+	$(F90) $(FFLAGS) -c reactivity_feedback.f90
 
 solve_soln_steady.o:   solve_soln_steady.f90 parameters_fe_M.o 
 	$(F90) $(FFLAGS) -c solve_soln_steady.f90

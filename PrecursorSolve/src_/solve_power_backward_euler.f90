@@ -32,7 +32,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     
     real :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     real :: first_zag, second_zag, third_zag, reactivity_zag
-    real :: total_power
+    real :: temp_reactivity_feedback, total_power
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
@@ -88,7 +88,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
-    step_end_time = 0.2 
+    step_end_time = 1.0 
     
     ramp_start_time = 0.0 
     ramp_end_time = 0.5
@@ -116,7 +116,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 !---End RAMP perturbation
 
 !---Zig-zag perturbation
-    
     reactivity_zag = 7.5E-3
     first_zag  = 0.5
     second_zag = 1.0
@@ -139,19 +138,21 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
             reactivity = reactivity
         end if
     end if
-    
-    !print *,'power amp',power_amplitude_prev
+
+    temp_reactivity_feedback = 0.0
+
+!---Calculate temperature reactivity feedback
+    if(feedback_method == 1 ) then
+       call temperature_feedback(temp_reactivity_feedback,t0,nl_iter)
+        reactivity_feedback = temp_reactivity_feedback
+    end if
+
 !---Power Solve
     power_amplitude_new = power_amplitude_last_time + &
-                          delta_t*( (reactivity  &
+                          delta_t*( (reactivity - reactivity_feedback &
                           - beta_correction  )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
-      !print *,' FFirst',  delta_t*( (reactivity & 
-      !  - beta_correction)  /gen_time)*power_amplitude_prev 
-
-      !print *,'Second', delta_t*(1.0_dp/total_fuel_length)*&
-      !  total_precursors_fuel
 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0

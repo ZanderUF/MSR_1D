@@ -20,13 +20,12 @@ implicit none
     parameter (pi = 3.1415926535897932)
     real :: constant_velocity
     logical :: constant_flag
-
+    
     !---Initialize to zero 
     precursor_soln_new(:,:,:,:) = 0 
     power_soln_new(:,:) = 0 
    
     !---Power amplitude set
-    
     power_amplitude_new = 1.0
     power_amplitude_prev = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
@@ -40,7 +39,7 @@ implicit none
     constant_velocity = 1.5! [cm/s]
     
     !---Flag for testing, use a flat power function or not
-    constant_flag = .TRUE.
+    constant_flag = .FALSE.
     !---Create spatial power function
     do i = 1, num_elem
         do j = 1, nodes_per_elem
@@ -60,14 +59,11 @@ implicit none
         end do
     end do
 
-    print *,'totalpowerinitial', total_power_initial
-    
     !---Apply to every node point within an element
     do i = 1,num_elem
         do j = 1, nodes_per_elem
             !---Apply to active fuel region
             if( i <= non_fuel_start ) then
-                !print *,'total_power/fuel',total_power_initial/non_fuel_start 
                 power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new
                 !---Set temperature distribution
                 temperature_soln_new(i,j) = (center_temp_initial*spatial_power_fcn(i,j))
@@ -76,10 +72,11 @@ implicit none
                 call density_corr(temperature,density)
                 density_soln_new(i,j) = density
                 !---Need to get initial velocity distribution
-                velocity_soln_new(i,j) = mass_flow/(area*density)
+                velocity_soln_new(i,j) = mass_flow/(area_core*density)
                 !velocity_soln_new(i,j) = constant_velocity 
-            !---Inactive region assumed to have zero power 
+                area_variation(i,j) = area_core
             else
+            !---Inactive region assumed to have zero power 
                 power_soln_new(i,j) = 0.0
                 !---Temperature in inactive region same as end of active region ==> no loss
                 temperature_soln_new(i,j) = temperature_soln_new(non_fuel_start ,3)
@@ -87,13 +84,23 @@ implicit none
                 call density_corr(temperature_soln_new(i,j),density)
                 density_soln_new = density
                 !---Need to get initial velocity distribution
-                velocity_soln_new(i,j) = mass_flow/(area*density)
-                !velocity_soln_new(i,j) = 0
+                velocity_soln_new(i,j) = mass_flow/(area_pipe*density)
                 !velocity_soln_new(i,j) = constant_velocity 
+                !---Area change for the piping 
+                area_variation(i,j) = area_pipe
+            
             end if
         end do 
     end do
-    
+  
+    total_temperature_initial = 0.0
+    do i = 1, non_fuel_start 
+        do j = 1, nodes_per_elem
+           total_temperature_initial = total_temperature_initial + temperature_soln_new(i,j) 
+        end do
+    end do
+    avg_temperature_initial = total_temperature_initial/non_fuel_start
+
 !-------------------------------------------------------------------------------
 !---Write out initial solution
     write(outfile_unit,fmt='(a)'), ' '
@@ -139,3 +146,26 @@ implicit none
     end do
     
 end subroutine
+
+!------------------------------------------------------------------
+subroutine get_norm_coord(i,j,norm_cos)
+    USE parameters_fe
+
+    implicit none
+    
+!---Dummy
+    integer, intent(in) :: i
+    integer, intent(in) :: j
+    real,    intent(out) :: norm_cos
+
+!---Local
+    real :: x_curr, x_last
+
+!---Get current global coordinate
+    x_curr =  real(global_coord(i,j) )
+    !---Last global coordinate
+    x_last =  real(global_coord(non_fuel_start,3))
+    !---Normalize coordinates so we go from -1 to 1
+    norm_cos = ( (x_curr) - (x_last*0.5) )/ (x_last)
+
+end subroutine get_norm_coord

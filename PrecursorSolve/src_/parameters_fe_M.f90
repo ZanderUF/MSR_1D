@@ -15,11 +15,11 @@ module parameters_fe
     integer  :: num_elem ! Number of elements in the mesh
     integer  :: max_num_nodes
     integer  :: ndf ! ndf
-    real     :: area   ! cross sectional area 
     integer  :: matrix_length
     real     :: elem_size
     integer  :: non_fuel_start
     real     :: mass_elem ! mass per element
+    real :: area_core, area_pipe
     
     real     :: total_power_prev
     integer  :: num_elem_external
@@ -30,9 +30,9 @@ module parameters_fe
 !---Mesh arrays
     integer, allocatable  :: conn_matrix(:,:)
     real , allocatable    :: global_coord(:,:)
-
     real, allocatable :: power_soln_test(:)
-    
+    real, allocatable :: area_variation(:,:)
+
 !---Elemental matrices
     real , dimension(3,3) :: elem_matrix_A_times_W
     real , dimension(3,3) :: identity_matrix
@@ -137,8 +137,13 @@ module parameters_fe
     integer :: max_nl_iter  ! numer of nonllinear iterations to do
     real :: residual
     real :: tolerance = 0.001 ! prescribed tolerance
-    
+
+    real :: avg_temperature_initial
+    real :: total_temperature_initial
+
+    real :: reactivity_feedback
 !---Flags
+    integer :: feedback_method = 0
     real :: save_time_interval
     integer :: td_method_type = 0
     logical :: DEBUG = .FALSE.

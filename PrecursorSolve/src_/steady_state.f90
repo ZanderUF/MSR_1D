@@ -189,25 +189,4 @@ implicit none
 
 end
 
-!------------------------------------------------------------------
-subroutine get_norm_coord(i,j,norm_cos)
-    USE parameters_fe
 
-    implicit none
-    
-!---Dummy
-    integer, intent(in) :: i
-    integer, intent(in) :: j
-    real,    intent(out) :: norm_cos
-
-!---Local
-    real :: x_curr, x_last
-
-!---Get current global coordinate
-    x_curr =  real(global_coord(i,j) )
-    !---Last global coordinate
-    x_last =  real(global_coord(non_fuel_start,3))
-    !---Normalize coordinates so we go from -1 to 1
-    norm_cos = ( (x_curr) - (x_last*0.5) )/ (0.5*x_last)
-
-end subroutine get_norm_coord

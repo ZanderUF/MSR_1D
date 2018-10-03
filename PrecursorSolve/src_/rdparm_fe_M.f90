@@ -17,7 +17,6 @@
       character(4) :: dum,duma,pn, read_time, read_zag,&
         read_debug, read_ramp, read_step 
 
-
       write(outfile_unit,fmt='(a)'), 'Reading parms'
       
       i0 = 0
@@ -51,6 +50,8 @@
               
           case('meth') ! which time dependent method
               td_method_type = iread(i0,iret)
+          case('feed')
+              feedback_method  = iread(i0,iret)
 
           case('step')
               read_step = aread(i4, iret) 
@@ -91,7 +92,9 @@
           case('pipe')
               num_elem_external = iread(i0,iret)
           case('area')
-              area = fread(i0,iret)
+              area_core = fread(i0,iret)
+          case('apip') 
+               area_pipe = fread(i0,iret)
           case('mflo')
               mass_flow=fread(i0,iret)
           case('tpow')
