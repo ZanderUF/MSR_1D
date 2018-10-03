@@ -29,6 +29,7 @@ nem        Integer      Number of equal spaced elements in the model
 npe        Integer      Number of nodes per element 
 pipe       Integer      Number of elements in the outer circuit
 area       Real         Area of the fuel core [:math:`cm^2`] 
+apip       Real         Area of the piping [:math:'cm^2']
 mflow      Real         Mass flow rate [:math:`g/cm^3`]
 tpow       Real         Total axial power [:math:`n/s-cm`]
 nitr       Real         Set number of maximum nonlinear iterations 
@@ -75,7 +76,8 @@ Sample Input File
        npe=3
        pipe=6
        area=10000.0
-       mflow=000
+       apip=1000.0
+       mflow=5000.0
        tpow=20
        nitr=300
        elem=1.0
