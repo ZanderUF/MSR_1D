@@ -22,6 +22,7 @@ meth       integer      0 - forward Euler 1 - backward Euler
 step       yes or no    Perform a step perturbation or not
 ramp       yes or no    Perform a ramp perturbation or not
 zag        yes or no    Perform a zig-zag perturbation or not
+feed       Integer      0 - (default) no feedback 1 - temperature
 del        Double       Indicate fixed time step size, ex: 1E-5
 tmax       Real         Indicate the total length of the simulation
 tin        Double       Beginning point of the perturbation 
