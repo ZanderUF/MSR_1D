@@ -137,7 +137,6 @@ implicit none
     power_amplitude_prev = power_amplitude_new
     power_amplitude_last_time = power_amplitude_new
    
-    
     precursor_soln_last_time = precursor_soln_new
     power_soln_prev = power_soln_new
     temperature_soln_prev = temperature_soln_new

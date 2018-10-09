@@ -70,9 +70,9 @@ subroutine solve_power_forward_euler(nl_iter, current_time)
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(1:non_fuel_start))
 
-    if(t0 == 0.0) then
+    !if(t0 == 0.0) then
         beta_correction = (gen_time*(total_precursors_fuel))/total_power
-    end if
+    !end if
 
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 

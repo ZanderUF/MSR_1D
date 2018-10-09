@@ -19,7 +19,7 @@ msr1d : common_unit.o error_functions.o \
 	parameters_fe_M.o rdmesh_M.o \
 	rdparm_fe_M.o rddelay_M.o\
 	assemble_matrix_ss.o assemble_matrix_transient.o \
-    boundary_cond.o cond_corr.o  \
+    cond_corr.o  \
 	datainput_fe_M.o \
 	density_corr.o   \
 	spatial_matrices.o \
@@ -32,8 +32,7 @@ msr1d : common_unit.o error_functions.o \
     transient_forward_euler.o transient_backward_euler.o \
     solve_temperature.o solve_velocity.o \
     reactivity_feedback.o initialize.o \
-    write_out_soln.o \
-    timestamp_M.o      
+    write_out_soln.o 
 	$(F90) $(FFLAGS) main_driver.f90 *.o -L $(LIBDIR)$(LIB) 
 
 main_driver.o : main_driver.f90
@@ -71,9 +70,6 @@ assemble_matrix_ss.o: assemble_matrix_ss.f90 parameters_fe_M.o
 
 assemble_matrix_transient.o: assemble_matrix_transient.f90 parameters_fe_M.o
 	$(F90) $(FFLAGS) -c assemble_matrix_transient.f90 
-
-boundary_cond.o: boundary_cond.f90 parameters_fe_M.o
-	$(F90) $(FFLAGS) -c boundary_cond.f90   
 
 cond_corr.o: cond_corr.f90       
 	$(F90) $(FFLAGS) -c cond_corr.f90
@@ -137,9 +133,6 @@ transient_backward_euler.o : transient_backward_euler.f90 parameters_fe_M.o
  
 write_out_soln.o: write_out_soln.f90
 	$(F90) $(FFLAGS) -c write_out_soln.f90
-
-timestamp_M.o: timestamp_M.f90     
-	$(F90) $(FFLAGS) -c timestamp_M.f90
 
 
 clean: 

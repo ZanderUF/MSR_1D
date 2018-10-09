@@ -39,7 +39,7 @@ implicit none
     constant_velocity = 1.5! [cm/s]
     
     !---Flag for testing, use a flat power function or not
-    constant_flag = .FALSE.
+    constant_flag = .TRUE.
     !---Create spatial power function
     do i = 1, num_elem
         do j = 1, nodes_per_elem
