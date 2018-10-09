@@ -52,24 +52,18 @@ implicit none
              temperature_soln_prev( num_elem,nodes_per_elem), &
              density_soln_prev( num_elem,nodes_per_elem),  &
              velocity_soln_prev( num_elem,nodes_per_elem), &
-             spatial_power_fcn( num_elem, nodes_per_elem) )
-    allocate(elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem)) 
-    allocate(elem_vol_int(num_elem,nodes_per_elem))
-    allocate(precursor_soln_last_time( num_isotopes,num_delay_group,num_elem,nodes_per_elem),&
-             power_soln_last_time(num_elem,nodes_per_elem) )
-    allocate(area_variation(num_elem,nodes_per_elem))
+             spatial_power_fcn( num_elem, nodes_per_elem), &
+             elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem),& 
+             elem_vol_int(num_elem,nodes_per_elem),&
+             precursor_soln_last_time( num_isotopes,num_delay_group,num_elem,nodes_per_elem),&
+             power_soln_last_time(num_elem,nodes_per_elem),& 
+             area_variation(num_elem,nodes_per_elem) )
 
 !---Test integral over volume of element only int_-1^1 f(x)
-    elem_vol_int(:,:) = 0
-
-!---Reactor properties
-    mass_elem = 100.0/num_elem
+    !elem_vol_int(:,:) = 0
 
 !---Starting element for non fuel region, subtract off from end of domain
     non_fuel_start = num_elem - num_elem_external 
-
-!---Initialize matrix entries 
-    elem_matrix_A = 0.0
 
 !---Create 1D mesh
     call mesh_creation

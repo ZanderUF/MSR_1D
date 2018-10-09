@@ -49,14 +49,17 @@ implicit none
                             call solve_precursor_backward_euler(f,g,n,nl_iter)
                         enddo delay_loop 
                     enddo isotope_loop 
-                    
-                    call solve_temperature(n)
-                    call solve_velocity(n)
-            
+                   
+                    if( mass_flow > 0.0) then
+                        call solve_temperature(n)
+                        call solve_velocity(n)
+                    end if
+
                 enddo elements_loop 
+
                 
-                precursor_soln_prev = precursor_soln_new
-                power_amplitude_prev = power_amplitude_new
+                !precursor_soln_prev = precursor_soln_new
+                !power_amplitude_prev = power_amplitude_new
                 
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_backward_euler(nl_iter,t0) 
@@ -95,9 +98,9 @@ implicit none
                 
                 !---Check if too many nonlinear iterations and not converging
                 if ( nl_iter > max_nl_iter) then
-                    
                     if(nl_iter > abs_max_nl_iter) then
-                        write(outfile_unit,fmt=('(a)')) 'Gone past max amount of nonlinear iterations &
+                        write(outfile_unit,fmt=('(a)')) 'Gone past max amount of &
+                                     nonlinear iterations &
                                      and might have a problem'
                     else
                         if (DEBUG .eqv. .TRUE.) then 

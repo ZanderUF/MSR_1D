@@ -82,9 +82,9 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     total_precursors_fuel     = sum(precursors_lambda_vec(1:non_fuel_start))
     ! Calc beta correction per delay group
     
-    !if(t0==0.0) then
+    if(t0==0.0) then
         beta_correction = (gen_time*(total_precursors_fuel))/total_power 
-    !end if
+    end if
 
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
@@ -148,17 +148,19 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     end if
 
 !---Power Solve
-    power_amplitude_new = power_amplitude_last_time + &
-                          delta_t*( (reactivity &
+    if( mass_flow <= 0.0) then
+        power_amplitude_new = power_amplitude_last_time + &
+                          delta_t*( (reactivity - sum(beta_i_mat) &
+                           )/gen_time)*power_amplitude_prev &
+                          + delta_t*(1.0_dp/total_fuel_length)*&
+                          total_precursors_fuel
+    else 
+        power_amplitude_new = power_amplitude_last_time + &
+                          delta_t*( (reactivity  &
                           - beta_correction  )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
-    print *,'total_fuel_prec',total_precursors_fuel
-
-    print *,'first',  ((reactivity - beta_correction )/gen_time)*power_amplitude_prev 
-                          
-    print *,'second',(1.0_dp/total_fuel_length)*total_precursors_fuel
-
+    end if
 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
@@ -167,7 +169,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
             power_soln_new(i,j) = power_amplitude_new*spatial_power_fcn(i,j)      
         end do
     end do
-
 
 !---End power solve
 

@@ -84,10 +84,6 @@ subroutine spatial_matrices (n, nl_iter)
                     !---Assemble P matrix
                     elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                         evaluated_velocity*cnst*shape_fcn(j)*global_der_shape_fcn(i)
-                    !---Transient calculation
-                    if ( steady_state_flag .eqv. .FALSE.) then 
-                        
-                    end if!---end transient case if 
                 
                 end do !---End loop over j matrix entries
             end do !---End loop over i matrix entries
