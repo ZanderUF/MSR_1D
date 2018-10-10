@@ -22,8 +22,8 @@ implicit none
     character(len=27) :: time_velocity_name
     character(len=10) :: name_precursor_file, name_temperature_file,name_velocity_file
     real(kind=4) :: temp_time
-    temp_time = t0
     
+    temp_time = t0
     temp_unit = 18
     vel_unit  = 23
 !---If writing to a new file for a given time step
@@ -46,7 +46,18 @@ implicit none
            status='unknown',form='formatted',position='asis')
         open (unit=vel_unit, file = time_velocity_name//name_velocity_file, &
            status='unknown',form='formatted',position='asis')
-    
+ 
+    write(temp_unit,fmt='(a)'), 'Temperature [K] | Position (x) [cm]'
+    write(vel_unit, fmt='(a)'), 'Velocity [cm/s]   | Position (x) [cm] ' 
+    do i = 1, range_elem
+        do j = 1, nodes_per_elem
+            write(temp_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
+                  temperature_soln_new(i,j)
+            write(vel_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
+                  velocity_soln_new(i,j)
+        end do
+    end do
+ 
     end if
 
 !---Write to solution file
@@ -54,9 +65,6 @@ implicit none
     write(file_unit,fmt='(a,6I10)'), 'Position(x) ',&
                                     (i, i=1,num_delay_group)
 
-    write(temp_unit,fmt='(a)'), 'Temperature [K] | Position (x) [cm]'
-    write(vel_unit, fmt='(a)'), 'Velocity [cm/s]   | Position (x) [cm] ' 
-    
     do f = 1, num_isotopes ! isotope family
         do i = 1, range_elem  
             do j = 1, nodes_per_elem
@@ -66,15 +74,6 @@ implicit none
         end do
     end do
     
-    do i = 1, range_elem
-        do j = 1, nodes_per_elem
-            write(temp_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
-                  temperature_soln_new(i,j)
-            write(vel_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
-                  velocity_soln_new(i,j)
-        end do
-    end do
-
 !---Close unit so we can move onto new one in future 
     if(transient_save .eqv. .TRUE.) then
         close(file_unit)

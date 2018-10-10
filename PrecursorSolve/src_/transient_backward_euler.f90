@@ -41,6 +41,7 @@ implicit none
                 elements_loop: do n = 1 , num_elem 
                     !---Generate spatial matrices
                     call spatial_matrices(n,nl_iter)
+                    call numerical_flux_matrices(n,nl_iter)
                     isotope_loop: do f = 1, num_isotopes
                         delay_loop: do g = 1, num_delay_group
                             !---Assemble matrices solve elemental coefficients 
@@ -56,7 +57,6 @@ implicit none
                     end if
 
                 enddo elements_loop 
-
                 
                 !precursor_soln_prev = precursor_soln_new
                 !power_amplitude_prev = power_amplitude_new

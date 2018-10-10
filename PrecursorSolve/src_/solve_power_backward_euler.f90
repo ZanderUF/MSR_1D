@@ -33,6 +33,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     real :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     real :: first_zag, second_zag, third_zag, reactivity_zag
     real :: temp_reactivity_feedback, total_power
+    real, dimension(num_isotopes,num_delay_group) :: beta_correction_vec
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
@@ -80,11 +81,12 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(1:non_fuel_start))
+    
     ! Calc beta correction per delay group
     
-    if(t0==0.0) then
-        beta_correction = (gen_time*(total_precursors_fuel))/total_power 
-    end if
+    !if(t0==0.0) then
+        beta_correction = gen_time*sum(precursors_lambda_vec(1:non_fuel_start))/total_power 
+    !end if
 
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
@@ -146,18 +148,20 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
        call temperature_feedback(temp_reactivity_feedback,t0,nl_iter)
         reactivity_feedback = temp_reactivity_feedback
     end if
-
+    
 !---Power Solve
-    if( mass_flow <= 0.0) then
-        power_amplitude_new = power_amplitude_last_time + &
-                          delta_t*( (reactivity - sum(beta_i_mat) &
-                           )/gen_time)*power_amplitude_prev &
+    if(td_method_type == 0) then ! Forward Euler
+         power_amplitude_new = power_amplitude_prev + &
+                          delta_t*(( reactivity  &
+                           - beta_correction  )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
-    else 
+    end if
+    
+    if(td_method_type == 0) then ! Backward Euler
         power_amplitude_new = power_amplitude_last_time + &
-                          delta_t*( (reactivity  &
-                          - beta_correction  )/gen_time)*power_amplitude_prev &
+                          delta_t*(( reactivity  &
+                           - beta_correction  )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
     end if

@@ -33,12 +33,13 @@ implicit none
             elements_loop: do n = 1 , num_elem 
                 !---Generate spatial matrices
                 call spatial_matrices(n,1)
+                call numerical_flux_matrices(n,1)
                 isotope_loop: do f = 1, num_isotopes
                     delay_loop: do g = 1, num_delay_group
                         !---Assemble matrices solve elemental coefficients 
                         call assemble_matrix_transient(f,g,n) 
                         !---Solve for the elemental solution
-                        call solve_precursor_forward_euler(f,g,n,1)
+                        call solve_precursor_backward_euler(f,g,n,1)
                     enddo delay_loop 
                 enddo isotope_loop 
                 
@@ -55,7 +56,7 @@ implicit none
             precursor_soln_prev   = precursor_soln_new
             power_amplitude_prev  = power_amplitude_new
             !---Solve for total power after spatial sweep through precursors
-            call solve_power_forward_euler(1,t0) 
+            call solve_power_backward_euler(1,t0) 
             
             !---Write solution to a file periodically
             transient_save_flag = .TRUE.

@@ -69,6 +69,8 @@ module parameters_fe
     real , dimension(3)   :: last_elem_vec_f
     real , dimension(3)   :: elem_vec_q
 
+    real, dimension(3)    :: RHS_transient_final_vec
+
 !---Gauss integration 
     integer  :: num_gaus_pts = 4
 !---Shape functions, Lagrange, quadratic order

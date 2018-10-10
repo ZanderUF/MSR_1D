@@ -70,21 +70,39 @@ implicit none
 
 !---Steady state solve for temperature 
     call steady_state
+    if(time_solve .eqv. .TRUE. ) then
+        if( td_method_type == 0) then
+            write(outfile_unit, fmt=('(a)')) 'Performing forward Euler time integration' 
+            print *,'FORWARD'
+            !---Transient solve forward Euler method 
+            call transient_forward_euler
+        end if
+        
+        if( td_method_type == 1) then
+            print *,'BACKWARD'
+            write(outfile_unit, fmt=('(a)')) 'Performing backward Euler time integration'
+            !---Transient solve backward Euler method
+            call transient_backward_euler
+        end if
+    end if
 
-    if( td_method_type == 0) then
-        write(outfile_unit, fmt=('(a)')) 'Performing forward Euler time integration' 
-        print *,'FORWARD'
-        !---Transient solve forward Euler method 
-        call transient_forward_euler
-    end if
-    
-    if( td_method_type == 1) then
-        print *,'BACKWARD'
-        write(outfile_unit, fmt=('(a)')) 'Performing backward Euler time integration'
-        !---Transient solve backward Euler method
-        call transient_backward_euler
-    end if
-    
+ deallocate(precursor_soln_new, &
+             power_soln_new, &
+             temperature_soln_new, &
+             density_soln_new, &
+             velocity_soln_new, &
+             precursor_soln_prev, &
+             power_soln_prev, &
+             temperature_soln_prev, &
+             density_soln_prev, &
+             velocity_soln_prev, &
+             spatial_power_fcn, &
+             elem_vec_q_final, & 
+             elem_vol_int, &
+             precursor_soln_last_time, &
+             power_soln_last_time, & 
+             area_variation )
+   
 !---Close units
    close(outfile_unit)
    close(soln_outfile_unit)

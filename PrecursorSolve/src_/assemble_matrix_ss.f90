@@ -36,33 +36,8 @@ subroutine assemble_matrix_ss (isotope,delay_group,n)
     lda =   length
     lwork = length
     
-    elem_vec_q = 0.0
     elem_matrix_G = 0.0
     elem_vec_w_left_face = 0.0
-    matrix_W_right_face = 0.0 
-    matrix_W_left_face = 0.0
-
-    !---Create source vector 'q', and W - 
-    do i = 1, nodes_per_elem
-        do j = 1, nodes_per_elem
-            elem_vec_q(i) = elem_vec_q(i) + &
-                            elem_matrix_A(i,j)*spatial_power_fcn(n,j)*power_amplitude_prev
-            !---Applies for all elements except the first one
-            if(n > 1) then !--- n - element #
-                !---Grab previous precursor conc. + velocity at 
-                !---rhs of previous element
-                 matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
-                                            interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                 matrix_W_left_face(i,j)  = velocity_soln_prev(n,i)*&
-                                            interp_fcn_lhs(i)*interp_fcn_lhs(j)
-            else!---First element case, need to connect with end element 
-                 matrix_W_right_face(i,j) = velocity_soln_prev(num_elem,i)*&
-                                            interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                 matrix_W_left_face(i,j)  = velocity_soln_prev(num_elem,i)*&
-                                            interp_fcn_lhs(i)*interp_fcn_lhs(j)
-            end if!---End flux calculation
-        end do
-    end do
 
     do i = 1, nodes_per_elem
         !---Calculate q vector
@@ -85,7 +60,6 @@ subroutine assemble_matrix_ss (isotope,delay_group,n)
     end do   
 
 !****************************************************************
-
 if(DEBUG .eqv. .TRUE.) then
     write(outfile_unit,fmt='(a)'), ' '
     write(outfile_unit,fmt='(a,1I2)'),'G Matrix | element --> ',n
@@ -93,7 +67,6 @@ if(DEBUG .eqv. .TRUE.) then
           write(outfile_unit,fmt='(12es14.3)') &
                (elem_matrix_G(i,j),j=1,nodes_per_elem)             
     end do
-
     
     write(outfile_unit,fmt='(a)'), ' ' 
     write(outfile_unit,fmt='(a,1I3)'),'left face vector | element --> ', n
@@ -103,7 +76,8 @@ if(DEBUG .eqv. .TRUE.) then
     
     write(outfile_unit,fmt='(a)'),' '
     write(outfile_unit,fmt='(a,1I2)'),'beta/gen time *{q} element source vector | element --> ',n
-    write(outfile_unit,fmt='(12es14.3)') (elem_vec_q_final(isotope,delay_group,i),i=1,nodes_per_elem)             
+    write(outfile_unit,fmt='(12es14.3)') &
+         (elem_vec_q_final(isotope,delay_group,i),i=1,nodes_per_elem)             
 end if
 
 end subroutine assemble_matrix_ss

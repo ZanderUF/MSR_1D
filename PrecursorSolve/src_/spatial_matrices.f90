@@ -90,29 +90,6 @@ subroutine spatial_matrices (n, nl_iter)
     
     end do !---end do over gauss pts
 
-!---Create source vector 'q', and W - 
-    do i = 1, nodes_per_elem
-        do j = 1, nodes_per_elem
-            !print *,'spatial_power_fcn * amp', spatial_power_fcn(n,j)*power_amplitude_prev
-            elem_vec_q(i) = elem_vec_q(i) + &
-                            elem_matrix_A(i,j)*spatial_power_fcn(n,j)*power_amplitude_prev
-            !---Applies for all elements except the first one
-            if(n > 1) then !--- n - element #
-                !---Grab previous precursor conc. + velocity at 
-                !---rhs of previous element
-                 matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
-                                            interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                 matrix_W_left_face(i,j)  = velocity_soln_prev(n,i)*&
-                                            interp_fcn_lhs(i)*interp_fcn_lhs(j)
-            else!---First element case, need to connect with end element 
-                 matrix_W_right_face(i,j) = velocity_soln_prev(num_elem,i)*&
-                                            interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                 matrix_W_left_face(i,j)  = velocity_soln_prev(num_elem,i)*&
-                                            interp_fcn_lhs(i)*interp_fcn_lhs(j)
-            end if!---End flux calculation
-        end do
-    end do
-   
     !---Invert A matrix, only needs to be done once
     if ( n < 2 .and. nl_iter < 2) then
         do i = 1, nodes_per_elem
@@ -150,21 +127,7 @@ subroutine spatial_matrices (n, nl_iter)
                write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_U(j,i),i=1,nodes_per_elem)             
         end do
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I2)'),'[W] right Matrix | element --> ',n
-        do j=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (matrix_W_right_face(j,i),i=1,nodes_per_elem)             
-        end do
-        
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I2)'),'[W] left Matrix | element --> ',n
-        do j=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (matrix_W_left_face(j,i),i=1,nodes_per_elem)             
-        end do       
    end if !---End matrix write out
 !------------------------------------------------------------------------------
 
 end subroutine spatial_matrices 
-

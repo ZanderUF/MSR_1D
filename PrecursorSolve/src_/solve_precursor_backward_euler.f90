@@ -19,24 +19,44 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
 
 !---Local
     integer :: i,j,f,g
+    real, dimension(3) :: A_inv_times_RHS
+  
+    A_inv_times_RHS(:) = 0.0
 
-    !print *,'elem_matrix_', elem_matrix_A_times_W_RHS
-!---PRECURSOR SOLVE
+!---Multiply A^{-1}*f(u)
+    do i = 1, nodes_per_elem
+        do j =1, nodes_per_elem
+            A_inv_times_RHS(i) = A_inv_times_RHS(i) * &
+                                 inverse_A_matrix(i,j)*RHS_transient_final_vec(j)
+        end do
+    end do 
+
+
+!---Solve for new precursor at delta t
     do i = 1, nodes_per_elem
     precursor_soln_new(isotope,delay_group, n,i) = &
             precursor_soln_last_time(isotope, delay_group, n,i) + &
-            delta_t*(H_times_soln_vec(i) + &
-            (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
-            A_times_W_times_upwind_elem_vec(i) ) 
+            delta_t*(A_inv_times_RHS(i) )
+
     !---test to make sure values are not too small
     if(precursor_soln_new(isotope, delay_group, n, i) < 1E-8_dp) then
         precursor_soln_new(isotope, delay_group, n, i) = 0.0
     end if
 
     end do
-!---END PRECURSOR SOLVE    
-   
+!---End precursor solve    
 
+!---Null transient unit test
+    if( reactivity_input == 0.0) then
+        !---Make sure change in the solution is zero for null transient
+        do i = 1, nodes_per_elem
+            if(A_inv_times_RHS(i) > 0.0) then
+                write(outfile_unit, fmt='(a)'), 'FAILING NULL TRANSIENT TEST'
+            end if
+        end do
+    end if
+
+!*************************************
     if (DEBUG .eqv. .TRUE.) then
     !---Write out solution for current element 
         write(outfile_unit,fmt='(a)'), ' ' 

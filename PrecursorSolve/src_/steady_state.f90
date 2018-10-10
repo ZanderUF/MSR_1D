@@ -31,7 +31,7 @@ implicit none
     L2_norm_prev = 0.0
     L2_norm_current = 0.0
     difference_counter = 0
-    nl_iter_tolerance = 1E-12
+    nl_iter_tolerance = 1E-15
     abs_max_nl_iter = 1000
 !---Normal calculation flow - no need if doing unit test
     if (unit_test .eqv. .FALSE.) then
@@ -53,16 +53,18 @@ implicit none
             do n = 1, num_elem
                 !---Computer spatial matrices 
 	            call spatial_matrices(n,nl_iter)
+                call numerical_flux_matrices(n,nl_iter)
                 !---Solve steady state system 
                 do f = 1, num_isotopes
                     do g = 1, num_delay_group
                         !---Assemble K, F
                         call assemble_matrix_ss(f,g,n)
-                        call solve_soln_steady(f,g,n,nl_iter)
+                        call solve_precursor_ss(f,g,n,nl_iter)
                     end do !---Over delayed groups
                 end do !---Over isotopes
             end do !---Over nodes
             
+
             !---Write out the solution
             if(DEBUG .eqv. .TRUE.) then
                 call write_out_soln(outfile_unit,num_elem,transient_save_flag) 
@@ -85,7 +87,6 @@ implicit none
                 do f = 1, num_isotopes
                     do g = 1, num_delay_group
                         difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
-                        
                         if( difference_L2 < nl_iter_tolerance) then
                             difference_counter = difference_counter + 1
                         end if
@@ -117,7 +118,8 @@ implicit none
     end if !---end nonlinear if 
          
     write(outfile_unit, fmt=('(a)') ) ' ' 
-    write(outfile_unit, fmt=('(a, 100I4)')) 'Number of nonlinear iterations: ', nl_iter
+    write(outfile_unit, fmt=('(a, 100I4)')) 'Number of steady state nonlinear iterations: '&
+                                            , nl_iter
     write(outfile_unit, fmt=('(a)') ) ' ' 
     
     !---Make the final converged solution the 'previous' solution
@@ -130,59 +132,26 @@ implicit none
             end do
         end do
     end do
+    
     !---Set power 'previous' to new
+    precursor_soln_last_time = precursor_soln_new
+    
     power_amplitude_prev = power_amplitude_new
     power_amplitude_last_time = power_amplitude_new
-   
-    precursor_soln_last_time = precursor_soln_new
     power_soln_prev = power_soln_new
     temperature_soln_prev = temperature_soln_new
     velocity_soln_prev = velocity_soln_new
 
-    !---Write to outfile
+!---Write precursor solution outfile
     call write_out_soln(outfile_unit,num_elem,transient_save_flag)
 
-!---Calculate adjustment to beta
-    temp_vec_prec = 0
-    
-    !---Calculate over fuel region
-    do f = 1, num_isotopes 
-       do g = 1, num_delay_group
-            do i = 1, num_elem 
-                do j = 1, nodes_per_elem
-                   temp_vec_prec(i)     = temp_vec_prec(i) + &
-                                          lamda_i_mat(f,g)*&
-                                          elem_vol_int(i,j)*precursor_soln_prev(f,g,i,j)
-                end do
-            end do
-       end do
-    end do
-    
-    total_fuel_length = 0.0
-    do i = 1, num_elem
-        do j = 1, nodes_per_elem
-            total_fuel_length = total_fuel_length + spatial_power_fcn(i,j)*elem_vol_int(i,j)
-        end do
-    end do
-
-    !--- 
-    total_precursor_ref   = sum(temp_vec_prec)
-    total_precursors_fuel = sum(temp_vec_prec(1:non_fuel_start))
-     
-!    beta_correction = gen_time*((total_precursor_ref - &
-!                                 total_precursors_fuel)/(power_amplitude_prev*total_fuel_length))
-!
-    
-    call write_out_soln(soln_outfile_unit,num_elem,transient_save_flag) 
-    
-!---Set steady state flag off
+!---Set steady state flag off 
     steady_state_flag = .FALSE.
-    
+
+!---Write to outfile     
     write(outfile_unit, '(a)'), ' '
-    write(outfile_unit, '(a)'), ' *******************************'
+    write(outfile_unit, '(a)'), '*******************************'
     write(outfile_unit, '(a)'), 'End of Steady state solve'
-    write(outfile_unit, '(a)'), ' *******************************'
+    write(outfile_unit, '(a)'), '*******************************'
 
-end
-
-
+end subroutine steady_state

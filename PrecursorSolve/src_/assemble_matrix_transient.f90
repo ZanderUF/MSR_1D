@@ -20,95 +20,94 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     integer,intent(in) :: n
 !---Local variables
     integer :: i, j, ii, jj, nr,nc, ncl,length   
-    real, dimension(3) ::  elem_prev_soln, flux_rhs, flux_lhs, &
-                          temp_vec, basis_at_lhs, basis_at_rhs, rhs_final_vec
     real, dimension(3,3) :: inverse_matrix,temp_matrix
-   
+    real, dimension(3) :: elem_vec_q_times_beta_lambda, U_times_soln_vec, &
+                          A_times_lambda_times_soln_vec, W_left_times_upwind_soln, &
+                          W_right_times_soln
+
 !---Initialize
-    elem_matrix_H = 0
-    elem_matrix_G = 0
-    rhs_final_vec = 0
-    A_times_W_times_upwind_elem_vec = 0
-    A_times_W_times_RHS_elem_vec = 0
-    elem_matrix_A_times_W_RHS = 0
-    elem_matrix_A_times_W = 0
-    H_times_soln_vec = 0
-    elem_vec_A_times_q = 0
+    elem_vec_q_times_beta_lambda(:)  = 0.0
+    U_times_soln_vec (:)             = 0.0
+    A_times_lambda_times_soln_vec(:) = 0.0 
+    W_left_times_upwind_soln(:)      = 0.0
+    W_right_times_soln(:)            = 0.0
 
-    elem_matrix_A_times_W = matmul(inverse_A_matrix, matrix_W_left_face)
-    
-    !---Calculate H matrix, will be inverted later on
-    elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
-                    lamda_i_mat(isotope,delay_group)*identity_matrix - &
-                    matmul(inverse_A_matrix,matrix_W_right_face)
-    
-    A_times_W_times_RHS_elem_vec = matmul(inverse_A_matrix,matrix_W_right_face)
-    
-    elem_vec_A_times_q = matmul(inverse_A_matrix,elem_vec_q)
-     
-    !---Multiply H matrix by previous soln vec
     do i = 1, nodes_per_elem
+        elem_vec_q_times_beta_lambda(i) = &
+        ( beta_i_mat(isotope,delay_group)/lamda_i_mat(isotope,delay_group) )*&
+          elem_vec_q(i) 
+        
         do j = 1, nodes_per_elem
-            H_times_soln_vec(i) = H_times_soln_vec(i) + &
-                    elem_matrix_H(i,j)*&
-                    precursor_soln_prev(isotope,delay_group,n,j) 
             
-            elem_matrix_A_times_W_RHS(i) = elem_matrix_A_times_W_RHS(i) + &
-                    A_times_W_times_RHS_elem_vec(i,j)*&
-                    precursor_soln_prev(isotope,delay_group,n,1)
+            U_times_soln_vec(i) = U_times_soln_vec(i) + &
+                                  elem_matrix_U(i,j)*&
+                                  precursor_soln_prev(isotope,delay_group,n,j)                 
+            A_times_lambda_times_soln_vec(i) =A_times_lambda_times_soln_vec(i)+&
+                                         elem_matrix_A(i,j)*&
+                                         precursor_soln_prev(isotope,delay_group,n,j)
 
-            if ( n > 1) then
-                A_times_W_times_upwind_elem_vec(i) = &
-                    A_times_W_times_upwind_elem_vec(i) + &
-                    elem_matrix_A_times_W(i,j)*&
+            W_right_times_soln(i) = W_right_times_soln(i) + &
+                                    matrix_W_right_face(i,j)*&
+                                    precursor_soln_prev(isotope,delay_group,n,j)
+
+            if ( n > 1) then !---Always get the previous element
+                W_left_times_upwind_soln(i) = &
+                    W_left_times_upwind_soln(i) + &
+                    matrix_W_left_face(i,j)*&
                     precursor_soln_prev(isotope,delay_group,n-1,3)
-            else
-                A_times_W_times_upwind_elem_vec(i) = &
-                    A_times_W_times_upwind_elem_vec(i) + &
-                    elem_matrix_A_times_W(i,j)*&
+            else !--Account for connection end of domain to beginning
+                W_left_times_upwind_soln(i) = &
+                    W_left_times_upwind_soln(i) + &
+                    matrix_W_left_face(i,j)*&
                     precursor_soln_prev(isotope,delay_group, num_elem,3)
             end if
         end do 
     end do
+    
+    !---Calcualte the RHS vector ** F(u)
+    do i = 1, nodes_per_elem
+        RHS_transient_final_vec(i) = U_times_soln_vec(i) - &
+                           A_times_lambda_times_soln_vec(i) + &
+                           elem_vec_q_times_beta_lambda(i) -  &
+                           W_right_times_soln(i) + &
+                           W_left_times_upwind_soln(i) 
+    end do 
     
 !****************************************************************
 !---Write out    
     if (DEBUG .eqv. .TRUE.) then
         write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0
         write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I2)'),'H Matrix | element --> ',n
+        
+        write(outfile_unit,fmt='(a)'), ' ' 
+        write(outfile_unit,fmt='(a,1I3)'),' [U]*{c_e} | element --> ', n
+        do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)')U_times_soln_vec(j)              
+        end do
+        write(outfile_unit,fmt='(a)'), ' ' 
+        write(outfile_unit,fmt='(a,1I3)'),' (lambda)*[A]*{c_e} | element --> ', n
         do i=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (elem_matrix_H(i,j),j=1,nodes_per_elem)             
+              write(outfile_unit,fmt='(12es14.3)')A_times_lambda_times_soln_vec(i)
         end do
         
         write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),' [H]*{c_e} | element --> ', n
+        write(outfile_unit,fmt='(a,1I3)'),' (beta/Cap lambda)*{q_e} |&
+                                            element --> ', n
         do j=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)')H_times_soln_vec(j)             
-        end do
-        write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),' [A-1]*[W_l] | element --> ', n
-        do i=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (elem_matrix_A_times_W(i,j),j=1,nodes_per_elem)             
-        end do
-        
-        write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3)'),' [A^-1][W_l]*{c_e-1} | element --> ', n
-        do j=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)')A_times_W_times_upwind_elem_vec(j)             
+              write(outfile_unit,fmt='(12es14.3)')elem_vec_q_times_beta_lambda(j)             
         end do
         
         write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I2)'),'-lambda*I Matrix | element --> ',n
+        write(outfile_unit,fmt='(a,1I2)'),' [W_R]*{c_e} | element --> ',n
         do j=1,nodes_per_elem 
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (-lamda_i_mat(1,1)*identity_matrix(j,i),i=1,nodes_per_elem)             
+              write(outfile_unit,fmt='(12es14.3)')W_right_times_soln(j) 
         end do
            
         write(outfile_unit,fmt='(a)'),' '
-        write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
-        write(outfile_unit,fmt='(12es14.3)') (elem_vec_q(i),i=1,nodes_per_elem)             
+        write(outfile_unit,fmt='(a,1I2)'),' [W_L]*{c_(e-1)} | element --> ',n
+        do j=1,nodes_per_elem
+            write(outfile_unit,fmt='(12es14.3)') W_left_times_upwind_soln(j)          
+        end do
+
     end if
 end 
