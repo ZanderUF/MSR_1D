@@ -27,7 +27,7 @@ msr1d : common_unit.o error_functions.o \
 	inter_shape_fcns.o numerical_flux_matrices.o \
 	mesh_creation.o steady_state.o \
     solve_precursor_ss.o  \
-    solve_power_backward_euler.o solve_power_forward_euler.o \
+    solve_power_backward_euler.o \
     solve_precursor_backward_euler.o \
     transient_forward_euler.o transient_backward_euler.o \
     solve_temperature.o solve_velocity.o \
@@ -106,9 +106,6 @@ reactivity_feedback.o: reactivity_feedback.f90 parameters_fe_M.o
 
 solve_precursor_ss.o:   solve_precursor_ss.f90 parameters_fe_M.o 
 	$(F90) $(FFLAGS) -c solve_precursor_ss.f90
-
-solve_power_forward_euler.o:   solve_power_forward_euler.f90 parameters_fe_M.o 
-	$(F90) $(FFLAGS) -c solve_power_forward_euler.f90
 
 solve_power_backward_euler.o:   solve_power_backward_euler.f90 parameters_fe_M.o 
 	$(F90) $(FFLAGS) -c solve_power_backward_euler.f90
