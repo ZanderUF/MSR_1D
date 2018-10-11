@@ -26,7 +26,6 @@ implicit none
 !---Set to make sure we don't iterate forever if we are not converging
     abs_max_nl_iter = 500 
     nl_iter_tolerance = 1E-12
-
 !---Start time-dependent solve
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
@@ -36,6 +35,7 @@ implicit none
             nl_iter = 1 
             L2_norm_prev = 0.0
             L2_norm_current = 0.0
+            difference_counter = 0
             nonlinearloop: do  
                 !---Create element matrices and assemble
                 elements_loop: do n = 1 , num_elem 
@@ -58,7 +58,7 @@ implicit none
 
                 enddo elements_loop 
                 
-                !precursor_soln_prev = precursor_soln_new
+                precursor_soln_prev = precursor_soln_new
                 !power_amplitude_prev = power_amplitude_new
                 
                 !---Solve for total power after spatial sweep through precursors
@@ -73,7 +73,6 @@ implicit none
                         end do
                     end do
                     
-                    difference_counter = 0
                     !---Calculate the difference in the L2 norms between iterations
                     do f = 1, num_isotopes
                         do g = 1, num_delay_group
@@ -88,7 +87,8 @@ implicit none
                     if ( difference_counter == num_delay_group) then
                         max_nl_iter = nl_iter - 1
                     end if
-
+                    
+                    !print *,'difference_L2',difference_L2
                     !---Swap for next iteration
                     L2_norm_prev = L2_norm_current
 
@@ -113,10 +113,10 @@ implicit none
                     exit
                 end if 
             
+            !print *,'difference_counter',difference_counter   
             enddo nonlinearloop 
-           
             transient_save_flag = .TRUE.
-            
+            !print *,'nl_iter ',nl_iter 
             !---Write solution to a file periodically
             if( modulo(t0,save_time_interval) < delta_t) then
                 
@@ -154,9 +154,10 @@ implicit none
                        Beta Correction | Reactivity Feedback'
             end if
 
-            write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5,12es14.5)')), &
+            write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5,&
+            12es14.5,12es14.5)')), &
             t0, power_amplitude_new, power_amplitude_new,&
-                  reactivity, beta_correction, reactivity_feedback
+            reactivity, beta_correction, reactivity_feedback
 
 
             !---Swap solutions

@@ -71,6 +71,7 @@ implicit none
 !---Steady state solve for temperature 
     call steady_state
     if(time_solve .eqv. .TRUE. ) then
+        print *,' in Time solve' 
         if( td_method_type == 0) then
             write(outfile_unit, fmt=('(a)')) 'Performing forward Euler time integration' 
             print *,'FORWARD'

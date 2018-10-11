@@ -34,7 +34,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
 
     do i = 1, nodes_per_elem
         elem_vec_q_times_beta_lambda(i) = &
-        ( beta_i_mat(isotope,delay_group)/lamda_i_mat(isotope,delay_group) )*&
+        ( beta_i_mat(isotope,delay_group)/gen_time )*&
           elem_vec_q(i) 
         
         do j = 1, nodes_per_elem
@@ -44,6 +44,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
                                   precursor_soln_prev(isotope,delay_group,n,j)                 
             A_times_lambda_times_soln_vec(i) =A_times_lambda_times_soln_vec(i)+&
                                          elem_matrix_A(i,j)*&
+                                         lamda_i_mat(isotope,delay_group)*&
                                          precursor_soln_prev(isotope,delay_group,n,j)
 
             W_right_times_soln(i) = W_right_times_soln(i) + &
@@ -108,6 +109,11 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
         do j=1,nodes_per_elem
             write(outfile_unit,fmt='(12es14.3)') W_left_times_upwind_soln(j)          
         end do
-
+        
+        write(outfile_unit,fmt='(a)'),' '
+        write(outfile_unit,fmt='(a,1I2)'),' RHS F(u) | element --> ',n
+        do j=1,nodes_per_elem
+            write(outfile_unit,fmt='(12es14.3)') RHS_transient_final_vec(j)          
+        end do
     end if
 end 

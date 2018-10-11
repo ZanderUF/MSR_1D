@@ -26,12 +26,11 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
 !---Multiply A^{-1}*f(u)
     do i = 1, nodes_per_elem
         do j =1, nodes_per_elem
-            A_inv_times_RHS(i) = A_inv_times_RHS(i) * &
+            A_inv_times_RHS(i) = A_inv_times_RHS(i) + &
                                  inverse_A_matrix(i,j)*RHS_transient_final_vec(j)
         end do
     end do 
-
-
+    
 !---Solve for new precursor at delta t
     do i = 1, nodes_per_elem
     precursor_soln_new(isotope,delay_group, n,i) = &
@@ -60,7 +59,7 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
     if (DEBUG .eqv. .TRUE.) then
     !---Write out solution for current element 
         write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3,a,1I3)'),'Solution | element --> ', n, ' isotope -->',isotope
+        write(outfile_unit,fmt='(a,1I3,a,1I3)'),'Solution | element --> ', n, ' Group -->',delay_group
         do j=1,nodes_per_elem 
               write(outfile_unit,fmt='(a,1I2,12es14.3)'), 'Node -->', n-1+j, precursor_soln_new(isotope, delay_group,n,j)          
         end do   

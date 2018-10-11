@@ -73,7 +73,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
             total_power = total_power + &
                         elem_vol_int(i,j)*power_amplitude_prev*&
                         spatial_power_fcn(i,j)
-
             total_fuel_length = total_fuel_length + &
                                 spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
@@ -84,9 +83,9 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     
     ! Calc beta correction per delay group
     
-    !if(t0==0.0) then
+    if(t0==0.0) then
         beta_correction = gen_time*sum(precursors_lambda_vec(1:non_fuel_start))/total_power 
-    !end if
+    end if
 
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
@@ -148,7 +147,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
        call temperature_feedback(temp_reactivity_feedback,t0,nl_iter)
         reactivity_feedback = temp_reactivity_feedback
     end if
-    
+
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &
@@ -158,7 +157,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           total_precursors_fuel
     end if
     
-    if(td_method_type == 0) then ! Backward Euler
+    if(td_method_type == 1) then ! Backward Euler
         power_amplitude_new = power_amplitude_last_time + &
                           delta_t*(( reactivity  &
                            - beta_correction  )/gen_time)*power_amplitude_prev &

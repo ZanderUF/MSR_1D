@@ -68,6 +68,7 @@ implicit none
                 !---Set temperature distribution
                 temperature_soln_new(i,j) = (center_temp_initial*spatial_power_fcn(i,j))
                 temperature = temperature_soln_new(i,j)
+                print *,'temperature',temperature
                 !---Get density to set the velocity
                 call density_corr(temperature,density)
                 density_soln_new(i,j) = density

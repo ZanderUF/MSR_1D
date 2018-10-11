@@ -30,7 +30,6 @@ implicit none
    
     L2_norm_prev = 0.0
     L2_norm_current = 0.0
-    difference_counter = 0
     nl_iter_tolerance = 1E-15
     abs_max_nl_iter = 1000
 !---Normal calculation flow - no need if doing unit test
@@ -49,6 +48,8 @@ implicit none
     !---Steady state solver for nonlinear ss problems
         write(outfile_unit, fmt='(a)'), ' ' 
         write(outfile_unit, fmt='(a)'), 'Start steady state calculation'
+        
+        difference_counter = 0
         do !---Nonlinear loop
             do n = 1, num_elem
                 !---Computer spatial matrices 
@@ -63,7 +64,6 @@ implicit none
                     end do !---Over delayed groups
                 end do !---Over isotopes
             end do !---Over nodes
-            
 
             !---Write out the solution
             if(DEBUG .eqv. .TRUE.) then
@@ -72,7 +72,6 @@ implicit none
 
             !---Swap for for next iteration
             precursor_soln_prev = precursor_soln_new
-           
             !---Calculate L2 norm to decide when enough iterations are complete 
             if(nl_iter > 1) then
                  
@@ -143,7 +142,7 @@ implicit none
     velocity_soln_prev = velocity_soln_new
 
 !---Write precursor solution outfile
-    call write_out_soln(outfile_unit,num_elem,transient_save_flag)
+!    call write_out_soln(outfile_unit,num_elem,transient_save_flag)
 
 !---Set steady state flag off 
     steady_state_flag = .FALSE.
