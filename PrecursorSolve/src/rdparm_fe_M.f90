@@ -91,6 +91,8 @@
               nodes_per_elem = iread(i0, iret)         
           case('pipe')
               num_elem_external = iread(i0,iret)
+          case('sful')
+              fuel_region_start = iread(i0,iret)
           case('area')
               area_core = fread(i0,iret)
           case('apip') 

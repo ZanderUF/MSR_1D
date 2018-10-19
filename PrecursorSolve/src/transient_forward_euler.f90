@@ -53,8 +53,21 @@ implicit none
             enddo elements_loop 
             
             !---Swap solutions
-            precursor_soln_prev   = precursor_soln_new
-            power_amplitude_prev  = power_amplitude_new
+            !precursor_soln_prev   = precursor_soln_new
+            !power_amplitude_prev  = power_amplitude_new
+           
+           do f = 1, num_isotopes
+                do g = 1, num_delay_group
+                    !precursor_soln_new(f,g,1,1) = &
+                    !            precursor_soln_new(f,g,num_elem,3)
+                   !print *,'prec beg', precursor_soln_new(f,g,1,1)
+                    !print *,'prec end', precursor_soln_new(f,g,num_elem,3)
+                    !print *,' difference',  precursor_soln_new(f,g,1,1) - &
+                                 !precursor_soln_new(f,g,num_elem,3)
+                    
+                end do
+            end do
+            
             !---Solve for total power after spatial sweep through precursors
             call solve_power_backward_euler(1,t0) 
             
@@ -110,6 +123,9 @@ implicit none
             end if
             
             t1 = t0 + delta_t
+            
+            precursor_soln_prev   = precursor_soln_new
+            power_amplitude_prev  = power_amplitude_new
 
             t0 = t1
        

@@ -24,6 +24,7 @@ implicit none
     integer :: difference_counter, abs_max_nl_iter    
 
 !---Set to make sure we don't iterate forever if we are not converging
+    max_nl_iter = 100
     abs_max_nl_iter = 500 
     nl_iter_tolerance = 1E-12
 !---Start time-dependent solve
@@ -58,41 +59,42 @@ implicit none
 
                 enddo elements_loop 
                 
-                precursor_soln_prev = precursor_soln_new
+                !precursor_soln_last_time  = precursor_soln_new
+                !precursor_soln_prev = precursor_soln_new
                 !power_amplitude_prev = power_amplitude_new
                 
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_backward_euler(nl_iter,t0) 
                 
                 !---Calculate L2 norm of precursor solution
-                if(nl_iter > 1) then
-                    do f = 1, num_isotopes
-                        do g = 1, num_delay_group
-                            L2_norm_current(f,g) = sqrt( sum( precursor_soln_new(f,g,:,:)*&
-                                                   precursor_soln_new(f,g,:,:) ) ) 
-                        end do
-                    end do
-                    
-                    !---Calculate the difference in the L2 norms between iterations
-                    do f = 1, num_isotopes
-                        do g = 1, num_delay_group
-                            difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
+                !if(nl_iter > 1) then
+                !    do f = 1, num_isotopes
+                !        do g = 1, num_delay_group
+                !            L2_norm_current(f,g) = sqrt( sum( precursor_soln_new(f,g,:,:)*&
+                !                                   precursor_soln_new(f,g,:,:) ) ) 
+                !        end do
+                !    end do
+                !    
+                !    !---Calculate the difference in the L2 norms between iterations
+                !    do f = 1, num_isotopes
+                !        do g = 1, num_delay_group
+                !            difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
 
-                            if( difference_L2 < nl_iter_tolerance) then
-                                difference_counter = difference_counter + 1
-                            end if
-                        end do
-                    end do
-                    !---Need to make sure the L2 norm converges for all precursor groups
-                    if ( difference_counter == num_delay_group) then
-                        max_nl_iter = nl_iter - 1
-                    end if
-                    
-                    !print *,'difference_L2',difference_L2
-                    !---Swap for next iteration
-                    L2_norm_prev = L2_norm_current
+                !            if( difference_L2 < nl_iter_tolerance) then
+                !                difference_counter = difference_counter + 1
+                !            end if
+                !        end do
+                !    end do
+                !    !---Need to make sure the L2 norm converges for all precursor groups
+                !    if ( difference_counter == num_delay_group) then
+                !        max_nl_iter = nl_iter - 1
+                !    end if
+                !    
+                !    !print *,'difference_L2',difference_L2
+                !    !---Swap for next iteration
+                !    L2_norm_prev = L2_norm_current
 
-                end if
+                !end if
 
                 nl_iter = nl_iter + 1 !---Nonlinear iteration counter
                 
@@ -113,10 +115,10 @@ implicit none
                     exit
                 end if 
             
-            !print *,'difference_counter',difference_counter   
             enddo nonlinearloop 
+            
             transient_save_flag = .TRUE.
-            !print *,'nl_iter ',nl_iter 
+            
             !---Write solution to a file periodically
             if( modulo(t0,save_time_interval) < delta_t) then
                 

@@ -26,7 +26,7 @@ implicit none
     power_soln_new(:,:) = 0 
    
     !---Power amplitude set
-    power_amplitude_new = 1.0
+    power_amplitude_new = 1E9
     power_amplitude_prev = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
     
@@ -68,7 +68,6 @@ implicit none
                 !---Set temperature distribution
                 temperature_soln_new(i,j) = (center_temp_initial*spatial_power_fcn(i,j))
                 temperature = temperature_soln_new(i,j)
-                print *,'temperature',temperature
                 !---Get density to set the velocity
                 call density_corr(temperature,density)
                 density_soln_new(i,j) = density

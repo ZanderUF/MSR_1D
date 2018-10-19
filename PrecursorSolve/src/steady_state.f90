@@ -31,7 +31,7 @@ implicit none
     L2_norm_prev = 0.0
     L2_norm_current = 0.0
     nl_iter_tolerance = 1E-15
-    abs_max_nl_iter = 1000
+    abs_max_nl_iter = 1500
 !---Normal calculation flow - no need if doing unit test
     if (unit_test .eqv. .FALSE.) then
         !---Set starting values for power, velocity, temperature 
@@ -72,34 +72,35 @@ implicit none
 
             !---Swap for for next iteration
             precursor_soln_prev = precursor_soln_new
-            !---Calculate L2 norm to decide when enough iterations are complete 
-            if(nl_iter > 1) then
-                 
-                 do f = 1, num_isotopes
-                    do g = 1, num_delay_group
-                        L2_norm_current(f,g) = sqrt ( sum ( precursor_soln_new(f,g,:,:)*&
-                                               precursor_soln_new(f,g,:,:) ))   ! L2 norm
-                    end do
-                end do
+            
+                        !---Calculate L2 norm to decide when enough iterations are complete 
+            !if(nl_iter > 1) then
+            !     
+            !     do f = 1, num_isotopes
+            !        do g = 1, num_delay_group
+            !            L2_norm_current(f,g) = sqrt ( sum ( precursor_soln_new(f,g,:,:)*&
+            !                                   precursor_soln_new(f,g,:,:) ))   ! L2 norm
+            !        end do
+            !    end do
 
-                !---Calculate the difference in the L2 norms between iterations 
-                do f = 1, num_isotopes
-                    do g = 1, num_delay_group
-                        difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
-                        if( difference_L2 < nl_iter_tolerance) then
-                            difference_counter = difference_counter + 1
-                        end if
-                    end do
-                end do
-                
-                !---Need to make sure the L2 norm converges for all precursor groups
-                if ( difference_counter == num_delay_group) then
-                    max_nl_iter = nl_iter - 1 
-                end if
+            !    !---Calculate the difference in the L2 norms between iterations 
+            !    do f = 1, num_isotopes
+            !        do g = 1, num_delay_group
+            !            difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
+            !            if( difference_L2 < nl_iter_tolerance) then
+            !                difference_counter = difference_counter + 1
+            !            end if
+            !        end do
+            !    end do
+            !    
+            !    !---Need to make sure the L2 norm converges for all precursor groups
+            !    if ( difference_counter == num_delay_group) then
+            !        max_nl_iter = nl_iter - 1 
+            !    end if
 
-                !---Swap for next iteration
-                L2_norm_prev = L2_norm_current
-            end if
+            !    !---Swap for next iteration
+            !    L2_norm_prev = L2_norm_current
+            !end if
             
             nl_iter = nl_iter + 1
     
@@ -115,7 +116,8 @@ implicit none
         
         end do !---end nonlinear iteration loop
     end if !---end nonlinear if 
-         
+    
+   
     write(outfile_unit, fmt=('(a)') ) ' ' 
     write(outfile_unit, fmt=('(a, 100I4)')) 'Number of steady state nonlinear iterations: '&
                                             , nl_iter
@@ -142,7 +144,7 @@ implicit none
     velocity_soln_prev = velocity_soln_new
 
 !---Write precursor solution outfile
-!    call write_out_soln(outfile_unit,num_elem,transient_save_flag)
+    !call write_out_soln(outfile_unit,num_elem,transient_save_flag)
 
 !---Set steady state flag off 
     steady_state_flag = .FALSE.

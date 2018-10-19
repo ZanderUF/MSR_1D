@@ -32,6 +32,7 @@ module parameters_fe
     real , allocatable    :: global_coord(:,:)
     real, allocatable :: power_soln_test(:)
     real, allocatable :: area_variation(:,:)
+    integer :: fuel_region_start
 
 !---Elemental matrices
     real , dimension(3,3) :: elem_matrix_A_times_W

@@ -84,7 +84,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     ! Calc beta correction per delay group
     
     if(t0==0.0) then
-        beta_correction = gen_time*sum(precursors_lambda_vec(1:non_fuel_start))/total_power 
+        beta_correction = gen_time*total_precursors_fuel/total_power 
     end if
 
 !---Hardcoded times to start perturbation - should read from input

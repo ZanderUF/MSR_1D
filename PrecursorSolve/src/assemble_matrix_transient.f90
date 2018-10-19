@@ -57,10 +57,14 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
                     matrix_W_left_face(i,j)*&
                     precursor_soln_prev(isotope,delay_group,n-1,3)
             else !--Account for connection end of domain to beginning
+                W_right_times_soln(i) = W_right_times_soln(i) + &
+                                    matrix_W_right_face(i,j)*&
+                                    precursor_soln_prev(isotope,delay_group,n,j)
+
                 W_left_times_upwind_soln(i) = &
                     W_left_times_upwind_soln(i) + &
                     matrix_W_left_face(i,j)*&
-                    precursor_soln_prev(isotope,delay_group, num_elem,3)
+                    precursor_soln_prev(isotope, delay_group, num_elem, 1)
             end if
         end do 
     end do
@@ -77,10 +81,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
 !****************************************************************
 !---Write out    
     if (DEBUG .eqv. .TRUE.) then
-        write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0
-        write(outfile_unit,fmt='(a)'), ' '
-        
-        write(outfile_unit,fmt='(a)'), ' ' 
+                write(outfile_unit,fmt='(a)'), ' ' 
         write(outfile_unit,fmt='(a,1I3)'),' [U]*{c_e} | element --> ', n
         do j=1,nodes_per_elem 
               write(outfile_unit,fmt='(12es14.3)')U_times_soln_vec(j)              
@@ -115,5 +116,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
         do j=1,nodes_per_elem
             write(outfile_unit,fmt='(12es14.3)') RHS_transient_final_vec(j)          
         end do
-    end if
+        write(outfile_unit,fmt='(a)'),' '
+ 
+end if
 end 

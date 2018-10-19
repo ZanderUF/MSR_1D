@@ -56,9 +56,18 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
      
     !---CALCULATE SOLUTION for a given element
     precursor_soln_new(isotope,delay_group,n,:) = matmul(inverse_matrix,rhs_final_vec)
+    
+    !if( n==num_elem) then
+    !    print *,'ENDDD'
 
+    !    print *,'END',precursor_soln_new(isotope,delay_group,num_elem,3)
+    !    precursor_soln_new(isotope,delay_group,1,1) = &
+    !            precursor_soln_new(isotope,delay_group,num_elem,3)
+    !
+    !    print *,'beg',precursor_soln_new(isotope,delay_group,1,1) 
+    !end if
 
-!----------------------------------------------------
+    !----------------------------------------------------
     if (DEBUG .eqv. .TRUE.) then
         !---Write out
         write(outfile_unit,fmt='(a)'), ' ' 
