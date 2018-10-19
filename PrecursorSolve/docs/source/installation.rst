@@ -2,7 +2,9 @@
 
 Installation Guide
 ==================
-Installation has only been tested on a Mac to date
+Installation has been tested on:
+    OSX 10.11.6 with GNU Fortran 5.4.0
+    RHEL 6.8 with GNU Fortran 4.4.7
 
 --------------
 Access to Code
