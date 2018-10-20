@@ -19,21 +19,21 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Local
     integer :: i,j,f,g
-    real (kind=16), dimension(num_delay_group,num_elem) :: precursors_vec
-    real (kind=16), dimension(num_delay_group) :: test_fuel_prec, test_total_prec
+    double precision, dimension(num_delay_group,num_elem) :: precursors_vec
+    double precision, dimension(num_delay_group) :: test_fuel_prec, test_total_prec
 
-    real (kind=16), dimension(num_elem) :: temp_vec_num_elem, &
-                                           precursors_lambda_vec, &
-                                           power_soln_new_temp 
-    real (kind=16):: power_new_total, total_precursor_ref,&
+    double precision, dimension(num_elem) :: temp_vec_num_elem, &
+                                  precursors_lambda_vec, &
+                                  power_soln_new_temp 
+    double precision :: power_new_total, total_precursor_ref,&
                      total_precursor_ref_sum, total_fuel_length,&
                      total_precursors_fuel, &
                      rho_initial, step_time
-    
-    real :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
-    real :: first_zag, second_zag, third_zag, reactivity_zag
-    real :: temp_reactivity_feedback, total_power
-    real, dimension(num_isotopes,num_delay_group) :: beta_correction_vec
+    double precision :: ramp_end_time, ramp_start_time, &
+                        step_end_time, step_start_time
+    double precision :: first_zag, second_zag, third_zag, reactivity_zag
+    double precision :: temp_reactivity_feedback, total_power
+    double precision, dimension(num_isotopes,num_delay_group) :: beta_correction_vec
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
