@@ -26,7 +26,7 @@ implicit none
     power_soln_new(:,:) = 0 
    
     !---Power amplitude set
-    power_amplitude_new = 1E9
+    power_amplitude_new = 1.0
     power_amplitude_prev = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
     
@@ -80,8 +80,9 @@ implicit none
                 power_soln_new(i,j) = 0.0
                 !---Temperature in inactive region same as end of active region ==> no loss
                 temperature_soln_new(i,j) = temperature_soln_new(non_fuel_start ,3)
+                temperature=temperature_soln_new(i,j)
                 !---Get density to set the velocity
-                call density_corr(temperature_soln_new(i,j),density)
+                call density_corr(temperature,density)
                 density_soln_new = density
                 !---Need to get initial velocity distribution
                 velocity_soln_new(i,j) = mass_flow/(area_pipe*density)
