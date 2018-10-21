@@ -23,6 +23,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     double precision, dimension(num_delay_group) :: test_fuel_prec, test_total_prec
 
     double precision, dimension(num_elem) :: temp_vec_num_elem, &
+<<<<<<< HEAD
                                            precursors_lambda_vec, &
                                            power_soln_new_temp 
     double precision:: power_new_total, total_precursor_ref,&
@@ -34,6 +35,19 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     double precision :: first_zag, second_zag, third_zag, reactivity_zag
     double precision :: temp_reactivity_feedback, total_power
     real, dimension(num_isotopes,num_delay_group) :: beta_correction_vec
+=======
+                                  precursors_lambda_vec, &
+                                  power_soln_new_temp 
+    double precision :: power_new_total, total_precursor_ref,&
+                     total_precursor_ref_sum, total_fuel_length,&
+                     total_precursors_fuel, &
+                     rho_initial, step_time
+    double precision :: ramp_end_time, ramp_start_time, &
+                        step_end_time, step_start_time
+    double precision :: first_zag, second_zag, third_zag, reactivity_zag
+    double precision :: temp_reactivity_feedback, total_power
+    double precision, dimension(num_isotopes,num_delay_group) :: beta_correction_vec
+>>>>>>> c3c97386e7ece50af3a8bafd608f8a473dd14b79
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0

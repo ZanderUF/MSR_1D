@@ -80,7 +80,12 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
         write(outfile_unit,fmt='(a)'), ' ' 
         write(outfile_unit,fmt='(a,1I3,a,1I3)'),'New Solution | element --> ', n, ' Group -->',delay_group
         do j=1,nodes_per_elem 
+<<<<<<< HEAD
               write(outfile_unit,fmt='(a,1I2,16es14.3)'), 'Node -->', conn_matrix(n,j), precursor_soln_new(isotope, delay_group,n,j)          
+=======
+              write(outfile_unit,fmt='(a,1I2,12es14.3)'), 'Node -->', &
+                conn_matrix(n,j), precursor_soln_new(isotope, delay_group,n,j)          
+>>>>>>> c3c97386e7ece50af3a8bafd608f8a473dd14b79
         end do   
         write(outfile_unit,fmt='(a)'), '********************************'
     end if
