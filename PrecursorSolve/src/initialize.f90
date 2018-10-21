@@ -36,7 +36,7 @@ implicit none
     !---Initial guesses 
     center_temp_initial  = 800
     !---Constant velocity for testing
-    constant_velocity = 1.5! [cm/s]
+    constant_velocity = .0! [cm/s]
     
     !---Flag for testing, use a flat power function or not
     constant_flag = .TRUE.

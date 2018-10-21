@@ -144,7 +144,7 @@ implicit none
     velocity_soln_prev = velocity_soln_new
 
 !---Write precursor solution outfile
-    !call write_out_soln(outfile_unit,num_elem,transient_save_flag)
+    call write_out_soln(outfile_unit,num_elem,transient_save_flag)
 
 !---Set steady state flag off 
     steady_state_flag = .FALSE.

@@ -51,9 +51,9 @@ implicit none
     write(vel_unit, fmt='(a)'), 'Velocity [cm/s]   | Position (x) [cm] ' 
     do i = 1, range_elem
         do j = 1, nodes_per_elem
-            write(temp_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
+            write(temp_unit, fmt='(12es16.3, 12es16.10)') global_coord(i,j), &
                   temperature_soln_new(i,j)
-            write(vel_unit, fmt='(12es14.3, 12es14.3)') global_coord(i,j), &
+            write(vel_unit, fmt='(12es16.3, 12es16.10)') global_coord(i,j), &
                   velocity_soln_new(i,j)
         end do
     end do
@@ -68,7 +68,7 @@ implicit none
     do f = 1, num_isotopes ! isotope family
         do i = 1, range_elem  
             do j = 1, nodes_per_elem
-                write(file_unit, fmt='(12es14.3, 12es14.3)')  global_coord(i,j), &
+                write(file_unit, fmt='(16es16.8, 16es16.10)')  global_coord(i,j), &
                 ( precursor_soln_new(f,g,i,j), g=1,num_delay_group)
             end do
         end do

@@ -3,7 +3,7 @@ module parameters_fe
     implicit none
 
 !---Gauss pts
-    real , dimension(4)  :: gauspt, gauswt
+    double precision , dimension(4)  :: gauspt, gauswt
     data gauspt /-0.8611363116, -0.3399810435, 0.3399810435, 0.8611363116 /  
     data gauswt / 0.347854851 ,  0.6521451548, 0.6521451548, 0.347854851 /
     integer, parameter :: dp = selected_real_kind(14)
@@ -35,72 +35,71 @@ module parameters_fe
     integer :: fuel_region_start
 
 !---Elemental matrices
-    real , dimension(3,3) :: elem_matrix_A_times_W
-    real , dimension(3,3) :: identity_matrix
-    real , dimension(3,3) :: inverse_A_matrix
-    real , dimension(3,3) :: analytic_elem_matrix_P_ss
-    real , dimension(3,3) :: analytic_elem_matrix_A
-    real , dimension(3,3) :: elem_matrix_U
-    real , dimension(3,3) :: elem_matrix_A
-    real , dimension(3,3) :: elem_matrix_G
-    real , dimension(3,3) :: elem_matrix_F
-    real , dimension(3,3) :: elem_matrix_H
-    real , dimension(3,3) :: matrix_W_left_face
-    real , dimension(3,3) :: matrix_W_right_face
-    real , dimension(3)   :: interp_fcn_rhs, interp_fcn_lhs
+    double precision , dimension(3,3) :: elem_matrix_A_times_W
+    double precision , dimension(3,3) :: identity_matrix
+    double precision , dimension(3,3) :: inverse_A_matrix
+    double precision , dimension(3,3) :: analytic_elem_matrix_P_ss
+    double precision , dimension(3,3) :: analytic_elem_matrix_A
+    double precision , dimension(3,3) :: elem_matrix_U
+    double precision , dimension(3,3) :: elem_matrix_A
+    double precision , dimension(3,3) :: elem_matrix_G
+    double precision , dimension(3,3) :: elem_matrix_F
+    double precision , dimension(3,3) :: elem_matrix_H
+    double precision , dimension(3,3) :: matrix_W_left_face
+    double precision , dimension(3,3) :: matrix_W_right_face
+    double precision , dimension(3)   :: interp_fcn_rhs, interp_fcn_lhs
     data interp_fcn_lhs / 1,0,0/
     data interp_fcn_rhs / 0,0,1/
     data identity_matrix /1,0,0,&
                          0,1,0,&
                          0,0,1/
-   
-    real , dimension(3)   :: elem_matrix_A_times_W_RHS
-    real , dimension(3)   :: elem_vec_A_times_q
-    real , dimension(3)   :: A_times_W_times_upwind_elem_vec 
-    real , dimension(3,3)   :: A_times_W_times_RHS_elem_vec
-    real , dimension(3)   :: H_times_soln_vec
-    real , dimension(3)   :: elem_vec_w_left_face
-    real , dimension(3)   :: elem_vec_v
-    real , dimension(3)   :: Pu_minus_flux_vec
-    real , dimension(3)   :: elem_vec_f 
-    real , dimension(3)   :: elem_vec_Pu
-    real , dimension(3)   :: elem1_vec_M_s1 
-    real , dimension(3)   :: last_elem_vec_M_s2
-    real , dimension(3)   :: elem1_vec_f
-    real , dimension(3)   :: last_elem_vec_f
-    real , dimension(3)   :: elem_vec_q
+    double precision :: g_jacobian 
+    double precision , dimension(3)   :: elem_matrix_A_times_W_RHS
+    double precision , dimension(3)   :: elem_vec_A_times_q
+    double precision , dimension(3)   :: A_times_W_times_upwind_elem_vec 
+    double precision , dimension(3,3)   :: A_times_W_times_RHS_elem_vec
+    double precision , dimension(3)   :: H_times_soln_vec
+    double precision , dimension(3)   :: elem_vec_w_left_face
+    double precision , dimension(3)   :: elem_vec_v
+    double precision , dimension(3)   :: Pu_minus_flux_vec
+    double precision , dimension(3)   :: elem_vec_f 
+    double precision , dimension(3)   :: elem_vec_Pu
+    double precision , dimension(3)   :: elem1_vec_M_s1 
+    double precision , dimension(3)   :: last_elem_vec_M_s2
+    double precision , dimension(3)   :: elem1_vec_f
+    double precision , dimension(3)   :: last_elem_vec_f
+    double precision , dimension(3)   :: elem_vec_q
 
-    real, dimension(3)    :: RHS_transient_final_vec
+    double precision, dimension(3)    :: RHS_transient_final_vec
 
 !---Gauss integration 
     integer  :: num_gaus_pts = 4
 !---Shape functions, Lagrange, quadratic order
-    real , dimension(3) :: shape_fcn
-    real , dimension(3) :: der_shape_fcn
-    real , dimension(3) :: global_der_shape_fcn 
-    real                :: g_jacobian
-!---Solution matrices - global
-    
-    real , allocatable :: precursor_soln_last_time(:,:,:,:)
-    real , allocatable :: power_soln_last_time(:,:)
+    double precision , dimension(3) :: shape_fcn
+    double precision , dimension(3) :: der_shape_fcn
+    double precision , dimension(3) :: global_der_shape_fcn 
 
-    real , allocatable :: elem_vec_q_final(:,:,:) 
-    real , allocatable :: elem_vol_int(:,:)
-    real , allocatable :: precursor_soln_new(:,:,:,:) ! isotope,group,node,value
-    real , allocatable :: power_soln_new(:,:)
-    real , allocatable :: temperature_soln_new(:,:)
-    real , allocatable :: density_soln_new(:,:)
-    real , allocatable :: velocity_soln_new(:,:)
+!---double precisiontion matrices - global
 
-    real , allocatable :: precursor_soln_prev(:,:,:,:)! isotope,group,node,value
-    real , allocatable :: power_soln_prev(:,:)
-    real , allocatable :: temperature_soln_prev(:,:)
-    real , allocatable :: density_soln_prev(:,:)
-    real , allocatable :: velocity_soln_prev(:,:) 
-    real , allocatable :: spatial_power_fcn(:,:)
-    
-    real , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
-    real , allocatable :: previous_elem_soln_vec(:,:)  ! previous solution vector
+    double precision , allocatable :: precursor_soln_last_time(:,:,:,:)
+    double precision , allocatable :: power_soln_last_time(:,:)
+
+    double precision , allocatable :: elem_vec_q_final(:,:,:) 
+    double precision , allocatable :: elem_vol_int(:,:)
+    double precision , allocatable :: precursor_soln_new(:,:,:,:) ! isotope,group,node,value
+    double precision , allocatable :: power_soln_new(:,:)
+    double precision , allocatable :: temperature_soln_new(:,:)
+    double precision , allocatable :: density_soln_new(:,:)
+    double precision , allocatable :: velocity_soln_new(:,:)
+
+    double precision , allocatable :: precursor_soln_prev(:,:,:,:)! isotope,group,node,value
+    double precision , allocatable :: power_soln_prev(:,:)
+    double precision , allocatable :: temperature_soln_prev(:,:)
+    double precision , allocatable :: density_soln_prev(:,:)
+    double precision , allocatable :: velocity_soln_prev(:,:) 
+    double precision , allocatable :: spatial_power_fcn(:,:)
+    double precision , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
+    double precision , allocatable :: previous_elem_soln_vec(:,:)  ! previous solution vector
 
 !---Time information 
     logical :: time_solve       ! decide if we are doing time solve or not  
@@ -125,7 +124,7 @@ module parameters_fe
     real, allocatable  :: lamda_i_mat(:,:)
     real, allocatable  :: beta_i_mat(:,:)
     double precision     :: gen_time
-    real     :: mass_flow
+    double precision     :: mass_flow
     integer  :: num_isotopes
     integer  :: num_delay_group
 

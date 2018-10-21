@@ -24,8 +24,8 @@ implicit none
     integer :: difference_counter, abs_max_nl_iter    
 
 !---Set to make sure we don't iterate forever if we are not converging
-    max_nl_iter = 100
-    abs_max_nl_iter = 500 
+    max_nl_iter = 2 
+    abs_max_nl_iter = 600 
     nl_iter_tolerance = 1E-12
 !---Start time-dependent solve
     transient = .TRUE.
@@ -53,19 +53,18 @@ implicit none
                     enddo isotope_loop 
                    
                     if( mass_flow > 0.0) then
-                        call solve_temperature(n)
-                        call solve_velocity(n)
+                        !call solve_temperature(n)
+                        !call solve_velocity(n)
                     end if
 
                 enddo elements_loop 
                 
                 !precursor_soln_last_time  = precursor_soln_new
-                !precursor_soln_prev = precursor_soln_new
-                !power_amplitude_prev = power_amplitude_new
+                precursor_soln_prev = precursor_soln_new
                 
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_backward_euler(nl_iter,t0) 
-                
+                power_amplitude_prev = power_amplitude_new
                 !---Calculate L2 norm of precursor solution
                 !if(nl_iter > 1) then
                 !    do f = 1, num_isotopes
@@ -156,8 +155,8 @@ implicit none
                        Beta Correction | Reactivity Feedback'
             end if
 
-            write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5,&
-            12es14.5,12es14.5)')), &
+            write(power_outfile_unit, ('(16es14.7 ,16es14.5, 16es16.8, 16es14.5,&
+            16es14.5,16es14.5)')), &
             t0, power_amplitude_new, power_amplitude_new,&
             reactivity, beta_correction, reactivity_feedback
 
@@ -169,8 +168,8 @@ implicit none
             power_amplitude_last_time = power_amplitude_new
             
             if(mass_flow > 0.0 ) then
-                temperature_soln_prev = temperature_soln_new
-                velocity_soln_prev    = velocity_soln_new
+                !temperature_soln_prev = temperature_soln_new
+                !velocity_soln_prev    = velocity_soln_new
             end if
 
            !---Stop if we've exceeded TMAX.
