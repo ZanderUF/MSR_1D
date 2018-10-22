@@ -11,18 +11,20 @@
 ! 
 subroutine cond_corr(T, C_p)
 
-implicit none
+    USE global_parameters_M
 
-! Dummy
-    real, intent(in)  :: T
-    real, intent(out) :: C_p 
-! Local
-    real :: a
-    real :: b  
+    implicit none
+
+!---Dummy
+    real(dp), intent(in)  :: T
+    real(dp), intent(out) :: C_p 
+
+!---Local
+    real(dp) :: a
+    real(dp) :: b  
     
-    a = 9.636 
-    b = 10.487
+    a = 9.636_dp 
+    b = 10.487_dp
     C_p = a + b*T
-
 
 end

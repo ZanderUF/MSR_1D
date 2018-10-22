@@ -2,14 +2,23 @@
 !
 ! Steady state - T = [K]^-1 * F 
 ! 
-! Input:
-! 
+! Input: isotope - fissionble isotope contributing to the delayed precursors
+!        delay_group - delayed neutron precursor grop
+!        n - current node index 
+!        nl_iter - nonlinear iteration index
+!
 ! Output:
 !
 ! 
 subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
-
-    USE parameters_fe
+        
+    USE flags_M
+    USE material_info_M
+    USE mesh_info_M
+    USE time_info_M
+    USE global_parameters_M
+    USE solution_vectors_M
+    USE element_matrices_M
 
     implicit none
 
@@ -20,13 +29,14 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
     integer,intent(in) :: n ! current node
 
 !---Local
-    real, dimension(3)  :: rhs_final_vec 
-    real, dimension(3,3) :: inverse_matrix
+    real(dp), dimension(3)   :: rhs_final_vec 
+    real(dp), dimension(3,3) :: inverse_matrix
+    integer :: length, i, j, f,g
+    
     !---Inversion routine parameters
     integer :: lda, info, lwork
-    integer, dimension(3) :: ipiv
-    real, dimension(3) :: work
-    integer :: length, i, j, f,g
+    integer,  dimension(3) :: ipiv
+    real(dp), dimension(3) :: work
 
     length = 3
 !---Initialize
@@ -57,15 +67,12 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
     !---CALCULATE SOLUTION for a given element
     precursor_soln_new(isotope,delay_group,n,:) = matmul(inverse_matrix,rhs_final_vec)
     
-    !if( n==num_elem) then
-    !    print *,'ENDDD'
-
-    !    print *,'END',precursor_soln_new(isotope,delay_group,num_elem,3)
-    !    precursor_soln_new(isotope,delay_group,1,1) = &
-    !            precursor_soln_new(isotope,delay_group,num_elem,3)
-    !
-    !    print *,'beg',precursor_soln_new(isotope,delay_group,1,1) 
-    !end if
+    do i = 1, nodes_per_elem
+        if( precursor_soln_new(isotope,delay_group,n,i) < 0.0_dp) then
+            write(outfile_unit, fmt='(a,I6)'), 'Negative precursor conc. calculated at ',&
+                                               n
+        end if
+    end do
 
     !----------------------------------------------------
     if (DEBUG .eqv. .TRUE.) then

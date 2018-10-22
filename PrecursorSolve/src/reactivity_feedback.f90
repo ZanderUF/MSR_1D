@@ -14,7 +14,9 @@
 
 subroutine temperature_feedback(temp_reactivity_feedback,current_time,nl_iter)
 
-    USE parameters_fe
+    USE global_parameters_M
+    USE solution_vectors_M
+    USE mesh_info_M
 
     implicit none
 
@@ -34,9 +36,8 @@ subroutine temperature_feedback(temp_reactivity_feedback,current_time,nl_iter)
 
     !---Initialize
     total_temperature_current  = 0.0
-    fuel_elem_len = num_elem - num_elem_external 
 
-    do i = 1, fuel_elem_len 
+    do i = fuel_region_start, fuel_region_end 
         do j = 1, nodes_per_elem
             total_temperature_current = total_temperature_current + temperature_soln_new(i,j)
         end do

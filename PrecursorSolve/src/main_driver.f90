@@ -19,4 +19,4 @@ program msr1d
 !  call timestamp ( )
 
   stop
-end 
+end program msr1d 

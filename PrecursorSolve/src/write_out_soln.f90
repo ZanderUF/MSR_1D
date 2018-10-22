@@ -6,7 +6,11 @@
 !
 subroutine write_out_soln(file_unit,range_elem,transient_save)
     
-    USE parameters_fe
+    USE global_parameters_M
+    USE solution_vectors_M
+    USE mesh_info_M
+    USE material_info_M
+    USE time_info_M
 
 implicit none
 
@@ -68,7 +72,7 @@ implicit none
     do f = 1, num_isotopes ! isotope family
         do i = 1, range_elem  
             do j = 1, nodes_per_elem
-                write(file_unit, fmt='(16es16.8, 16es16.10)')  global_coord(i,j), &
+                write(file_unit, fmt='(16es16.6, 16es16.10)')  global_coord(i,j), &
                 ( precursor_soln_new(f,g,i,j), g=1,num_delay_group)
             end do
         end do

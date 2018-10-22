@@ -8,7 +8,13 @@
 
 subroutine solve_velocity(n)
 
-    USE parameters_fe
+    USE flags_M
+    USE material_info_M
+    USE mesh_info_M
+    USE time_info_M
+    USE global_parameters_M
+    USE solution_vectors_M
+    USE element_matrices_M
 
 implicit none
 

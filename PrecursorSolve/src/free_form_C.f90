@@ -1036,7 +1036,7 @@
       integer                    :: lim, it, m1, return_value, iz, iard, mult, llim, i, in
       integer                    :: il, nn, ii, j, ib, lsq, l
       integer,dimension(*)       :: ld
-      real   ,dimension(*)       :: dd
+      real(dp)   ,dimension(*)       :: dd
       real(dp)                   :: vnum, vstor, del, vl
       real,dimension(2)          :: vn, vs
       equivalence (vnum,vn(1)), (vstor,vs(1))

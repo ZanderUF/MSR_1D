@@ -13,31 +13,37 @@
 ! 
 
 subroutine assemble_matrix_ss (isotope,delay_group,n)
-!---
-    USE parameters_fe  
+
+    USE element_matrices_M
+    USE flags_M
+    USE material_info_M
+    USE mesh_info_M
+    USE global_parameters_M
+    USE solution_vectors_M
 
     implicit none
+
 !---Dummy variables
-    integer,intent(in) :: isotope
-    integer,intent(in) :: delay_group
+    integer, intent(in) :: isotope
+    integer, intent(in) :: delay_group
     integer :: n
+
 !---Local variables
     integer :: i, j, ii, jj, nr,nc, length   
-    
 !---Inversion routine parameters
     integer :: lda, info, lwork
-    integer, dimension(3) :: ipiv
-    real, dimension(3) :: work
+    integer,  dimension(3) :: ipiv
+    real(dp), dimension(3) :: work
 
     length = 3
 !---Initialize
-    ipiv =  0
-    work =  0.0
+    ipiv =  0.0_dp
+    work =  0.0_dp
     lda =   length
     lwork = length
     
-    elem_matrix_G = 0.0
-    elem_vec_w_left_face = 0.0
+    elem_matrix_G        = 0.0_dp
+    elem_vec_w_left_face = 0.0_dp
 
     do i = 1, nodes_per_elem
         !---Calculate q vector

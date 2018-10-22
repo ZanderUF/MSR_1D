@@ -7,7 +7,13 @@
 
 subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
 
-    USE parameters_fe
+    USE flags_M
+    USE material_info_M
+    USE mesh_info_M
+    USE time_info_M
+    USE global_parameters_M
+    USE solution_vectors_M
+    USE element_matrices_M
 
     implicit none
 
@@ -19,7 +25,7 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
 
 !---Local
     integer :: i,j,f,g
-    real, dimension(3) :: A_inv_times_RHS
+    real(dp), dimension(3) :: A_inv_times_RHS
   
     A_inv_times_RHS(:) = 0.0
 
@@ -38,15 +44,16 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
                 precursor_soln_prev(isotope, delay_group, n,i) + &
                 delta_t*(A_inv_times_RHS(i) )
         !---test to make sure values are not too small
-        !if(precursor_soln_new(isotope, delay_group, n, i) < 1E-16_dp) then
-        !    precursor_soln_new(isotope, delay_group, n, i) = 0.0
-        !end if
+        if(precursor_soln_new(isotope, delay_group, n, i) < 1E-16_dp) then
+            precursor_soln_new(isotope, delay_group, n, i) = 0.0
+        end if
+        
         end do
     end if
     
     if(td_method_type == 1) then
         do i = 1, nodes_per_elem
-        precursor_soln_new(isotope,delay_group, n,i) = &
+            precursor_soln_new(isotope,delay_group, n,i) = &
                 precursor_soln_last_time(isotope, delay_group, n,i) + &
                 delta_t*(A_inv_times_RHS(i) )
         !---test to make sure values are not too small
@@ -74,13 +81,14 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
         write(outfile_unit,fmt='(a,1I3,a,1I3)'),'Previous Solution | element --> ',&
         n, ' Group -->',delay_group
         do j=1,nodes_per_elem 
-              write(outfile_unit,fmt='(a,1I2,16es14.3)'), 'Node -->', &
+              write(outfile_unit,fmt='(a,1I2,16es14.8)'), 'Node -->', &
               conn_matrix(n,j), precursor_soln_prev(isotope, delay_group,n,j)          
         end do
         write(outfile_unit,fmt='(a)'), ' ' 
-        write(outfile_unit,fmt='(a,1I3,a,1I3)'),'New Solution | element --> ', n, ' Group -->',delay_group
+        write(outfile_unit,fmt='(a,1I3,a,1I3)'),'New Solution | element --> ', &
+                                                 n, ' Group -->',delay_group
         do j=1,nodes_per_elem 
-              write(outfile_unit,fmt='(a,1I2,16es14.3)'), 'Node -->', &
+              write(outfile_unit,fmt='(a,1I2,16es14.8)'), 'Node -->', &
               conn_matrix(n,j), precursor_soln_new(isotope, delay_group,n,j)          
         end do   
         write(outfile_unit,fmt='(a)'), '********************************'

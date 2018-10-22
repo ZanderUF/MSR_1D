@@ -12,17 +12,19 @@
 ! 
 subroutine density_corr(T, density)
 
+    USE global_parameters_M
+
 implicit none
 
 ! Dummy
-    real, intent(in)  :: T
-    real, intent(out) :: density 
+    real(dp), intent(in)  :: T
+    real(dp), intent(out) :: density 
 ! Local
-    real :: a
-    real :: b  
+    real(dp) :: a
+    real(dp) :: b  
    
-    a = 2.603
-    b= -6.69E-4
+    a = 2.603_dp
+    b= -6.69E-4_dp
 
     density = a + b*T
 

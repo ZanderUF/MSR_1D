@@ -6,27 +6,33 @@
 ! Output:
 ! 
 subroutine transient_backward_euler()
+    
+    USE flags_M
+    USE global_parameters_M
+    USE solution_vectors_M
+    USE time_info_M
+    USE mesh_info_M
+    USE material_info_M
 
-   USE parameters_fe
-
-implicit none
+    implicit none
 
 !---Dummy
 
 !---Local
     integer :: f,g,n,i,j,nl_iter, power_write_unit
-    real    :: t1
+    real(dp)    :: t1
     character(len=24) :: time_soln_name
     character(len=10) :: time_characters
     real(kind=4) :: temp_time
-    real, dimension(num_isotopes, num_delay_group) :: L2_norm_current, L2_norm_prev
-    real :: nl_iter_tolerance, difference_L2
+    real(dp), dimension(num_isotopes, num_delay_group) :: L2_norm_current, L2_norm_prev
+    real(dp) :: nl_iter_tolerance, difference_L2
     integer :: difference_counter, abs_max_nl_iter    
 
 !---Set to make sure we don't iterate forever if we are not converging
     max_nl_iter = 2 
     abs_max_nl_iter = 600 
-    nl_iter_tolerance = 1E-12
+    nl_iter_tolerance = 1E-12_dp
+
 !---Start time-dependent solve
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
@@ -66,34 +72,34 @@ implicit none
                 call solve_power_backward_euler(nl_iter,t0) 
                 power_amplitude_prev = power_amplitude_new
                 !---Calculate L2 norm of precursor solution
-                !if(nl_iter > 1) then
-                !    do f = 1, num_isotopes
-                !        do g = 1, num_delay_group
-                !            L2_norm_current(f,g) = sqrt( sum( precursor_soln_new(f,g,:,:)*&
-                !                                   precursor_soln_new(f,g,:,:) ) ) 
-                !        end do
-                !    end do
-                !    
-                !    !---Calculate the difference in the L2 norms between iterations
-                !    do f = 1, num_isotopes
-                !        do g = 1, num_delay_group
-                !            difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
+                if(nl_iter > 1) then
+                    do f = 1, num_isotopes
+                        do g = 1, num_delay_group
+                            L2_norm_current(f,g) = sqrt( sum( precursor_soln_new(f,g,:,:)*&
+                                                   precursor_soln_new(f,g,:,:) ) ) 
+                        end do
+                    end do
+                    
+                    !---Calculate the difference in the L2 norms between iterations
+                    do f = 1, num_isotopes
+                        do g = 1, num_delay_group
+                            difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
 
-                !            if( difference_L2 < nl_iter_tolerance) then
-                !                difference_counter = difference_counter + 1
-                !            end if
-                !        end do
-                !    end do
-                !    !---Need to make sure the L2 norm converges for all precursor groups
-                !    if ( difference_counter == num_delay_group) then
-                !        max_nl_iter = nl_iter - 1
-                !    end if
+                            if( difference_L2 < nl_iter_tolerance) then
+                                difference_counter = difference_counter + 1
+                            end if
+                        end do
+                    end do
+                    !---Need to make sure the L2 norm converges for all precursor groups
+                    if ( difference_counter == num_delay_group) then
+                        max_nl_iter = nl_iter - 1
+                    end if
                 !    
                 !    !print *,'difference_L2',difference_L2
                 !    !---Swap for next iteration
-                !    L2_norm_prev = L2_norm_current
+                    L2_norm_prev = L2_norm_current
 
-                !end if
+                end if
 
                 nl_iter = nl_iter + 1 !---Nonlinear iteration counter
                 
@@ -134,13 +140,13 @@ implicit none
                 open (unit=power_write_unit, file= time_soln_name//time_characters,&
                 status='unknown',form='formatted',position='asis')
  
-                write(power_write_unit,fmt='(a,12es14.3)'), &
+                write(power_write_unit,fmt='(a,es23.16)'), &
                 'Power distribution at time:',t0
                 write(power_write_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
                 
                 do i = 1,num_elem
                     do j = 1, nodes_per_elem
-                        write(power_write_unit, fmt='(f6.3, 12es14.3)') &
+                        write(power_write_unit, fmt='(f6.3, es23.16)') &
                               global_coord(i,j), power_soln_new(i,j)
                     end do
                 end do
@@ -155,10 +161,11 @@ implicit none
                        Beta Correction | Reactivity Feedback'
             end if
 
-            write(power_outfile_unit, ('(16es14.7 ,16es14.5, 16es16.8, 16es14.5,&
-            16es14.5,16es14.5)')), &
-            t0, power_amplitude_new, power_amplitude_new,&
-            reactivity, beta_correction, reactivity_feedback
+            write(power_outfile_unit, ('(es23.16 ,es23.16,es23.16, es23.16,&
+                                         es23.16)')), &
+	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,&
+              reactivity, beta_correction
+            
 
 
             !---Swap solutions

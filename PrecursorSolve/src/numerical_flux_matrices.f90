@@ -15,10 +15,14 @@
 !*****************************************************************************80
 
 subroutine numerical_flux_matrices (n, nl_iter)
-!
-  USE parameters_fe  
+ 
+    USE element_matrices_M
+    USE flags_M
+    USE global_parameters_M
+    USE mesh_info_M
+    USE solution_vectors_M
 
-  implicit none
+    implicit none
 
 !---Dummy variables
     integer, intent(in) :: n
@@ -28,9 +32,10 @@ subroutine numerical_flux_matrices (n, nl_iter)
     integer :: i, j
 
 !---Initialize
-    matrix_W_right_face = 0.0
-    matrix_W_left_face  = 0.0
-    elem_vec_q          = 0.0
+    matrix_W_right_face = 0.0_dp
+    matrix_W_left_face  = 0.0_dp
+    elem_vec_q          = 0.0_dp
+
 !---Create source vector 'q', and W - 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
@@ -44,10 +49,10 @@ subroutine numerical_flux_matrices (n, nl_iter)
                 !---rhs of previous element
                  matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
                                             interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                 matrix_W_left_face(i,j)  = velocity_soln_prev(n,i)*&
+                 matrix_W_left_face(i,j)  = velocity_soln_prev(n-1,i)*&
                                             interp_fcn_lhs(i)*interp_fcn_lhs(j)
             else!---First element case, need to connect with end element 
-                 matrix_W_right_face(i,j) = velocity_soln_prev(num_elem,i)*&
+                 matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
                                             interp_fcn_rhs(i)*interp_fcn_rhs(j)  
                  matrix_W_left_face(i,j)  = velocity_soln_prev(num_elem,i)*&
                                             interp_fcn_lhs(i)*interp_fcn_lhs(j)

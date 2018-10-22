@@ -7,13 +7,16 @@
 
 subroutine inter_shape_fcns (xi, h)
 !
-    USE parameters_fe  
+    USE global_parameters_M
+    USE gauss_integration_M
+    USE flags_M
+    USE mesh_info_M
 
     implicit none
 !---Dummy variable
-    double precision :: xi 
+    real :: xi 
     !real, dimension(3) :: elem_coord
-    double precision :: h
+    real :: h
 
 !---local
     integer :: i   
@@ -29,7 +32,6 @@ subroutine inter_shape_fcns (xi, h)
     	der_shape_fcn(1) = xi - 0.5 
     	der_shape_fcn(2) = -2.0*xi
     	der_shape_fcn(3) = xi + 0.5
-       
         g_jacobian = h*0.5 
         !! Compute jacobian
     	!do i = 1, nodes_per_elem

@@ -1,7 +1,8 @@
    module rddelay_M
 
    USE free_form
-   USE parameters_fe
+   USE global_parameters_M
+   USE material_info_M
 
    implicit none
    private

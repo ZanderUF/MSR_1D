@@ -1,6 +1,6 @@
 !*****************************************************************************80
 !
-!! Sets up 1D mesh assuming quadratic functions  
+!! Sets up 1D mesh assuming quadratic spatial interpolation  
 !
 !  Discussion:
 !          Creates connectivity mesh assuming 1D discontinuous elements in a line
@@ -12,13 +12,17 @@
 !  If element is 1.0 ==> 1.0 cm
 ! 
 subroutine mesh_creation ( )
-!
-USE parameters_fe  
 
-implicit none
+   USE global_parameters_M 
+   USE mesh_info_M
+   USE flags_M
 
+   implicit none
+
+!---Dummy
+
+!---Local
     integer :: i,j,ii
-    real :: temp
 
 !---allocate arrays
     allocate( conn_matrix(num_elem, nodes_per_elem) , &
@@ -49,6 +53,21 @@ implicit none
             end if
         end do
     end do
+
+
+!---Check to make sure dimensions are physical
+    if(DEBUG .eqv. .TRUE.) then
+        do i = 1, num_elem
+            do j = 1, nodes_per_elem
+                if( global_coord(i,j) < 0.0 ) then
+                    write(outfile_unit, fmt=('(a)')), 'ERROR: global coordinate is negative'
+                    write(outfile_unit, fmt=('(a,I6)')),'At element number: ',i
+                    
+                    stop 
+                end if
+            end do
+        end do
+    end if
 
 !-------------------------------------------------------------------------------
 !---Write to outfile

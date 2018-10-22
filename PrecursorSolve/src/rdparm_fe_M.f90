@@ -1,8 +1,14 @@
    module rdparm_fe_M
 
      USE free_form
-     USE parameters_fe
- 
+
+     USE global_parameters_M
+     USE flags_M
+     USE time_info_M 
+     USE mesh_info_M
+     USE material_info_M
+     USE solution_vectors_M
+
    implicit none
    private
    public :: rdparm_fe

@@ -1,21 +1,27 @@
 ! Transient solver
 ! Notes: Solves precursor and power equations using foward Euler
 !        Explicit method 
+!
 ! Input: none
 !
 ! Output:
 ! 
 subroutine transient_forward_euler()
 
-   USE parameters_fe
+    USE flags_M
+    USE global_parameters_M
+    USE solution_vectors_M
+    USE time_info_M
+    USE mesh_info_M
+    USE material_info_M
 
-implicit none
+    implicit none
 
 !---Dummy
 
 !---Local
     integer :: f,g,n,i,j
-    real    :: t1 
+    real(dp)    :: t1 
     integer :: power_write_unit
     character(len=24) :: time_soln_name
     character(len=10) :: time_characters
@@ -85,12 +91,12 @@ implicit none
                 open (unit=power_write_unit, file= time_soln_name//time_characters,&
                 status='unknown',form='formatted',position='asis')
  
-                write(power_write_unit,fmt='(a,12es14.3)'), 'Power distribution at time:',&
+                write(power_write_unit,fmt='(a,es23.16)'), 'Power distribution at time:',&
                       t0  
                 write(power_write_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
                 do i = 1,num_elem
                     do j = 1, nodes_per_elem
-                        write(power_write_unit, fmt='(f6.3, 12es14.3)') &
+                        write(power_write_unit, fmt='(f6.3, es23.16)') &
                               global_coord(i,j), power_soln_new(i,j)
                     end do
                 end do
@@ -105,8 +111,10 @@ implicit none
 	            write(power_outfile_unit, ('(a)')), &
 				'Time (s) | Power Amp | Norm Power | Reactivity | Beta Correction'
 	        end if
-	        write(power_outfile_unit, ('(12es14.6 ,12es14.5, 12es14.5, 12es14.5, 12es14.5)')), &
-	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,reactivity, beta_correction
+	        write(power_outfile_unit, ('(es23.16 ,es23.16,es23.16, es23.16,&
+                                         es23.16)')), &
+	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,&
+              reactivity, beta_correction
             
 	        !---Swap solutions
             precursor_soln_prev  = precursor_soln_new 
