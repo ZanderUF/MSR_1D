@@ -24,8 +24,9 @@ Guide
 Style
 ^^^^^
 
-For the code written the practices found in the link below were followed
-https://www.fortran90.org/src/best-practices.html
+    For the code written the practices found in the link below were followed
+    
+    https://www.fortran90.org/src/best-practices.html
 
 Indices and tables
 ==================
