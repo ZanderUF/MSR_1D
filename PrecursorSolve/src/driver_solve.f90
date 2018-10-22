@@ -43,6 +43,8 @@ implicit none
 !---Read in problem parameters here
     call datainput_fe(input_file)
 
+    call write_out_parms()
+
 !---Allocate solution vector and global matrices
     allocate(precursor_soln_new(num_isotopes,num_delay_group,num_elem,nodes_per_elem),  &
              power_soln_new(num_elem,nodes_per_elem), &

@@ -47,7 +47,7 @@ implicit none
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             !---FUEL region
-            if( (fuel_region_start <= i) .AND.  (i <= fuel_region_start) ) then
+            if( (fuel_region_start <= i) .AND.  (i <= fuel_region_end) ) then
                 !---Flat spatial shape 
                 if(constant_flag .eqv. .TRUE.) then
                     spatial_power_fcn(i,j) = 1.0
@@ -62,12 +62,14 @@ implicit none
             end if
         end do
     end do
-
+    
     !---Apply to every node point within an element
-    do i = 1,num_elem
+    do i = 1, num_elem
+
         do j = 1, nodes_per_elem
             !---Apply to active fuel region
-            if( (fuel_region_start <= i) .AND.  (i <= fuel_region_end) ) then
+            if( (fuel_region_start < i) .AND.  (i <= fuel_region_end) ) then
+                print *,' i',i
                 power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new
                 !---Set temperature distribution
                 temperature_soln_new(i,j) = (temperature_initial*spatial_power_fcn(i,j))

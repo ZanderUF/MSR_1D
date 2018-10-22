@@ -12,7 +12,7 @@ subroutine write_out_soln(file_unit,range_elem,transient_save)
     USE material_info_M
     USE time_info_M
 
-implicit none
+    implicit none
 
 !---Dummy
     integer, intent(in) :: file_unit

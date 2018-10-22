@@ -13,7 +13,7 @@ FFLAGS = -g -fbounds-check
 LIBDIR = ../../lapack-3.8.0/ 
 LIB    = -llapack -lblas
 
-EXE = msr1d_prg
+EXE = msr1d
 ################################
 msr1d : assemble_matrix_ss.o \
       assemble_matrix_transient.o \
@@ -51,6 +51,7 @@ msr1d : assemble_matrix_ss.o \
       transient_backward_euler.o \
       transient_forward_euler.o \
       vast_kind_param.o \
+      write_input_parms.o \
       write_out_soln.o \
       y0trns_M.o 
 	$(F90) $(FFLAGS)  main_driver.f90 *.o -L $(LIBDIR)$(LIB) -o $(EXE) 
@@ -177,6 +178,9 @@ vast_kind_param.o : vast_kind_param.f90
 write_out_soln.o: write_out_soln.f90 global_parameters_M.o solution_vectors_M.o \
 				  mesh_info_M.o material_info_M.o
 	$(F90) $(FFLAGS) -c write_out_soln.f90
+
+write_input_parms.o: write_input_parms.f90
+	$(F90) $(FFLAGS) -c write_input_parms.f90
 
 y0trns_M.o : y0trns_M.f90
 	$(F90) $(FFLAGS) -c y0trns_M.f90

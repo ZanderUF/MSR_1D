@@ -30,7 +30,7 @@ implicit none
     L2_norm_prev = 0.0
     L2_norm_current = 0.0
     nl_iter_tolerance = 1E-15_dp
-    abs_max_nl_iter = 1500_dp
+    abs_max_nl_iter = 1500
 
     !---Set starting values for power, velocity, temperature 
     call initialize
@@ -60,9 +60,9 @@ implicit none
         difference_counter = 0
         
         !---Write out the solution
-        if(DEBUG .eqv. .TRUE.) then
-            call write_out_soln(outfile_unit,num_elem,transient_save_flag) 
-        end if
+        !if(DEBUG .eqv. .TRUE.) then
+        !    call write_out_soln(outfile_unit,num_elem,transient_save_flag) 
+        !end if
 
         !---Swap for for next iteration
         precursor_soln_prev = precursor_soln_new
@@ -99,7 +99,8 @@ implicit none
     
         !---If we've gone thru too many nonlinear iterations exit
         if (nl_iter > max_nl_iter) then
-             stop 
+             print *,' nl -iter',nl_iter
+             exit 
          !---If we've gone through a max prescribed and still not converged
         elseif( nl_iter> abs_max_nl_iter) then
              write(outfile_unit,('(a)')) 'We have gone through the max &
