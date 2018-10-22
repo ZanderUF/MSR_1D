@@ -31,7 +31,6 @@ msr1d : assemble_matrix_ss.o \
       heat_capacity_corr.o \
       initialize.o \
       inter_shape_fcns.o \
-      main_driver.o \
       material_info_M.o \
       mesh_creation.o \
       mesh_info_M.o \
