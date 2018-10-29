@@ -67,12 +67,13 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
     !---CALCULATE SOLUTION for a given element
     precursor_soln_new(isotope,delay_group,n,:) = matmul(inverse_matrix,rhs_final_vec)
     
-    do i = 1, nodes_per_elem
-        if( precursor_soln_new(isotope,delay_group,n,i) < 0.0_dp) then
-            write(outfile_unit, fmt='(a,I6)'), 'Negative precursor conc. calculated at ',&
-                                               n
-        end if
-    end do
+    !do i = 1, nodes_per_elem
+    !    if( precursor_soln_new(isotope,delay_group,n,i) < 1E-16_dp) then
+    !        precursor_soln_new(isotope,delay_group,n,i) = 0.0_dp
+    !        write(outfile_unit, fmt='(a,I6,a,I6)'), 'Negative precursor conc. &
+    !                        calculated at node: ', n, 'element: ',i
+    !    end if
+    !end do
 
     !----------------------------------------------------
     if (DEBUG .eqv. .TRUE.) then

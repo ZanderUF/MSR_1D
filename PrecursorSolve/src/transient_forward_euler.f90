@@ -59,8 +59,8 @@ subroutine transient_forward_euler()
             enddo elements_loop 
             
             !---Swap solutions
-            !precursor_soln_prev   = precursor_soln_new
-            !power_amplitude_prev  = power_amplitude_new
+            precursor_soln_prev   = precursor_soln_new
+            power_amplitude_prev  = power_amplitude_new
            
            do f = 1, num_isotopes
                 do g = 1, num_delay_group

@@ -20,7 +20,7 @@ implicit none
     integer  ::  i,j, n  
     character(len=80) :: current_path
     character(len=20) :: outfile_name
-    character(len=20) :: steady_state_soln_file_name
+    character(len=21) :: steady_state_soln_file_name
     character(len=20) :: last_time_file_name
     character(len=20) :: power_soln_file_name
     character(len=7)  :: input_file

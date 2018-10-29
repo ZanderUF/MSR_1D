@@ -26,7 +26,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     integer :: i,j,f,g
     double precision, dimension(num_delay_group,num_elem) :: precursors_vec
     double precision, dimension(num_delay_group) :: test_fuel_prec, test_total_prec
-
     double precision, dimension(num_elem) :: temp_vec_num_elem, &
                                            precursors_lambda_vec, &
                                            power_soln_new_temp 
@@ -34,7 +33,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                      total_precursor_ref_sum, total_fuel_length,&
                      total_precursors_fuel, &
                      rho_initial, step_time
-    
     double precision :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     double precision :: first_zag, second_zag, third_zag, reactivity_zag
     double precision :: temp_reactivity_feedback, total_power
@@ -82,12 +80,11 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                                 spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
-    
+
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(fuel_region_start:fuel_region_end))
-    
-    ! Calc beta correction per delay group
-    
+     
+    !---Calc beta correction per delay group
     if(t0==0.0) then
         beta_correction = gen_time*total_precursors_fuel/total_power 
     end if
@@ -127,6 +124,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     second_zag = 1.0
     third_zag  = 1.5
     rho_initial = 0.0
+    
     if(zag_flag .eqv. .TRUE.) then
         if( t0 < first_zag ) then
             reactivity = rho_initial + &
@@ -157,7 +155,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &
                           delta_t*(( reactivity  &
-                           - beta_correction  )/gen_time)*power_amplitude_prev &
+                          - beta_correction )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
     end if
@@ -165,7 +163,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     if(td_method_type == 1) then ! Backward Euler
         power_amplitude_new = power_amplitude_last_time + &
                           delta_t*(( reactivity  &
-                           - beta_correction  )/gen_time)*power_amplitude_prev &
+                          - beta_correction )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
     end if

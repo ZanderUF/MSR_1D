@@ -17,7 +17,6 @@ implicit none
 !---Dummy
 
 !---Local
-    
     integer  :: f,g,i,jj,j,n, nl_iter
     real(dp), dimension(num_isotopes,num_delay_group) :: L2_norm_current,L2_norm_prev 
     real(dp) :: nl_iter_tolerance, difference_L2    
@@ -99,7 +98,6 @@ implicit none
     
         !---If we've gone thru too many nonlinear iterations exit
         if (nl_iter > max_nl_iter) then
-             print *,' nl -iter',nl_iter
              exit 
          !---If we've gone through a max prescribed and still not converged
         elseif( nl_iter> abs_max_nl_iter) then

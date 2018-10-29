@@ -77,19 +77,12 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     
     !---Calcualte the RHS vector ** F(u)
     do i = 1, nodes_per_elem
-        !print *,' U times',U_times_soln_vec(i)
-        !print *,' A lambda',A_times_lambda_times_soln_vec(i)
-        !print *,' elem vec',elem_vec_q_times_beta_lambda(i)
-        !print *,' W right', W_right_times_soln(i)
-        !print *,' W left', W_left_times_upwind_soln(i)
-
         RHS_transient_final_vec(i) = U_times_soln_vec(i) - &
                            A_times_lambda_times_soln_vec(i) + &
                            elem_vec_q_times_beta_lambda(i) -  &
                            W_right_times_soln(i) + &
                            W_left_times_upwind_soln(i) 
-        !print *,'RHS vec',RHS_transient_final_vec(i)
-        !print *,' ' 
+    
     end do 
 !****************************************************************
 !---Write out    

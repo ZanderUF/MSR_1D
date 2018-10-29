@@ -50,19 +50,21 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
         
         end do
     end if
-    
+   
     if(td_method_type == 1) then
         do i = 1, nodes_per_elem
             precursor_soln_new(isotope,delay_group, n,i) = &
                 precursor_soln_last_time(isotope, delay_group, n,i) + &
                 delta_t*(A_inv_times_RHS(i) )
         !---test to make sure values are not too small
-        if(precursor_soln_new(isotope, delay_group, n, i) < 1E-16_dp) then
-            precursor_soln_new(isotope, delay_group, n, i) = 0.0
-        end if
+            if(precursor_soln_new(isotope, delay_group, n, i) < 1E-16_dp) then
+                precursor_soln_new(isotope, delay_group, n, i) = &
+                            precursor_soln_new(isotope, delay_group, n,i-1 )
+            end if
         
         end do
     end if
+
 !---End precursor solve    
 
 !---Null transient unit test

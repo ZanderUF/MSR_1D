@@ -30,7 +30,7 @@ implicit none
     power_soln_new(:,:)         = 0.0_dp
    
     !---Power amplitude set
-    power_amplitude_new   = 1.0_dp
+    power_amplitude_new   = 10.0_dp
     power_amplitude_prev  = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
     
@@ -47,7 +47,7 @@ implicit none
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             !---FUEL region
-            if( (fuel_region_start <= i) .AND.  (i <= fuel_region_end) ) then
+            if( (fuel_region_start < i) .AND.  (i <= fuel_region_end) ) then
                 !---Flat spatial shape 
                 if(constant_flag .eqv. .TRUE.) then
                     spatial_power_fcn(i,j) = 1.0
@@ -62,14 +62,11 @@ implicit none
             end if
         end do
     end do
-    
     !---Apply to every node point within an element
     do i = 1, num_elem
-
         do j = 1, nodes_per_elem
             !---Apply to active fuel region
             if( (fuel_region_start < i) .AND.  (i <= fuel_region_end) ) then
-                print *,' i',i
                 power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new
                 !---Set temperature distribution
                 temperature_soln_new(i,j) = (temperature_initial*spatial_power_fcn(i,j))
@@ -85,7 +82,11 @@ implicit none
             !---Inactive region assumed to have zero power 
                 power_soln_new(i,j) = 0.0
                 !---Temperature in inactive region same as end of active region ==> no loss
-                temperature_soln_new(i,j) = temperature_soln_new(fuel_region_start, 3)
+                if( i == 1) then
+                    temperature_soln_new(i,j) = temperature_initial 
+                else
+                    temperature_soln_new(i,j) = temperature_soln_new(fuel_region_end, 3)
+                end if
                 temperature=temperature_soln_new(i,j)
                 !---Get density to set the velocity
                 call density_corr(temperature,density)
@@ -104,10 +105,14 @@ implicit none
     total_temperature_initial = 0.0
     do i = fuel_region_start, fuel_region_end 
         do j = 1, nodes_per_elem
-           total_temperature_initial = total_temperature_initial + temperature_soln_new(i,j) 
+           total_temperature_initial = total_temperature_initial + &
+                                             temperature_soln_new(i,j) 
         end do
     end do
     avg_temperature_initial = total_temperature_initial/(fuel_region_start-fuel_region_end)
+
+!---
+    velocity_soln_prev = velocity_soln_new
 
 !-------------------------------------------------------------------------------
 !---Write out initial solution
