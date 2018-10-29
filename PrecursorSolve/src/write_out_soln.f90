@@ -26,19 +26,21 @@ subroutine write_out_soln(file_unit,range_elem,transient_save)
     character(len=27) :: time_velocity_name
     character(len=10) :: name_precursor_file, name_temperature_file,name_velocity_file
     real(kind=4) :: temp_time
-    
+    integer :: time_counter
+
     temp_time = t0
     temp_unit = 18
     vel_unit  = 23
+    time_counter = 1
 !---If writing to a new file for a given time step
     if(transient_save .eqv. .TRUE.) then 
         !file_unit = 15
         time_precursor_name   = 'precursor_soln_at_time_step_'      
         time_temperature_name = 'temperature_soln_at_time_step_'
         time_velocity_name    = 'velocity_soln_at_time_step_'
-        write(name_precursor_file,'(f10.2)' ) temp_time 
-        write(name_temperature_file, '(f10.2)') temp_time
-        write(name_velocity_file, '(f10.2)' ) temp_time
+        write(name_precursor_file,   '(f10.2)' ) temp_time 
+        write(name_temperature_file, '(f10.2)' ) temp_time
+        write(name_velocity_file,    '(f10.2)' ) temp_time
         
         name_precursor_file   = adjustl(name_precursor_file) 
         name_temperature_file = adjustl(name_temperature_file)
@@ -51,17 +53,19 @@ subroutine write_out_soln(file_unit,range_elem,transient_save)
         open (unit=vel_unit, file = time_velocity_name//name_velocity_file, &
            status='unknown',form='formatted',position='asis')
  
-    write(temp_unit,fmt='(a)'), 'Temperature [K] | Position (x) [cm]'
-    write(vel_unit, fmt='(a)'), 'Velocity [cm/s]   | Position (x) [cm] ' 
-    do i = 1, range_elem
-        do j = 1, nodes_per_elem
-            write(temp_unit, fmt='(12es16.3, 12es16.10)') global_coord(i,j), &
-                  temperature_soln_new(i,j)
-            write(vel_unit, fmt='(12es16.3, 12es16.10)') global_coord(i,j), &
-                  velocity_soln_new(i,j)
+        write(temp_unit,fmt='(a)'), 'Temperature [K] | Position (x) [cm]'
+        write(vel_unit, fmt='(a)'), 'Velocity [cm/s]   | Position (x) [cm] ' 
+        do i = 1, range_elem
+            do j = 1, nodes_per_elem
+                write(temp_unit, fmt='(12es16.3, 12es16.10)') global_coord(i,j), &
+                      temperature_soln_new(i,j)
+                write(vel_unit, fmt='(12es16.3, 12es16.10)') global_coord(i,j), &
+                      velocity_soln_new(i,j)
+            end do
         end do
-    end do
- 
+    
+        time_counter = time_counter + 1
+    
     end if
 
 !---Write to solution file
