@@ -23,12 +23,17 @@ step       yes or no    Perform a step perturbation or not
 ramp       yes or no    Perform a ramp perturbation or not
 zag        yes or no    Perform a zig-zag perturbation or not
 feed       Integer      0 - (default) no feedback 1 - temperature
+rdpw       yes or no    Read power profile from a file
 del        Double       Indicate fixed time step size, ex: 1E-5
 tmax       Real         Indicate the total length of the simulation
 tin        Double       Beginning point of the perturbation 
 nem        Integer      Number of equal spaced elements in the model
 npe        Integer      Number of nodes per element 
 pipe       Integer      Number of elements in the outer circuit
+inlt       Integer      Starting element of the inlet plenum
+scor       Integer      Starting element of the main core region
+ecor       Integer      Final element of the main core region
+outl       Integer      Final element of the outlet plenum
 area       Real         Area of the fuel core [:math:`cm^2`] 
 apip       Real         Area of the piping [:math:'cm^2']
 mflow      Real         Mass flow rate [:math:`g/cm^3`]
