@@ -1,8 +1,8 @@
-! Solve velocity field
+!---Solve velocity field
 !
-! Input: n - element number 
+!---Input: n - element number 
 !
-! Output:
+!---Output:
 !
 !
 
@@ -23,15 +23,16 @@ implicit none
 
 !---Local
     integer :: j
-    real :: temperature, density
+    real(dp) :: temperature_eval, density_eval
 
 !---Loop over all nodes in element
     do j = 1, nodes_per_elem
-        temperature = temperature_soln_prev(n,j)
+        temperature_eval       = temperature_soln_prev(n,j)
         !---Evaluate density based on temperature
-        call density_corr(temperature,density)
-        density_soln_new(n,j) = density
-        velocity_soln_new(n,j) = mass_flow/(area_variation(n,j)*density)
+        call density_corr_msfr(temperature_eval, density_eval)
+        density_soln_new(n,j)  = density_eval
+        velocity_soln_new(n,j) = mass_flow*exp(-0.2_dp*t0)/(area_variation(n,j)*density_eval)
+
     end do
 
 end subroutine solve_velocity

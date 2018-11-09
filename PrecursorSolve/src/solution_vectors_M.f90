@@ -26,6 +26,8 @@ module solution_vectors_M
     real(dp) , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
     real(dp) , allocatable :: previous_elem_soln_vec(:,:)  ! previous solution vector
 
+    real(dp) , allocatable :: dif3d_power_input(:,:)
+
     real(dp) :: power_amplitude_last_time
     real(dp) :: power_amplitude_start
     real(dp) :: power_amplitude_prev

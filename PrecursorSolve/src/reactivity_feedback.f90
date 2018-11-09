@@ -37,7 +37,7 @@ subroutine temperature_feedback(temp_reactivity_feedback,current_time,nl_iter)
     !---Initialize
     total_temperature_current  = 0.0
 
-    do i = fuel_region_start, fuel_region_end 
+    do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
             total_temperature_current = total_temperature_current + temperature_soln_new(i,j)
         end do

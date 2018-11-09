@@ -18,5 +18,6 @@ implicit none
     logical :: ramp_flag = .FALSE.
     logical :: step_flag = .FALSE.
     logical :: zag_flag = .FALSE.
+    logical :: read_power_from_file = .FALSE.
 
 end module flags_M

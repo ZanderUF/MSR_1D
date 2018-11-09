@@ -44,7 +44,7 @@ implicit none
     call datainput_fe(input_file)
 
     call write_out_parms()
-
+    
 !---Allocate solution vector and global matrices
     allocate(precursor_soln_new(num_isotopes,num_delay_group,num_elem,nodes_per_elem),  &
              power_soln_new(num_elem,nodes_per_elem), &
@@ -66,6 +66,7 @@ implicit none
 !---Create 1D mesh
     call mesh_creation
 
+    call read_power
 !---Steady state solve for temperature 
     call steady_state
 

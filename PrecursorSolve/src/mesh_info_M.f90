@@ -13,7 +13,8 @@ module mesh_info_M
     integer  :: num_elem_external
     real(dp) :: elem_size
     real(dp) :: mass_elem ! mass per element
-    real(dp) :: area_core, area_pipe
+    real(dp) :: Area_Core, Area_Pipe, Area_Plenum
+   
 
 !---Mesh arrays
     integer, allocatable  :: conn_matrix(:,:)
@@ -22,7 +23,10 @@ module mesh_info_M
     real(dp), allocatable :: global_coord(:,:)
     real(dp), allocatable :: power_soln_test(:)
     real(dp), allocatable :: area_variation(:,:)
-    integer :: fuel_region_start
-    integer :: fuel_region_end
+    
+    integer :: Fuel_Core_End
+    integer :: Fuel_Core_Start
+    integer :: Fuel_Outlet_End
+    integer :: Fuel_Inlet_Start
 
 end module mesh_info_M

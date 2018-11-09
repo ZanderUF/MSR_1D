@@ -46,13 +46,19 @@ subroutine write_out_parms()
 
     write(outfile_unit, fmt='(a,I6)'), 'Number of nodes per element: ', nodes_per_elem
 
-    write(outfile_unit, fmt='(a,I6)'), 'Fuel region starts at element: ', fuel_region_start
+    write(outfile_unit, fmt='(a,I6)'), 'Inlet plenum starts at element: ',Fuel_Inlet_Start 
 
-    write(outfile_unit, fmt='(a,I6)'), 'Fuel region ends at element: ', fuel_region_end
+    write(outfile_unit, fmt='(a,I6)'), 'Main Core starts at element: ',Fuel_Core_Start 
 
-    write(outfile_unit, fmt='(a,es23.16)'), 'Cross sectional area of the core [cm^2]: ',area_core
-
-    write(outfile_unit, fmt='(a,es23.16)'), 'Cross sectional area of the piping [cm^2]: ',area_pipe
+    write(outfile_unit, fmt='(a,I6)'), 'Main Core ends at element: ', Fuel_Core_End 
+    
+    write(outfile_unit, fmt='(a,I6)'), 'Outlet plenum ends at element: ',Fuel_Outlet_End 
+    
+    write(outfile_unit, fmt='(a,es23.16)'), 'Cross sectional &
+                                        area of the core [cm^2]: ', Area_Core
+    
+    write(outfile_unit, fmt='(a,es23.16)'), 'Cross sectional &
+                                area of the piping [cm^2]: ', Area_Pipe
 
     write(outfile_unit, fmt='(a,es23.16)'), 'Mass flow rate [g/s]: ',mass_flow
 

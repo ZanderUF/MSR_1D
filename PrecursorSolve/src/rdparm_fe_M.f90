@@ -21,7 +21,7 @@
 !-----------------------------------------------
       integer :: i0, i2, i3, i4, iret
       character(4) :: dum,duma,pn, read_time, read_zag,&
-        read_debug, read_ramp, read_step 
+        read_debug, read_ramp, read_step,read_pow_file 
 
       write(outfile_unit,fmt='(a)'), 'Reading parms'
       
@@ -85,6 +85,15 @@
               if( read_zag == 'yes' ) then
                   zag_flag = .TRUE.
               end if
+          !--Decide if reading power from file or not
+          case('rdpw')
+              read_pow_file = aread(i4, iret)
+              if( read_pow_file == 'no ') then
+                  read_power_from_file = .FALSE.
+              end if
+              if( read_pow_file == 'yes' ) then
+                  read_power_from_file = .TRUE.
+              end if
           case ('del=')
               delta_t = dread(i0, iret)
           case ('tmax')
@@ -95,14 +104,22 @@
               num_elem = iread(i0, iret)
           case ('npe=')
               nodes_per_elem = iread(i0, iret)         
-          case('aend')
-              fuel_region_end = iread(i0,iret)
-          case('strt')
-              fuel_region_start = iread(i0,iret)
+          
+          !---Define core regions
+          case('inlt')
+              Fuel_Inlet_Start = iread(i0,iret)
+          case('scor')
+              Fuel_Core_Start = iread(i0,iret)
+          case('ecor')
+              Fuel_Core_End = iread(i0,iret)
+          case('outl')
+              Fuel_Outlet_End = iread(i0,iret)
+          !---Area of core and piping  
           case('area')
-              area_core = fread(i0,iret)
+              Area_Core = fread(i0,iret)
           case('apip') 
-               area_pipe = fread(i0,iret)
+               Area_Pipe = fread(i0,iret)
+          
           case('mflo')
               mass_flow=fread(i0,iret)
           case('tpow')

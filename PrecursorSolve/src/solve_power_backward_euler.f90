@@ -82,7 +82,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     end do
 
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
-    total_precursors_fuel     = sum(precursors_lambda_vec(fuel_region_start:fuel_region_end))
+    total_precursors_fuel     = sum(precursors_lambda_vec(Fuel_Inlet_Start:Fuel_Outlet_End))
      
     !---Calc beta correction per delay group
     if(t0==0.0) then
@@ -170,7 +170,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
-    do i = fuel_region_start, fuel_region_end 
+    do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
             power_soln_new(i,j) = power_amplitude_new*spatial_power_fcn(i,j)      
         end do

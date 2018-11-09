@@ -21,7 +21,8 @@ msr1d : assemble_matrix_ss.o \
       cond_corr.o \
       datainput_fe_M.o \
       density_corr.o \
-      driver_solve.o \
+      density_corr_msfr.o \
+	  driver_solve.o \
       element_matrices_M.o \
       error_functions.o \
       flags_M.o \
@@ -38,7 +39,8 @@ msr1d : assemble_matrix_ss.o \
       rddelay_M.o \
       rdmesh_M.o \
       rdparm_fe_M.o \
-      reactivity_feedback.o \
+	  read_power.o \
+	  reactivity_feedback.o \
       solution_vectors_M.o \
       solve_power_backward_euler.o \
       solve_precursor_backward_euler.o \
@@ -73,6 +75,9 @@ cond_corr.o: cond_corr.f90  global_parameters_M.o
 
 density_corr.o:  density_corr.f90 global_parameters_M.o    
 	$(F90) $(FFLAGS) -c density_corr.f90
+
+density_corr_msfr.o:  density_corr_msfr.f90 global_parameters_M.o    
+	$(F90) $(FFLAGS) -c density_corr_msfr.f90
 
 driver_solve.o: driver_solve.f90  global_parameters_M.o flags_M.o datainput_fe_M.o \
 		material_info_M.o mesh_info_M.o solution_vectors_M.o time_info_M.o 
@@ -125,6 +130,10 @@ rddelay_M.o : rdmesh_M.f90 free_form.o global_parameters_M.o
 rdparm_fe_M.o : rdparm_fe_M.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
 		material_info_M.o solution_vectors_M.o global_parameters_M.o        
 	$(F90) $(FFLAGS) -c rdparm_fe_M.f90
+
+read_power.o : read_power.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
+		material_info_M.o solution_vectors_M.o global_parameters_M.o        
+	$(F90) $(FFLAGS) -c read_power.f90
 
 datainput_fe_M.o: datainput_fe_M.f90 free_form.o rdparm_fe_M.o rddelay_M.o \
 		  mesh_info_M.o rdmesh_M.o global_parameters_M.o    

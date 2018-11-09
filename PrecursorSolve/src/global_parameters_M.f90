@@ -17,6 +17,7 @@ module global_parameters_M
     integer :: soln_outfile_unit = 99
     integer :: soln_last_t_unit = 66
     integer :: power_outfile_unit = 20
+    integer :: power_file_unit = 12 
 
 !---Nonlinear variables
     integer :: max_iter = 1 ! max num of nonlinear iterations to do

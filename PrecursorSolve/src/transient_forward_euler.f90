@@ -53,7 +53,7 @@ subroutine transient_forward_euler()
                     !---Solve for temperature
                     !call solve_temperature(n)
                     !---Solve for velocity
-                    !call solve_velocity(n)
+                    call solve_velocity(n)
                 end if
 
             enddo elements_loop 
@@ -122,7 +122,7 @@ subroutine transient_forward_euler()
             power_amplitude_prev = power_amplitude_new
             if( mass_flow > 0.0 ) then
                 !temperature_soln_prev = temperature_soln_new
-                !velocity_soln_prev    = velocity_soln_new
+                velocity_soln_prev    = velocity_soln_new
             end if
             
             !---Stop if we've exceeded TMAX.
