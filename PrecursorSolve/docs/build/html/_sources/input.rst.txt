@@ -17,9 +17,12 @@ Begins with **read parm** and ends with **end parm**
 Parameter  Value        Description
 =========  ===========  ================================================
 time       yes or no    Perform a time dependent calculation
+dbg        yes or no    Turn on DEBUG printing - prints a lot of stuff
+meth       integer      0 - forward Euler 1 - backward Euler       
 step       yes or no    Perform a step perturbation or not
 ramp       yes or no    Perform a ramp perturbation or not
 zag        yes or no    Perform a zig-zag perturbation or not
+feed       Integer      0 - (default) no feedback 1 - temperature
 del        Double       Indicate fixed time step size, ex: 1E-5
 tmax       Real         Indicate the total length of the simulation
 tin        Double       Beginning point of the perturbation 
@@ -27,6 +30,7 @@ nem        Integer      Number of equal spaced elements in the model
 npe        Integer      Number of nodes per element 
 pipe       Integer      Number of elements in the outer circuit
 area       Real         Area of the fuel core [:math:`cm^2`] 
+apip       Real         Area of the piping [:math:'cm^2']
 mflow      Real         Mass flow rate [:math:`g/cm^3`]
 tpow       Real         Total axial power [:math:`n/s-cm`]
 nitr       Real         Set number of maximum nonlinear iterations 
@@ -35,6 +39,7 @@ ndg        Integer      Number of delayed neutron groups
 nmat       Integer      Number of fissional materials
 gen        Real         Neutron generation time [:math:`s^-2`]
 reac       Real         Reactivity insertion for step and ramp
+save       Real         Interval to write out spatial solution files to
 =========  ===========  ================================================
 
 .. Delay Block::
@@ -72,7 +77,8 @@ Sample Input File
        npe=3
        pipe=6
        area=10000.0
-       mflow=000
+       apip=1000.0
+       mflow=5000.0
        tpow=20
        nitr=300
        elem=1.0

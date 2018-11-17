@@ -111,6 +111,14 @@ The first line in the file is a comment, this should be something meaningful to 
 <td>yes or no</td>
 <td>Perform a time dependent calculation</td>
 </tr>
+<tr class="row-odd"><td>dbg</td>
+<td>yes or no</td>
+<td>Turn on DEBUG printing - prints a lot of stuff</td>
+</tr>
+<tr class="row-even"><td>meth</td>
+<td>integer</td>
+<td>0 - forward Euler 1 - backward Euler</td>
+</tr>
 <tr class="row-odd"><td>step</td>
 <td>yes or no</td>
 <td>Perform a step perturbation or not</td>
@@ -123,33 +131,41 @@ The first line in the file is a comment, this should be something meaningful to 
 <td>yes or no</td>
 <td>Perform a zig-zag perturbation or not</td>
 </tr>
-<tr class="row-even"><td>del</td>
+<tr class="row-even"><td>feed</td>
+<td>Integer</td>
+<td>0 - (default) no feedback 1 - temperature</td>
+</tr>
+<tr class="row-odd"><td>del</td>
 <td>Double</td>
 <td>Indicate fixed time step size, ex: 1E-5</td>
 </tr>
-<tr class="row-odd"><td>tmax</td>
+<tr class="row-even"><td>tmax</td>
 <td>Real</td>
 <td>Indicate the total length of the simulation</td>
 </tr>
-<tr class="row-even"><td>tin</td>
+<tr class="row-odd"><td>tin</td>
 <td>Double</td>
 <td>Beginning point of the perturbation</td>
 </tr>
-<tr class="row-odd"><td>nem</td>
+<tr class="row-even"><td>nem</td>
 <td>Integer</td>
 <td>Number of equal spaced elements in the model</td>
 </tr>
-<tr class="row-even"><td>npe</td>
+<tr class="row-odd"><td>npe</td>
 <td>Integer</td>
 <td>Number of nodes per element</td>
 </tr>
-<tr class="row-odd"><td>pipe</td>
+<tr class="row-even"><td>pipe</td>
 <td>Integer</td>
 <td>Number of elements in the outer circuit</td>
 </tr>
-<tr class="row-even"><td>area</td>
+<tr class="row-odd"><td>area</td>
 <td>Real</td>
 <td>Area of the fuel core [<span class="math notranslate nohighlight">\(cm^2\)</span>]</td>
+</tr>
+<tr class="row-even"><td>apip</td>
+<td>Real</td>
+<td>Area of the piping [:math:’cm^2’]</td>
 </tr>
 <tr class="row-odd"><td>mflow</td>
 <td>Real</td>
@@ -182,6 +198,10 @@ The first line in the file is a comment, this should be something meaningful to 
 <tr class="row-even"><td>reac</td>
 <td>Real</td>
 <td>Reactivity insertion for step and ramp</td>
+</tr>
+<tr class="row-odd"><td>save</td>
+<td>Real</td>
+<td>Interval to write out spatial solution files to</td>
 </tr>
 </tbody>
 </table>
@@ -232,7 +252,8 @@ read parm
    npe=3
    pipe=6
    area=10000.0
-   mflow=000
+   apip=1000.0
+   mflow=5000.0
    tpow=20
    nitr=300
    elem=1.0
