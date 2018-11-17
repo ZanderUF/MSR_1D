@@ -98,3 +98,31 @@ Sample Input File
     beta=2.85E-4 1.5975E-3 1.41E-3 3.0525E-3 9.6E-4 1.95E-4  end
     end delay
 
+.. Input File DIF3D Values::
+
+Input file structure to read in from DIF3D
+------------------------------------------
+
+Values from DIF3D can be read in and projected onto the domain in the 1D problem
+Right now it reads in the power, power fraction, doppler reactivity worth, and density reactivity worth. These are all spatially dependent.  These values are integrated across the AREA specificed in the DIF3D problem. 
+
+The file read in is assumed to be titled: dif3d_values.txt
+It assumes the file is read in as follows
+
+====== ================================================ =========================
+Line   Value                                            Units
+====== ================================================ =========================
+1      Total number of axially integrated values        [integer value]
+2      Spatially integrated power to be read in         [Watts]
+3      Spatially integrated fraction of power           [Normalized by total] 
+4      Spatially integrated doppler worth               [reactivity]
+5      Total change in temperature for the perturbation [K]
+6      Spatially integrated density worth               [reactivity] 
+7      Total change in density during perturbation      [in percent]
+8      Column wise values begin here.                   [] 
+C 1    Axial z value from DIF3D                         [cm] 
+C 2    Power for that AREA                              [:math:`Watt/cm^2`]
+C 3    Fractional power for that AREA                   [normalized by total]
+C 4    Doppler reactivity worth                         [reactivity/:math:`cm^2`]
+C 5    Density reactivity worth                         [reactivity/:math:`cm^2`]   
+====== ================================================ =========================
