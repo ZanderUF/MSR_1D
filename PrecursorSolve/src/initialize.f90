@@ -19,87 +19,99 @@ implicit none
 
 !---Local
     integer :: i,jj,j,n
-    real(dp) :: ii, elem_length, density, temperature_initial,  &
+    real(dp) :: ii, elem_length, density, &
                 norm_cos, cosine_term, x_last, x_curr,&
                 temperature
     real(dp) :: constant_velocity
     logical :: constant_flag
-    
-    !---Initialize to zero 
+    real(dp) :: inlet_temperature, outlet_temperature
+    real(dp) :: fuel_elem_len
+        !---Initialize to zero 
     precursor_soln_new(:,:,:,:) = 0.0_dp 
-    !power_soln_new(:,:)         = 0.0_dp
    
     !---Power amplitude set
-    power_amplitude_new   = 10.0_dp
+    power_amplitude_new   = 1.0_dp
     power_amplitude_prev  = power_amplitude_new 
     power_amplitude_start = power_amplitude_new 
     
     steady_state_flag = .TRUE.
      
     !---Initial guesses 
-    temperature_initial  = 800.0_dp
-    !---Constant velocity for testing
-    constant_velocity = 10.0_dp ! [cm/s]
-   
+    inlet_temperature = 900.0_dp
+    outlet_temperature = 1000.0_dp
+    
     !---Test if reading power profile from file or not
         !--TODO
 
-    !---Flag for testing, use a flat power function or not
-    constant_flag = .TRUE.
     !---Create spatial power function
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             !---Beginning piping 
             if( i <= Fuel_Inlet_Start )      then
-                spatial_power_fcn(i,j) = 0.0
                 area_variation(i,j)    = Area_Pipe 
+                temperature_soln_new(i,j) = inlet_temperature  
             !---Fuel inlet plenum
             else if ( i <= Fuel_Core_Start)  then
-                Area_Plenum = 0.0
                 call Calculate_Plenum_Area(i,j,Area_Plenum)
                 area_variation(i,j) = Area_Plenum 
-                spatial_power_fcn(i,j) = 1.0
-                
-            !---Fuel main core
+                temperature_soln_new(i,j) = inlet_temperature    
+               !---Fuel main core
             else if ( i <= Fuel_Core_End )   then
-                area_variation(i,j) = Area_Core    
-                spatial_power_fcn(i,j) = 1.0
-            !---Fuel outlet plenum
+                area_variation(i,j) = Area_Core
+                
+                !---linearly interpolate temperature rise over the core
+                temperature_soln_new(i,j) = (outlet_temperature - inlet_temperature)/&
+                (Fuel_Core_End - Fuel_Core_Start)* &
+                (i-Fuel_Core_End ) + &
+                outlet_temperature 
+
+                !---Fuel outlet plenum
             else if ( i <= Fuel_Outlet_End ) then
-                Area_Plenum = 0.0
                 call Calculate_Plenum_Area(i,j,Area_Plenum)
                 area_variation(i,j) = Area_Plenum
-                spatial_power_fcn(i,j) = 1.0 
+                temperature_soln_new(i,j) = outlet_temperature 
             !---External piping
             else 
-                spatial_power_fcn(i,j) = 0.0
                 area_variation(i,j)    = Area_Pipe
+                temperature_soln_new(i,j) = outlet_temperature
             end if
-           
-            !power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new
-            temperature_soln_new(i,j) = (temperature_initial*spatial_power_fcn(i,j))
+            power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new*&
+                                  total_power_read_in
+
             temperature = temperature_soln_new(i,j)
             !---Get density to set the velocity
             call density_corr_msfr(temperature,density)
             density_soln_new(i,j) = density
-            !---Need to get initial velocity distribution
-            velocity_soln_new(i,j) = mass_flow/(area_core*density)
+            !!---Need to get initial velocity distribution
+            velocity_soln_new(i,j) = mass_flow/(area_variation(i,j)*density)
         end do
     end do
-
+    
     !---Get the average starting temperature
     total_temperature_initial = 0.0
+    Total_Density_Initial = 0.0
     do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
            total_temperature_initial = total_temperature_initial + &
-                                             temperature_soln_new(i,j) 
+                                             elem_vol_int_fe(j)*temperature_soln_new(i,j) 
+            Total_Density_Initial = Total_Density_Initial + &
+                                    elem_vol_int_fe(j)*density_soln_new(i,j)
         end do
     end do
-    avg_temperature_initial = total_temperature_initial/(Fuel_Inlet_Start-Fuel_Outlet_End)
 
+    fuel_elem_len =  global_coord(Fuel_Outlet_End,3) -global_coord(Fuel_Inlet_Start,1)
+    
+    avg_temperature_initial = total_temperature_initial/fuel_elem_len
+    Avg_Density_Initial = Total_Density_Initial/fuel_elem_len
+
+    write(outfile_unit,fmt='(a,es23.16)'), 'Average starting temperature is : ',&
+                                            avg_temperature_initial
+    write(outfile_unit,fmt='(a,es23.16)'), 'Average starting density is : ',&
+                                             Avg_Density_Initial
 !---
+    temperature_soln_prev = temperature_soln_new
     velocity_soln_prev = velocity_soln_new
-
+    density_soln_prev  = density_soln_new
 !-------------------------------------------------------------------------------
 !---Write out initial solution
     write(outfile_unit,fmt='(a)'), ' '

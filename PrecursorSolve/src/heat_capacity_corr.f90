@@ -13,20 +13,22 @@
 
 subroutine heat_capacity_corr(T, heat_capacity)
 
+    USE global_parameters_M
+
     implicit none
 
 !---Dummy
-    real, intent(in) :: T
-    real, intent(out) :: heat_capacity
+    real(dp), intent(in) :: T
+    real(dp), intent(out) :: heat_capacity
 !---Local
-    real :: a
-    real :: b
+    real(dp) :: a
+    real(dp) :: b
 
 
-    a = 976.78
-    b = 1.0634
+    a = 976.78_dp
+    b = 1.0634_dp
 
-    heat_capacity = (a + b*T)/1000.0
+    heat_capacity = (a + b*T)/1000.0_dp
 
 
 end subroutine heat_capacity_corr

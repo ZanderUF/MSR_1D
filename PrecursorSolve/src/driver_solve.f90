@@ -57,6 +57,8 @@ implicit none
              density_soln_prev( num_elem,nodes_per_elem),  &
              velocity_soln_prev( num_elem,nodes_per_elem), &
              spatial_power_fcn( num_elem, nodes_per_elem), &
+             spatial_doppler_fcn(num_elem, nodes_per_elem), &
+             spatial_expansion_fcn(num_elem, nodes_per_elem), &
              elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem),& 
              elem_vol_int(num_elem,nodes_per_elem),&
              precursor_soln_last_time( num_isotopes,num_delay_group,num_elem,nodes_per_elem),&

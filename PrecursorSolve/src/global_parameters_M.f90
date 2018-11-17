@@ -28,4 +28,11 @@ module global_parameters_M
 !---Math constants    
     real(dp) :: pi
     parameter (pi = 3.1415926535897932_dp)
+!---THIS ASSUMES 1 CM MESH SIZING
+    real(dp), dimension(3) :: elem_vol_int_fe
+    data elem_vol_int_fe / 0.16666667198838597,0.66666665602322805, &
+                          0.16666667198838597 /
+    
+
+
 end module global_parameters_M 

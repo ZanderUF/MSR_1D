@@ -75,7 +75,7 @@ subroutine spatial_matrices (n, nl_iter)
                                  shape_fcn(i)*velocity_soln_prev(n,i)
             evaluated_spatial_power = evaluated_spatial_power + &
                                       shape_fcn(i)*spatial_power_fcn(n,i)*&
-                                      power_amplitude_prev
+                                      total_power_read_in*power_amplitude_prev
         end do
         
         do i=1, nodes_per_elem
@@ -91,7 +91,7 @@ subroutine spatial_matrices (n, nl_iter)
             end do !---End loop over j matrix entries
         end do !---End loop over i matrix entries
      enddo gaussintegration!---end do over gauss pts
-
+    
     !---Invert A matrix, only needs to be done once
     if ( (n < 2) .and. (nl_iter < 2) ) then
         do i = 1, nodes_per_elem

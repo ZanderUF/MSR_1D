@@ -20,23 +20,22 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Dummy
     integer, intent(in) :: nl_iter
-    double precision, intent(in) :: current_time
+    real(dp), intent(in) :: current_time
 
 !---Local
     integer :: i,j,f,g
-    double precision, dimension(num_delay_group,num_elem) :: precursors_vec
-    double precision, dimension(num_delay_group) :: test_fuel_prec, test_total_prec
-    double precision, dimension(num_elem) :: temp_vec_num_elem, &
-                                           precursors_lambda_vec, &
-                                           power_soln_new_temp 
-    double precision:: power_new_total, total_precursor_ref,&
+    real(dp), dimension(num_delay_group,num_elem) :: precursors_vec
+    real(dp), dimension(num_delay_group) :: test_fuel_prec, test_total_prec
+    real(dp), dimension(num_elem) :: temp_vec_num_elem, &
+                                           precursors_lambda_vec
+    real(dp):: power_new_total, total_precursor_ref,&
                      total_precursor_ref_sum, total_fuel_length,&
                      total_precursors_fuel, &
                      rho_initial, step_time
-    double precision :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
-    double precision :: first_zag, second_zag, third_zag, reactivity_zag
-    double precision :: temp_reactivity_feedback, total_power
-    real, dimension(num_isotopes,num_delay_group) :: beta_correction_vec
+    real(dp) :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
+    real(dp) :: first_zag, second_zag, third_zag, reactivity_zag
+    real(dp) :: total_power
+    real(dp), dimension(num_isotopes,num_delay_group) :: beta_correction_vec
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
@@ -74,21 +73,22 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
-                        elem_vol_int(i,j)*power_amplitude_prev*&
-                        spatial_power_fcn(i,j)
+                        power_amplitude_prev*&
+                        total_power_read_in*spatial_power_fcn(i,j)!*elem_vol_int(i,j)
+            
             total_fuel_length = total_fuel_length + &
-                                spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                                total_power_read_in*spatial_power_fcn(i,j)!*elem_vol_int(i,j)
         end do
     end do
-
+    
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(Fuel_Inlet_Start:Fuel_Outlet_End))
-     
+    
     !---Calc beta correction per delay group
     if(t0==0.0) then
         beta_correction = gen_time*total_precursors_fuel/total_power 
     end if
-
+    
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
     step_end_time = 1.0 
@@ -147,14 +147,15 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Calculate temperature reactivity feedback
     if(feedback_method == 1 ) then
-       call temperature_feedback(temp_reactivity_feedback,t0,nl_iter)
-        reactivity_feedback = temp_reactivity_feedback
+        call temperature_feedback(temp_reactivity_feedback,Density_Reactivity_Feedback,&
+                                  t0,nl_iter)
+        reactivity_feedback = temp_reactivity_feedback + Density_Reactivity_Feedback
     end if
 
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &
-                          delta_t*(( reactivity  &
+                          delta_t*(( reactivity + reactivity_feedback  &
                           - beta_correction )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
@@ -172,7 +173,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     power_soln_new(:,:) = 0.0
     do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
-            power_soln_new(i,j) = power_amplitude_new*spatial_power_fcn(i,j)      
+            power_soln_new(i,j) = total_power_read_in* &
+                                  power_amplitude_new*spatial_power_fcn(i,j)      
         end do
     end do
 

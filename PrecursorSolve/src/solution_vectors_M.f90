@@ -22,19 +22,30 @@ module solution_vectors_M
     real(dp) , allocatable :: temperature_soln_prev(:,:)
     real(dp) , allocatable :: density_soln_prev(:,:)
     real(dp) , allocatable :: velocity_soln_prev(:,:) 
+    !---Spatially varying values read in from DIF3D    
     real(dp) , allocatable :: spatial_power_fcn(:,:)
+    real(dp) , allocatable :: spatial_doppler_fcn(:,:)
+    real(dp) , allocatable :: spatial_expansion_fcn(:,:)
+
     real(dp) , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
     real(dp) , allocatable :: previous_elem_soln_vec(:,:)  ! previous solution vector
 
     real(dp) , allocatable :: dif3d_power_input(:,:)
+    real(dp) , allocatable :: dif3d_doppler_input(:,:)
+    real(dp) , allocatable :: dif3d_expansion_input(:,:)
 
+    real(dp) :: total_power_read_in
+    real(dp) :: total_power_fraction
+    
     real(dp) :: power_amplitude_last_time
     real(dp) :: power_amplitude_start
     real(dp) :: power_amplitude_prev
     real(dp) :: power_amplitude_new
     
     real(dp) :: avg_temperature_initial
+    real(dp) :: Avg_Density_Initial
     real(dp) :: total_temperature_initial
+    real(dp) :: Total_Density_Initial
 
     real(dp) :: total_power_prev
     real(dp) :: total_power_initial

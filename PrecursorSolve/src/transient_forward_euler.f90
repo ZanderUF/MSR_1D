@@ -51,7 +51,7 @@ subroutine transient_forward_euler()
                 
                 if( mass_flow > 0.0 ) then
                     !---Solve for temperature
-                    !call solve_temperature(n)
+                    call solve_temperature(n)
                     !---Solve for velocity
                     call solve_velocity(n)
                 end if
@@ -109,20 +109,24 @@ subroutine transient_forward_euler()
 	        !---Write power amp out @ every time step
 	        if(t0 == 0.0) then
 	            write(power_outfile_unit, ('(a)')), &
-				'Time (s) | Power Amp | Norm Power | Reactivity | Beta Correction'
+				'Time (s)                 | Power Amp             | Norm Power          | &
+                 Reactivity              | Beta Correction       | Temp Feedback       | &
+                 Density Feedback       '
 	        end if
 	        write(power_outfile_unit, ('(es23.16 ,es23.16,es23.16, es23.16,&
-                                         es23.16)')), &
+                                         es23.15,es24.16,es24.16)')), &
 	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,&
-              reactivity, beta_correction
+              reactivity, beta_correction,temp_reactivity_feedback,&
+              Density_Reactivity_feedback
             
 	        !---Swap solutions
             precursor_soln_prev  = precursor_soln_new 
             power_soln_prev = power_soln_new
             power_amplitude_prev = power_amplitude_new
             if( mass_flow > 0.0 ) then
-                !temperature_soln_prev = temperature_soln_new
+                temperature_soln_prev = temperature_soln_new
                 velocity_soln_prev    = velocity_soln_new
+                density_soln_prev     = density_soln_new
             end if
             
             !---Stop if we've exceeded TMAX.

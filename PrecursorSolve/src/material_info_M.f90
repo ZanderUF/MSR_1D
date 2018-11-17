@@ -16,7 +16,8 @@ implicit none
     real(dp) :: reactivity          = 0.0_dp
     real(dp) :: reactivity_input    = 0.0_dp
     real(dp) :: reactivity_feedback = 0.0_dp
-
+    real(dp) :: temp_reactivity_feedback = 0.0_dp
+    real(dp) :: Density_Reactivity_Feedback = 0.0_dp
 !---Material information
     real(dp) ::               mass_flow
     integer  ::               num_isotopes

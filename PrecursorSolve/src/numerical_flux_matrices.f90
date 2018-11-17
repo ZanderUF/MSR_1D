@@ -42,7 +42,7 @@ subroutine numerical_flux_matrices (n, nl_iter)
             elem_vec_q(i) = elem_vec_q(i) + &
                             elem_matrix_A(i,j)*&
                             spatial_power_fcn(n,j)*&
-                            power_amplitude_prev
+                            total_power_read_in*power_amplitude_prev
             !---Applies for all elements except the first one
             if(n > 1) then !--- n - element #
                 !---Grab previous precursor conc. + velocity at 
