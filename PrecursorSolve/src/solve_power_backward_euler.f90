@@ -19,19 +19,18 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     implicit none
 
 !---Dummy
-    integer, intent(in) :: nl_iter
+    integer,  intent(in) :: nl_iter
     real(dp), intent(in) :: current_time
 
 !---Local
     integer :: i,j,f,g
     real(dp), dimension(num_delay_group,num_elem) :: precursors_vec
     real(dp), dimension(num_delay_group) :: test_fuel_prec, test_total_prec
-    real(dp), dimension(num_elem) :: temp_vec_num_elem, &
-                                           precursors_lambda_vec
+    real(dp), dimension(num_elem) :: precursors_lambda_vec
     real(dp):: power_new_total, total_precursor_ref,&
-                     total_precursor_ref_sum, total_fuel_length,&
-                     total_precursors_fuel, &
-                     rho_initial, step_time
+               total_precursor_ref_sum, total_fuel_length,&
+               total_precursors_fuel, &
+               rho_initial, step_time
     real(dp) :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     real(dp) :: first_zag, second_zag, third_zag, reactivity_zag
     real(dp) :: total_power
@@ -39,9 +38,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Initialize to zero
     precursors_lambda_vec(:) = 0.0
-    temp_vec_num_elem(:) = 0.0
     total_precursor_ref = 0.0
-
     precursors_vec = 0.0
 
 !---Calculate total precursor concentration*lamda over system 
@@ -70,6 +67,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     total_power = 0.0 
     !---Get total length of the fuel element
     total_fuel_length = 0.0
+    
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
@@ -78,9 +76,11 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
             
             total_fuel_length = total_fuel_length + &
                                 total_power_read_in*spatial_power_fcn(i,j)!*elem_vol_int(i,j)
+            
         end do
     end do
-    
+
+    !---Compare 
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(Fuel_Inlet_Start:Fuel_Outlet_End))
     
@@ -103,7 +103,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
         elseif ( t0 > step_end_time) then
             reactivity = reactivity_input 
         end if
-    end if !---End STEP perturbation
+    end if 
+!---End STEP perturbation
 
 !---RAMP perturbation 
     if(ramp_flag .eqv. .TRUE.) then
@@ -143,14 +144,17 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
         end if
     end if
 
-    temp_reactivity_feedback = 0.0
-
 !---Calculate temperature reactivity feedback
+    total_temperature_feedback = 0.0_dp
+    total_density_feedback = 0.0_dp
+
     if(feedback_method == 1 ) then
-        call temperature_feedback(temp_reactivity_feedback,Density_Reactivity_Feedback,&
-                                  t0,nl_iter)
-        reactivity_feedback = temp_reactivity_feedback + Density_Reactivity_Feedback
+        !---Total_temperature feedback
+        total_temperature_feedback = sum(Temperature_Reactivity_Feedback)
+        total_density_feedback     = sum(Density_Reactivity_Feedback) 
     end if
+    
+    reactivity_feedback = total_temperature_feedback + total_density_feedback
 
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler

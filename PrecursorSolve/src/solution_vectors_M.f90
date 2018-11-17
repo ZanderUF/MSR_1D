@@ -16,6 +16,9 @@ module solution_vectors_M
     real(dp) , allocatable :: temperature_soln_new(:,:)
     real(dp) , allocatable :: density_soln_new(:,:)
     real(dp) , allocatable :: velocity_soln_new(:,:)
+    real(dp) , allocatable :: density_soln_starting(:,:)
+    real(dp) , allocatable :: temperature_soln_starting(:,:)
+    real(dp) , allocatable :: power_soln_starting(:,:)
 
     real(dp) , allocatable :: precursor_soln_prev(:,:,:,:)! isotope,group,node,value
     real(dp) , allocatable :: power_soln_prev(:,:)
@@ -26,6 +29,9 @@ module solution_vectors_M
     real(dp) , allocatable :: spatial_power_fcn(:,:)
     real(dp) , allocatable :: spatial_doppler_fcn(:,:)
     real(dp) , allocatable :: spatial_expansion_fcn(:,:)
+
+    real(dp) , allocatable :: Density_Reactivity_Feedback(:,:)
+    real(dp) , allocatable :: Temperature_Reactivity_Feedback(:,:)
 
     real(dp) , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
     real(dp) , allocatable :: previous_elem_soln_vec(:,:)  ! previous solution vector

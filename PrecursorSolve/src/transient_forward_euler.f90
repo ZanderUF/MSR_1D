@@ -48,7 +48,8 @@ subroutine transient_forward_euler()
                         call solve_precursor_backward_euler(f,g,n,1)
                     enddo delay_loop 
                 enddo isotope_loop 
-                
+            
+
                 if( mass_flow > 0.0 ) then
                     !---Solve for temperature
                     call solve_temperature(n)
@@ -62,18 +63,6 @@ subroutine transient_forward_euler()
             precursor_soln_prev   = precursor_soln_new
             power_amplitude_prev  = power_amplitude_new
            
-           do f = 1, num_isotopes
-                do g = 1, num_delay_group
-                    !precursor_soln_new(f,g,1,1) = &
-                    !            precursor_soln_new(f,g,num_elem,3)
-                   !print *,'prec beg', precursor_soln_new(f,g,1,1)
-                    !print *,'prec end', precursor_soln_new(f,g,num_elem,3)
-                    !print *,' difference',  precursor_soln_new(f,g,1,1) - &
-                                 !precursor_soln_new(f,g,num_elem,3)
-                    
-                end do
-            end do
-            
             !---Solve for total power after spatial sweep through precursors
             call solve_power_backward_euler(1,t0) 
             
@@ -106,7 +95,8 @@ subroutine transient_forward_euler()
             end if !---End write out solution
             
             transient_save_flag = .FALSE.
-	        !---Write power amp out @ every time step
+
+	        !---Write power,reactivity, feedback out @ every time step
 	        if(t0 == 0.0) then
 	            write(power_outfile_unit, ('(a)')), &
 				'Time (s)                 | Power Amp             | Norm Power          | &
@@ -115,14 +105,16 @@ subroutine transient_forward_euler()
 	        end if
 	        write(power_outfile_unit, ('(es23.16 ,es23.16,es23.16, es23.16,&
                                          es23.15,es24.16,es24.16)')), &
-	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,&
-              reactivity, beta_correction,temp_reactivity_feedback,&
-              Density_Reactivity_feedback
+	          t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
+              reactivity, beta_correction,total_temperature_feedback,&
+              total_density_feedback 
             
-	        !---Swap solutions
+	        !---Swap solutions for next time step
             precursor_soln_prev  = precursor_soln_new 
             power_soln_prev = power_soln_new
             power_amplitude_prev = power_amplitude_new
+            
+            !---Only do this if the flow is turned on
             if( mass_flow > 0.0 ) then
                 temperature_soln_prev = temperature_soln_new
                 velocity_soln_prev    = velocity_soln_new
@@ -133,11 +125,9 @@ subroutine transient_forward_euler()
             if ( tmax <= t0 ) then
                 exit
             end if
-            
+
+            !---Calculate next time step            
             t1 = t0 + delta_t
-            
-            precursor_soln_prev   = precursor_soln_new
-            power_amplitude_prev  = power_amplitude_new
 
             t0 = t1
        

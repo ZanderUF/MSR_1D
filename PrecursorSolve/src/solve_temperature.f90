@@ -30,11 +30,17 @@ implicit none
         !---Get thermal heat_capacity value
         temperature_eval = temperature_soln_prev(n,j)
         call heat_capacity_corr(temperature_eval, heat_capacity_eval)
-        !call cond_corr(temperature,heat_capacity)
+        
         !---This should work for forward Euler
-        temperature_soln_new(n,j) = (power_soln_prev(n,j) &
+        temperature_soln_new(n,j) = ( (power_soln_prev(n,j) - &
+                                       power_soln_starting(n,j) ) &
                                     /( (mass_flow*heat_capacity_eval) )) &
                                     + temperature_soln_prev(n,j) 
+        
+        !---Calculate doppler feedback for current element 
+        Temperature_Reactivity_Feedback(n,j) = spatial_doppler_fcn(n,j)* &
+                    (temperature_soln_starting(n,j) - temperature_soln_prev(n,j)  )
+
     end do
     
 end subroutine solve_temperature

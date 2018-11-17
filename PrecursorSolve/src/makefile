@@ -40,7 +40,6 @@ msr1d : assemble_matrix_ss.o \
       rdmesh_M.o \
       rdparm_fe_M.o \
 	  read_power.o \
-	  reactivity_feedback.o \
       solution_vectors_M.o \
       solve_power_backward_euler.o \
       solve_precursor_backward_euler.o \
@@ -148,8 +147,8 @@ numerical_flux_matrices.o: numerical_flux_matrices.f90 global_parameters_M.o
 mesh_creation.o: mesh_creation.f90 global_parameters_M.o   
 	$(F90) $(FFLAGS) -c mesh_creation.f90
 
-reactivity_feedback.o: reactivity_feedback.f90 global_parameters_M.o 
-	$(F90) $(FFLAGS) -c reactivity_feedback.f90
+# reactivity_feedback.o: reactivity_feedback.f90 global_parameters_M.o 
+#	$(F90) $(FFLAGS) -c reactivity_feedback.f90
 
 solution_vectors_M.o : solution_vectors_M.f90
 	$(F90) $(FFLAGS) -c solution_vectors_M.f90

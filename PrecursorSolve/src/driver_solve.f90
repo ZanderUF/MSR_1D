@@ -61,9 +61,14 @@ implicit none
              spatial_expansion_fcn(num_elem, nodes_per_elem), &
              elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem),& 
              elem_vol_int(num_elem,nodes_per_elem),&
-             precursor_soln_last_time( num_isotopes,num_delay_group,num_elem,nodes_per_elem),&
+             precursor_soln_last_time(num_isotopes,num_delay_group,num_elem,nodes_per_elem),&
              power_soln_last_time(num_elem,nodes_per_elem),& 
-             area_variation(num_elem,nodes_per_elem) )
+             area_variation(num_elem,nodes_per_elem), & 
+             density_soln_starting(num_elem,nodes_per_elem), &
+             temperature_soln_starting(num_elem,nodes_per_elem), &
+             power_soln_starting(num_elem,nodes_per_elem), &
+             Density_Reactivity_Feedback(num_elem,nodes_per_elem), &
+             Temperature_Reactivity_Feedback(num_elem,nodes_per_elem) )
 
 !---Create 1D mesh
     call mesh_creation

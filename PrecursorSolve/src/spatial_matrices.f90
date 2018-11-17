@@ -29,7 +29,8 @@ subroutine spatial_matrices (n, nl_iter)
     implicit none
 
 !---Dummy variables
-    integer  ::  n, nl_iter
+    integer, intent(in) :: n
+    integer, intent(in) :: nl_iter
 
 !---Local variables 
     integer :: g, j, i,ii, ni

@@ -41,7 +41,7 @@ implicit none
     outlet_temperature = 1000.0_dp
     
     !---Test if reading power profile from file or not
-        !--TODO
+        !--TO DO
 
     !---Create spatial power function
     do i = 1, num_elem
@@ -75,10 +75,12 @@ implicit none
                 area_variation(i,j)    = Area_Pipe
                 temperature_soln_new(i,j) = outlet_temperature
             end if
+            
             power_soln_new(i,j) = spatial_power_fcn(i,j)*power_amplitude_new*&
                                   total_power_read_in
-
+            !temperature_soln_new(i,j) = 
             temperature = temperature_soln_new(i,j)
+            
             !---Get density to set the velocity
             call density_corr_msfr(temperature,density)
             density_soln_new(i,j) = density
@@ -87,31 +89,36 @@ implicit none
         end do
     end do
     
-    !---Get the average starting temperature
-    total_temperature_initial = 0.0
-    Total_Density_Initial = 0.0
-    do i = Fuel_Inlet_Start, Fuel_Outlet_End 
-        do j = 1, nodes_per_elem
-           total_temperature_initial = total_temperature_initial + &
-                                             elem_vol_int_fe(j)*temperature_soln_new(i,j) 
-            Total_Density_Initial = Total_Density_Initial + &
-                                    elem_vol_int_fe(j)*density_soln_new(i,j)
-        end do
-    end do
+    !!---Get the average starting temperature
+    !total_temperature_initial = 0.0
+    !Total_Density_Initial = 0.0
+    !do i = Fuel_Inlet_Start, Fuel_Outlet_End 
+    !    do j = 1, nodes_per_elem
+    !       total_temperature_initial = total_temperature_initial + &
+    !                                         elem_vol_int_fe(j)*temperature_soln_new(i,j) 
+    !        Total_Density_Initial = Total_Density_Initial + &
+    !                                elem_vol_int_fe(j)*density_soln_new(i,j)
+    !    end do
+    !end do
 
-    fuel_elem_len =  global_coord(Fuel_Outlet_End,3) -global_coord(Fuel_Inlet_Start,1)
-    
-    avg_temperature_initial = total_temperature_initial/fuel_elem_len
-    Avg_Density_Initial = Total_Density_Initial/fuel_elem_len
+    !fuel_elem_len =  global_coord(Fuel_Outlet_End,3) -global_coord(Fuel_Inlet_Start,1)
+    !
+    !avg_temperature_initial = total_temperature_initial/fuel_elem_len
+    !Avg_Density_Initial = Total_Density_Initial/fuel_elem_len
+    !write(outfile_unit,fmt='(a,es23.16)'), 'Average starting temperature is : ',&
+    !                                        avg_temperature_initial
+    !write(outfile_unit,fmt='(a,es23.16)'), 'Average starting density is : ',&
+    !                                         Avg_Density_Initial
 
-    write(outfile_unit,fmt='(a,es23.16)'), 'Average starting temperature is : ',&
-                                            avg_temperature_initial
-    write(outfile_unit,fmt='(a,es23.16)'), 'Average starting density is : ',&
-                                             Avg_Density_Initial
 !---
-    temperature_soln_prev = temperature_soln_new
-    velocity_soln_prev = velocity_soln_new
-    density_soln_prev  = density_soln_new
+    temperature_soln_prev     = temperature_soln_new
+    velocity_soln_prev        = velocity_soln_new
+    density_soln_prev         = density_soln_new
+    !---Need to keep the original density to see how far off from original we are
+    density_soln_starting     = density_soln_new
+    temperature_soln_starting = temperature_soln_new
+    power_soln_starting       = power_soln_new 
+
 !-------------------------------------------------------------------------------
 !---Write out initial solution
     write(outfile_unit,fmt='(a)'), ' '
