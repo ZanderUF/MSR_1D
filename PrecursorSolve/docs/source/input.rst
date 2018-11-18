@@ -33,6 +33,8 @@ pipe       Integer      Number of elements in the outer circuit
 inlt       Integer      Starting element of the inlet plenum
 scor       Integer      Starting element of the main core region
 ecor       Integer      Final element of the main core region
+hexs       Integer      Heat exchanger starting element location
+hexe       Integer      Heat exchanger ending element location
 outl       Integer      Final element of the outlet plenum
 area       Real         Area of the fuel core [:math:`cm^2`] 
 apip       Real         Area of the piping [:math:'cm^2']
