@@ -67,22 +67,20 @@ subroutine mesh_creation ( )
                 end if
             end do
         end do
-!---Write to outfile
-    write(outfile_unit,fmt='(a19)'),'Connectivity Matrix'
-    do j=1, num_elem
-           write(outfile_unit,fmt='(a,1I6,a4,4I6)') 'Element:',j,' -->', &
-                (conn_matrix(j,i),i=1,nodes_per_elem)             
-    end do
-    write(outfile_unit,fmt='(a)'),' ' 
-    write(outfile_unit,fmt='(a24)'),'Global Coordinate Matrix'
-    do j=1, num_elem 
-           write(outfile_unit,fmt='(12es14.3)')  &
-                (global_coord(j,i),i=1,nodes_per_elem)              
-    end do
+    !---Write to outfile
+        write(outfile_unit,fmt='(a19)'),'Connectivity Matrix'
+        do j=1, num_elem
+               write(outfile_unit,fmt='(a,1I6,a4,4I6)') 'Element:',j,' -->', &
+                    (conn_matrix(j,i),i=1,nodes_per_elem)             
+        end do
+        write(outfile_unit,fmt='(a)'),' ' 
+        write(outfile_unit,fmt='(a24)'),'Global Coordinate Matrix'
+        do j=1, num_elem 
+               write(outfile_unit,fmt='(12es14.3)')  &
+                    (global_coord(j,i),i=1,nodes_per_elem)              
+        end do
 
     end if
-
 !-------------------------------------------------------------------------------
 
-
-end
+end subroutine mesh_creation

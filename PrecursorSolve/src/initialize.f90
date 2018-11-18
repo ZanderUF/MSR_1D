@@ -82,7 +82,7 @@ implicit none
             temperature = temperature_soln_new(i,j)
             
             !---Get density to set the velocity
-            call density_corr_msfr(temperature,density)
+            call density_corr(temperature,density)
             density_soln_new(i,j) = density
             !!---Need to get initial velocity distribution
             velocity_soln_new(i,j) = mass_flow/(area_variation(i,j)*density)
@@ -163,6 +163,17 @@ implicit none
         end do
     end do
     
+    !---Write out area variation 
+    write(outfile_unit,fmt='(a)'), ' '
+    write(outfile_unit,fmt='(a)'), 'Axial area variation'
+    write(outfile_unit,fmt='(a)'), 'Position(x) Cross Sectional Area [cm^2]'
+    write(outfile_unit,fmt='(a)'), '------------------------------------'
+    do i = 1, num_elem 
+        do j = 1, nodes_per_elem
+            write(outfile_unit, fmt='(12es14.3, 12es14.3)')  global_coord(i,j), area_variation(i,j)
+        end do
+    end do
+
 end subroutine
 
 !-------
@@ -216,6 +227,8 @@ subroutine Calculate_Plenum_Area(i,j,area)
 end subroutine 
 
 !------------------------------------------------------------------
+!---Get coordinate normalized for cosine spatial profile
+!
 subroutine get_norm_coord(i,j,norm_cos)
     
     USE global_parameters_M

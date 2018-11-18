@@ -1,10 +1,11 @@
 ! Evalute density as functino of temperature based on correlation
 !
 ! Correlation is of the form density(T) = a + b*T where a, b are constants
-! Currently using FliNaK correlation from Salanne (2009) -    
-! (Heat-transport properties of molten fluorides: Determination from
-!  first-principles)
-! Valid from 750 - 1100 K
+!
+! G. J. Janz, R. P. T. Tomkins, Physical properties data compilations relevant to energy storage. IV. Molten salts: Data on Additional Single and Multi- Component Salt Systems. NSRDS-NBS-61(Pt.IV), U.S. National Bureau of Standards, 1981
+! This was done for KCl-MgCl2 salts
+!
+! Valid from 1017 - 1174 K
 ! Input:
 !       T - temperature to evaluate density at 
 ! Output:
@@ -23,9 +24,9 @@ implicit none
     real(dp) :: a
     real(dp) :: b  
    
-    a = 2.603_dp
-    b= -6.69E-4_dp
+    a = 2007.0_dp
+    b= -0.4571_dp
 
-    density = a + b*T
+    density = (a + b*T)*0.001_dp
 
 end

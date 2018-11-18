@@ -112,22 +112,22 @@ subroutine spatial_matrices (n, nl_iter)
         write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0
 
         write(outfile_unit,fmt='(a)'),' '
-        write(outfile_unit,fmt='(a,1I2)'),  'Nonlinear iteration ', nl_iter
+        write(outfile_unit,fmt='(a,4I6)'),  'Nonlinear iteration ', nl_iter
         write(outfile_unit,fmt='(a)'),  'Elemental matrices '
         write(outfile_unit,fmt='(a)'),'*****************************************'
-        write(outfile_unit,fmt='(a,1I2)'),'[A] element Matrix gaussian integration | element --> ',n
+        write(outfile_unit,fmt='(a,4I6)'),'[A] element Matrix gaussian integration | element --> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_A(j,i),i=1,nodes_per_elem)             
         end do
         write(outfile_unit,fmt='(a)'),' '
-        write(outfile_unit,fmt='(a,1I2)'),'[A^-1] element Matrix  | element --> ',n
+        write(outfile_unit,fmt='(a,4I6)'),'[A^-1] element Matrix  | element --> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.3)') &
                     (inverse_A_matrix(j,i),i=1,nodes_per_elem)             
         end do
         write(outfile_unit,fmt='(a)'),' '
-        write(outfile_unit,fmt='(a,1I2)'),'[U] element Matrix gaussian integration | element --> ',n
+        write(outfile_unit,fmt='(a,4I6)'),'[U] element Matrix gaussian integration | element --> ',n
         do j=1,nodes_per_elem 
                write(outfile_unit,fmt='(12es14.3)') &
                     (elem_matrix_U(j,i),i=1,nodes_per_elem)             

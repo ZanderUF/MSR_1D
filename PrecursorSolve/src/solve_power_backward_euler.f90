@@ -67,7 +67,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     total_power = 0.0 
     !---Get total length of the fuel element
     total_fuel_length = 0.0
-    
+
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
