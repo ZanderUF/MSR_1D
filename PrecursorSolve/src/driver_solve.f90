@@ -76,9 +76,13 @@ implicit none
     if(Read_DIF3D .eqv. .TRUE.) then
         call read_power
     end if
+    
+    call read_beta_flow
 
 !---Steady state solve for temperature 
     call steady_state
+    
+    print *, 'Finished Steady State'
 
 !---Time dependent calculation
     if(time_solve .eqv. .TRUE. ) then

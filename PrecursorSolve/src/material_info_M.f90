@@ -27,5 +27,7 @@ implicit none
     real(dp) ::               mass_flow
     integer  ::               num_isotopes
     integer  ::               num_delay_group
+    
+    real(dp), allocatable :: Beta_Fcn_Flow(:,:)
 
 end module material_info_M

@@ -68,14 +68,15 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     !---Get total length of the fuel element
     total_fuel_length = 0.0
 
+
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
                         power_amplitude_prev*&
-                        spatial_power_fcn(i,j)!*elem_vol_int(i,j)
+                        spatial_power_fcn(i,j)*elem_vol_int(i,j)
             
             total_fuel_length = total_fuel_length + &
-                                spatial_power_fcn(i,j)!*elem_vol_int(i,j)
+                                spatial_power_fcn(i,j)*elem_vol_int(i,j)
             
         end do
     end do

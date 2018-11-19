@@ -58,8 +58,6 @@ implicit none
         !---This counted the convergence of each delayed group
         difference_counter = 0
         
-        print *,' total precursor',sum(precursor_soln_new)
-
         !---Swap for for next iteration
         precursor_soln_prev = precursor_soln_new
         

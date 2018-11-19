@@ -39,6 +39,7 @@ msr1d : assemble_matrix_ss.o \
       rddelay_M.o \
       rdmesh_M.o \
       rdparm_fe_M.o \
+	  read_beta_flow.o \
 	  read_power.o \
       solution_vectors_M.o \
       solve_power_backward_euler.o \
@@ -133,6 +134,10 @@ rdparm_fe_M.o : rdparm_fe_M.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.
 read_power.o : read_power.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
 		material_info_M.o solution_vectors_M.o global_parameters_M.o        
 	$(F90) $(FFLAGS) -c read_power.f90
+
+read_beta_flow.o : read_beta_flow.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
+		material_info_M.o solution_vectors_M.o global_parameters_M.o        
+	$(F90) $(FFLAGS) -c read_beta_flow.f90
 
 datainput_fe_M.o: datainput_fe_M.f90 free_form.o rdparm_fe_M.o rddelay_M.o \
 		  mesh_info_M.o rdmesh_M.o global_parameters_M.o    
