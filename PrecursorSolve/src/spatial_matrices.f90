@@ -39,12 +39,12 @@ subroutine spatial_matrices (n, nl_iter)
     
     !---Inversion routine parameters
     integer :: lda, info, lwork,length
-    integer, dimension(3) :: ipiv
+    integer , dimension(3) :: ipiv
     real(dp), dimension(3) :: work
     
     length = 3
 !---Initialize inversion routine parms
-    ipiv =  0.0_dp
+    ipiv =  0.0
     work =  0.0
     lda =   length
     lwork = length
@@ -74,18 +74,21 @@ subroutine spatial_matrices (n, nl_iter)
         do i = 1, nodes_per_elem
             evaluated_velocity = evaluated_velocity + &
                                  shape_fcn(i)*velocity_soln_prev(n,i)
+            
             evaluated_spatial_power = evaluated_spatial_power + &
                                       shape_fcn(i)*spatial_power_fcn(n,i)*&
-                                      total_power_read_in*power_amplitude_prev
+                                      power_amplitude_prev
         end do
         
         do i=1, nodes_per_elem
+            
             elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
+            
             do j = 1, nodes_per_elem
-                 !---Assemble A matrix - only needs to be done once
+                 !---Determine A matrix - only needs to be done once
                 elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                      cnst*shape_fcn(i)*shape_fcn(j)
-                !---Assemble P matrix
+                !---Determine U matrix
                 elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                      evaluated_velocity*cnst*shape_fcn(j)*&
                                      global_der_shape_fcn(i)

@@ -26,10 +26,10 @@ implicit none
 !---------------------------------------------------------------
 
 !---Set some of the convergance properties
-    L2_norm_prev = 0.0
-    L2_norm_current = 0.0
+    L2_norm_prev      = 0.0
+    L2_norm_current   = 0.0
     nl_iter_tolerance = 1E-15_dp
-    abs_max_nl_iter = 1500
+    abs_max_nl_iter   = 1500
 
     !---Set starting values for power, velocity, temperature 
     call initialize
@@ -38,7 +38,7 @@ implicit none
     write(outfile_unit, fmt='(a)'), ' ' 
     write(outfile_unit, fmt='(a)'), 'Start steady state calculation'
     
-    nl_iter=1 
+    nl_iter = 1 
     
     nonlinearloop: do !---Nonlinear loop
         elements_loop: do n = 1, num_elem
@@ -49,7 +49,7 @@ implicit none
             isotope_loop: do f = 1, num_isotopes
                 delay_loop: do g = 1, num_delay_group
                     !---Assemble K, F
-                    call assemble_matrix_ss(f,g,n)
+                    call assemble_matrix_ss(f,g,n,nl_iter)
                     call solve_precursor_ss(f,g,n,nl_iter)
                 enddo delay_loop!---Over delayed groups
             enddo isotope_loop !---Over isotopes
@@ -58,10 +58,7 @@ implicit none
         !---This counted the convergence of each delayed group
         difference_counter = 0
         
-        !---Write out the solution
-        !if(DEBUG .eqv. .TRUE.) then
-        !    call write_out_soln(outfile_unit,num_elem,transient_save_flag) 
-        !end if
+        print *,' total precursor',sum(precursor_soln_new)
 
         !---Swap for for next iteration
         precursor_soln_prev = precursor_soln_new

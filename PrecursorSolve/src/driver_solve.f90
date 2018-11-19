@@ -72,8 +72,11 @@ implicit none
 
 !---Create 1D mesh
     call mesh_creation
+    
+    if(Read_DIF3D .eqv. .TRUE.) then
+        call read_power
+    end if
 
-    call read_power
 !---Steady state solve for temperature 
     call steady_state
 

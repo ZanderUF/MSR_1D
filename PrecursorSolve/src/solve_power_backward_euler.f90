@@ -72,10 +72,10 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
         do j = 1, nodes_per_elem
             total_power = total_power + &
                         power_amplitude_prev*&
-                        total_power_read_in*spatial_power_fcn(i,j)!*elem_vol_int(i,j)
+                        spatial_power_fcn(i,j)!*elem_vol_int(i,j)
             
             total_fuel_length = total_fuel_length + &
-                                total_power_read_in*spatial_power_fcn(i,j)!*elem_vol_int(i,j)
+                                spatial_power_fcn(i,j)!*elem_vol_int(i,j)
             
         end do
     end do
@@ -160,7 +160,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &
                           delta_t*(( reactivity + reactivity_feedback  &
-                          - beta_correction )/gen_time)*power_amplitude_prev &
+                          - beta_correction )/gen_time)*&
+                          power_amplitude_prev &
                           + delta_t*(1.0_dp/total_fuel_length)*&
                           total_precursors_fuel
     end if
@@ -178,7 +179,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
             power_soln_new(i,j) = total_power_read_in* &
-                                  power_amplitude_new*spatial_power_fcn(i,j)      
+                                  power_amplitude_new* &
+                                  spatial_power_fcn(i,j)      
         end do
     end do
 

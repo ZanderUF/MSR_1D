@@ -23,9 +23,10 @@ subroutine read_power
     real(dp) :: original_location, starting_coordinate
     real(dp) :: read_in_pow_frac,read_in_pow_frac_prev 
     real(dp) :: current_z,read_in_z, read_in_z_prev
-        real(dp) :: read_in_expansion, read_in_expansion_prev, &
+    real(dp) :: read_in_expansion, read_in_expansion_prev, &
                 read_in_doppler, read_in_doppler_prev, &
                 doppler_reactivity, expansion_reactivity
+    character(len=80) :: title_line
 
     open(unit=power_file_unit,file='dif3d_values.txt',status='OLD')
    
@@ -37,6 +38,7 @@ subroutine read_power
     read(power_file_unit, *), total_temperature_change ! total delta T for perturbation
     read(power_file_unit, *), total_expansion_read_in ! Spatially integrated expansion
     read(power_file_unit, *), total_density_change ! Percent change
+    read(power_file_unit,*), title_line
 
     allocate(dif3d_power_input(number_entries,number_entries) ) 
     allocate(dif3d_doppler_input(number_entries,number_entries) )
@@ -94,14 +96,14 @@ subroutine read_power
                 !---Reading in the power fraction.  Can multiply by the 
                 !--- total power read in initially to get the total anywhere
                 spatial_power_fcn(i,j) = abs(( (read_in_pow_frac ) / &
-                                         (read_in_z - read_in_z_prev) )* &
-                                         elem_vol_int_fe(j)) 
+                                         (read_in_z - read_in_z_prev) )) !* &
+                                         !elem_vol_int_fe(j)) 
                 spatial_doppler_fcn(i,j) = abs(( (read_in_doppler) / &
-                                         (read_in_z - read_in_z_prev) )* &
-                                         elem_vol_int_fe(j)) 
+                                         (read_in_z - read_in_z_prev) ))!* &
+                                         !elem_vol_int_fe(j)) 
                 spatial_expansion_fcn(i,j) = abs(( (read_in_expansion ) / &
-                                         (read_in_z - read_in_z_prev) )* &
-                                         elem_vol_int_fe(j)) 
+                                         (read_in_z - read_in_z_prev) ))!* &
+                                         !elem_vol_int_fe(j)) 
             end do
        else
             !---Outside of core region, set power to zero

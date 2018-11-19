@@ -21,7 +21,8 @@
 !-----------------------------------------------
       integer :: i0, i2, i3, i4, iret
       character(4) :: dum,duma,pn, read_time, read_zag,&
-        read_debug, read_ramp, read_step,read_pow_file 
+        read_debug, read_ramp, read_step,read_pow_file,&
+        read_dif3d_inp
 
       write(outfile_unit,fmt='(a)'), 'Reading parms'
       
@@ -53,7 +54,15 @@
               if (read_debug == 'yes ') then
                   DEBUG = .TRUE.
               end if
-              
+          case('dif3') ! DEBUG option
+              read_dif3d_inp = aread(i4, iret)
+              if (read_dif3d_inp == 'no ') then
+                  Read_DIF3D = .FALSE.
+              end if
+              if (read_dif3d_inp == 'yes ') then
+                  Read_DIF3D = .TRUE.
+              end if
+             
           case('meth') ! which time dependent method
               td_method_type = iread(i0,iret)
           case('feed')
@@ -119,7 +128,11 @@
               Area_Core = fread(i0,iret)
           case('apip') 
                Area_Pipe = fread(i0,iret)
-          
+          !---Define heat exchanger location
+          case('hexs')
+               Heat_Exchanger_Start = fread(i0,iret)     
+          case('hexe')
+               Heat_Exchanger_End = fread(i0,iret)
           case('mflo')
               mass_flow=fread(i0,iret)
           case('tpow')

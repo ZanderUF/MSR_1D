@@ -92,10 +92,11 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
         end do
 
         write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I3,a,1I3,a,1I3)'),&
-            'Solution | element --> ', n, ' Isotope ',isotope, ' Delayed Group ',delay_group
+        write(outfile_unit,fmt='(a,1I3,a,1I6,a,1I3)'),&
+            'Solution | element --> ', n, ' Isotope ',isotope,&
+             ' Delayed Group ',delay_group
             do j=1,nodes_per_elem 
-                write(outfile_unit,fmt='(a,1I2,12es14.3)'), 'Node -->', n-1+j,&
+                write(outfile_unit,fmt='(a,1I6,12es14.3)'), 'Node --> ', n-1+j,&
                   precursor_soln_new(isotope,delay_group,n,j)         
          
         end do

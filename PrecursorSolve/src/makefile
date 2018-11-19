@@ -194,4 +194,4 @@ y0trns_M.o : y0trns_M.f90
 	$(F90) $(FFLAGS) -c y0trns_M.f90
 
 clean: 
-	rm *.mod *.o
+	rm msr1d *.mod *.o

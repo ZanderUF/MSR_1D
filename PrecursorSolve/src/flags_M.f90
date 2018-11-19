@@ -19,5 +19,6 @@ implicit none
     logical :: step_flag = .FALSE.
     logical :: zag_flag = .FALSE.
     logical :: read_power_from_file = .FALSE.
+    logical :: Read_DIF3D = .FALSE.
 
 end module flags_M
