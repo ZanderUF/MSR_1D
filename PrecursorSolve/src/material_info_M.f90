@@ -25,9 +25,11 @@ implicit none
 
 !---Material information
     real(dp) ::               mass_flow
+    real(dp) ::               mass_flow_initial
     integer  ::               num_isotopes
     integer  ::               num_delay_group
     
     real(dp), allocatable :: Beta_Fcn_Flow(:,:)
+    integer :: number_entries_beta
 
 end module material_info_M

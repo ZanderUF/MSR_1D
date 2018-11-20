@@ -18,15 +18,19 @@ implicit none
 !---Dummy
 
 !---Local
-    integer :: i,jj,j,n
+    integer  :: i,jj,j,n
     real(dp) :: ii, elem_length, density, &
                 norm_cos, cosine_term, x_last, x_curr,&
                 temperature
     real(dp) :: constant_velocity
-    logical :: constant_flag
+    logical  :: constant_flag
     real(dp) :: inlet_temperature, outlet_temperature
     real(dp) :: fuel_elem_len
-        !---Initialize to zero 
+    
+    !---Set starting point for coast down transients 
+    mass_flow_initial = mass_flow
+    
+    !---Initialize to zero 
     precursor_soln_new(:,:,:,:) = 0.0_dp 
    
     !---Power amplitude set

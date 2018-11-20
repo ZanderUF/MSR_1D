@@ -101,13 +101,13 @@ subroutine transient_forward_euler()
 	            write(power_outfile_unit, ('(a)')), &
 				'Time (s)                 | Power Amp             | Norm Power          | &
                  Reactivity              | Beta Correction       | Temp Feedback       | &
-                 Density Feedback       '
+                 Density Feedback       |  Mass flow'
 	        end if
 	        write(power_outfile_unit, ('(es23.16 ,es23.16,es23.16, es23.16,&
-                                         es23.15,es24.16,es24.16)')), &
+                                         es23.15,es24.16,es24.16,es24.16)')), &
 	          t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
               reactivity, beta_correction,total_temperature_feedback,&
-              total_density_feedback 
+              total_density_feedback, mass_flow 
             
 	        !---Swap solutions for next time step
             precursor_soln_prev  = precursor_soln_new 
