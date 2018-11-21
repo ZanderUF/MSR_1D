@@ -32,13 +32,12 @@ implicit none
     !---Get Beta for the current mass flow
     do i = 1, number_entries_beta
         if( mass_flow <=  Beta_Fcn_Flow(i,1) ) then
-            !print *,'mass flow ',mass_flow
-            !print *,' beta fcn', Beta_Fcn_Flow(i,1)
             exit
         end if
 
     end do
-    
+  
+    !---Interpolate to get beta at current mass flow
     beta_1 = Beta_Fcn_Flow(i-1,2)
     beta_2 = Beta_Fcn_Flow(i,  2)
     mass_flow_1 = Beta_Fcn_Flow(i-1,1)
@@ -46,18 +45,11 @@ implicit none
     a = mass_flow - mass_flow_1
     b = mass_flow_2 - mass_flow
     f = a/(a+b)
-    !print *,' beta 1 ' ,beta_1
-    !print *,'beta 2 ' ,beta_2
-    !print *,' mass flow 1', mass_flow_1
-    !print *,' mass flow 2', mass_flow_2
-    !print *,' f' , f
-
-    beta_correction = beta_1**f * beta_2**(1-f)
-    ! Use fit line from excel
-    !beta_correction = -1.04E-4_dp*log(mass_flow) + 0.0082_dp
-   
-    !print *,'beta corre', beta_correction
-    !print *,' ' 
+    
+    beta_interp_current = f*beta_2 + (1.0_dp - f)*beta_1
+    
+    previous_time = t0 - delta_t 
+    current_time  = t0
 
 !---Loop over all nodes in element
     do j = 1, nodes_per_elem

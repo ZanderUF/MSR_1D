@@ -12,6 +12,7 @@ implicit none
     real(dp), allocatable  :: beta_i_mat(:,:)
     real(dp) ::               beta_correction
     real(dp) ::               gen_time = 0.0_dp
+    real(dp) :: beta_initial
     
     real(dp) :: reactivity          = 0.0_dp
     real(dp) :: reactivity_input    = 0.0_dp

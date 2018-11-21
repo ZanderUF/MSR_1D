@@ -23,6 +23,9 @@ implicit none
     integer :: difference_counter
     integer :: abs_max_nl_iter
     character(len=20) :: ss_file_name
+	real(dp) :: total_precursors_fuel, total_power
+	real(dp), dimension(num_elem) :: precursors_lambda_vec
+
 !---------------------------------------------------------------
 
 !---Set some of the convergance properties
@@ -121,7 +124,7 @@ implicit none
         end do
     end do
    
-    !---Set 'previous' to new
+    !---Set 'previous' to new - to initialize for time dependent problem
     do i = 1, num_elem
         do j = 1,nodes_per_elem
             power_soln_prev(i,j) = power_soln_new(i,j)
@@ -133,9 +136,46 @@ implicit none
     power_amplitude_prev      = power_amplitude_new
     !---For backward euler, need to keep the last value at the time step
     power_amplitude_last_time = power_amplitude_new
-    
+
+
 !---Write precursor solution outfile
     call write_out_soln(outfile_unit,num_elem,transient_save_flag)
+
+!---Calculate new beta for this mass flow
+!---Calculate total precursor concentration*lamda over system
+    do f = 1, num_isotopes
+       do g = 1, num_delay_group
+            do i = 1, num_elem
+                do j = 1, nodes_per_elem
+                   !---Precursors*lambda
+                   precursors_lambda_vec(i) = precursors_lambda_vec(i) + &
+                                      lamda_i_mat(f,g)*&
+                                      elem_vol_int(i,j)*&
+                                      precursor_soln_prev(f,g,i,j)
+                end do
+            end do
+       end do
+    end do   
+ 
+!--Calculate initial total power
+    total_power = 0.0_dp 
+	do i = 1, num_elem
+        do j = 1, nodes_per_elem
+            total_power = total_power + &
+                        power_amplitude_prev*&
+                        spatial_power_fcn(i,j)*elem_vol_int(i,j)
+        end do
+    end do
+
+!---Compare
+    total_precursors_fuel = sum(precursors_lambda_vec(Fuel_Inlet_Start:Fuel_Outlet_End))
+
+!---Calc beta correction per delay group
+    beta_initial = gen_time*total_precursors_fuel/total_power
+	
+	write(outfile_unit,fmt='(a)'), ' '	
+	write(outfile_unit,fmt='(a,f15.8)'), 'Initial_Beta ',beta_initial
+	write(outfile_unit,fmt='(a,f15.2)'), 'Mass Flow    ',mass_flow
 
 !---Set steady state flag off 
     steady_state_flag = .FALSE.

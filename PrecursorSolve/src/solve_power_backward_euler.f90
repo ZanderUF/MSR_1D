@@ -28,65 +28,59 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     real(dp), dimension(num_delay_group) :: test_fuel_prec, test_total_prec
     real(dp), dimension(num_elem) :: precursors_lambda_vec
     real(dp):: power_new_total, total_precursor_ref,&
-               total_precursor_ref_sum, total_fuel_length,&
+               total_precursor_ref_sum, total_spatial_fcn,&
                total_precursors_fuel, &
                rho_initial, step_time
     real(dp) :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     real(dp) :: first_zag, second_zag, third_zag, reactivity_zag
     real(dp) :: total_power
-    real(dp), dimension(num_isotopes,num_delay_group) :: beta_correction_vec
 
 !---Initialize to zero
-    precursors_lambda_vec(:) = 0.0
-    total_precursor_ref = 0.0
-    precursors_vec = 0.0
+    precursors_lambda_vec(:) = 0.0_dp
+    total_precursor_ref      = 0.0_dp
+    precursors_vec           = 0.0_dp
 
 !---Calculate total precursor concentration*lamda over system 
     do f = 1, num_isotopes 
        do g = 1, num_delay_group
             do i = 1, num_elem 
                 do j = 1, nodes_per_elem
+                   !---Precursors*lambda
                    precursors_lambda_vec(i) = precursors_lambda_vec(i) + &
                                       lamda_i_mat(f,g)*&
                                       elem_vol_int(i,j)*&
                                       precursor_soln_prev(f,g,i,j)
-                   
+                   !--Just precursor concentration 
                    precursors_vec(g,i) = precursors_vec(g,i) + &
                                        elem_vol_int(i,j)*  &
                                        precursor_soln_prev(f,g,i,j)
-    
-                   total_precursor_ref = total_precursor_ref + &
-                                      lamda_i_mat(f,g)*&
-                                      elem_vol_int(i,j)*&
-                                      precursor_soln_prev(f,g,i,j)
                 end do
             end do
        end do
     end do
    
-    total_power = 0.0 
-    !---Get total length of the fuel element
-    total_fuel_length = 0.0
+    total_power = 0.0
 
-
+!---Get contribution of power from assumed spatial profile 
+    total_spatial_fcn = 0.0
+    
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
                         power_amplitude_prev*&
                         spatial_power_fcn(i,j)*elem_vol_int(i,j)
             
-            total_fuel_length = total_fuel_length + &
+            total_spatial_fcn = total_spatial_fcn + &
                                 spatial_power_fcn(i,j)*elem_vol_int(i,j)
-            
         end do
     end do
 
-    !---Compare 
+!---Compare 
     total_precursor_ref_sum   = sum(precursors_lambda_vec)
     total_precursors_fuel     = sum(precursors_lambda_vec(Fuel_Inlet_Start:Fuel_Outlet_End))
     
-    !---Calc beta correction per delay group
-    if(t0==0.0) then
+!---Calc beta correction per delay group
+    if(t0 == 0.0) then
         beta_correction = gen_time*total_precursors_fuel/total_power 
     end if
     
@@ -163,7 +157,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           delta_t*(( reactivity + reactivity_feedback  &
                           - beta_correction )/gen_time)*&
                           power_amplitude_prev &
-                          + delta_t*(1.0_dp/total_fuel_length)*&
+                          + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel
     end if
     
@@ -171,7 +165,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
         power_amplitude_new = power_amplitude_last_time + &
                           delta_t*(( reactivity  &
                           - beta_correction )/gen_time)*power_amplitude_prev &
-                          + delta_t*(1.0_dp/total_fuel_length)*&
+                          + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel
     end if
 

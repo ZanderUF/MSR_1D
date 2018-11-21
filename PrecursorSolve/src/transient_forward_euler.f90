@@ -1,4 +1,5 @@
 ! Transient solver
+!
 ! Notes: Solves precursor and power equations using foward Euler
 !        Explicit method 
 !
@@ -80,12 +81,12 @@ subroutine transient_forward_euler()
                 open (unit=power_write_unit, file= time_soln_name//time_characters,&
                 status='unknown',form='formatted',position='asis')
  
-                write(power_write_unit,fmt='(a,es23.16)'), 'Power distribution at time:',&
+                write(power_write_unit,fmt='(a,f12.8)'), 'Power distribution at time:',&
                       t0  
                 write(power_write_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
                 do i = 1,num_elem
                     do j = 1, nodes_per_elem
-                        write(power_write_unit, fmt='(f6.3, es23.16)') &
+                        write(power_write_unit, fmt='(f6.3, f12.8)') &
                               global_coord(i,j), power_soln_new(i,j)
                     end do
                 end do
@@ -99,12 +100,12 @@ subroutine transient_forward_euler()
 	        !---Write power,reactivity, feedback out @ every time step
 	        if(t0 == 0.0) then
 	            write(power_outfile_unit, ('(a)')), &
-				'Time (s)                 | Power Amp             | Norm Power          | &
-                 Reactivity              | Beta Correction       | Temp Feedback       | &
-                 Density Feedback       |  Mass flow'
+				'   Time (s)|     Power Amp|    Norm Power| &
+                  Reactivity|       Beta|   Temp Rho|&
+                 Density Rho|   Mass flow'
 	        end if
-	        write(power_outfile_unit, ('(es23.16 ,es23.16,es23.16, es23.16,&
-                                         es23.15,es24.16,es24.16,es24.16)')), &
+	        write(power_outfile_unit, ('(f12.8 ,f15.8,f15.8, f12.8,&
+                                         f12.8,f12.8,f12.8,f12.2)')), &
 	          t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
               reactivity, beta_correction,total_temperature_feedback,&
               total_density_feedback, mass_flow 

@@ -32,12 +32,93 @@
       i4 = 4
       iret=0
       do while (iret == 0)
-         pn = aread(i2, iret)
+         pn = cread(10, iret)
+         print *,'Pn  ',pn
          dum = aread(i3, iret)
          duma = aread(i3,iret) 
          select case(pn)
          case default
-                       
+         
+         case ('Time_Solve') ! decide if we are doing a time solve
+              read_time = aread(i4, iret) 
+              if ( read_time == 'no  ' ) then
+                  time_solve  = .FALSE.
+              end if
+              if ( read_time == 'yes ' ) then
+                  time_solve  = .TRUE.
+              endif
+                print *,' oh'
+          case('Debug') ! DEBUG option
+              print *,'YA'
+              read_debug = aread(i4, iret)
+              if (read_debug == 'no ') then
+                  DEBUG = .FALSE.
+              end if
+              if (read_debug == 'yes ') then
+                  DEBUG = .TRUE.
+              end if
+          case('Read_DIF3D') ! DEBUG option
+              read_dif3d_inp = aread(i4, iret)
+              if (read_dif3d_inp == 'no ') then
+                  Read_DIF3D = .FALSE.
+              end if
+              if (read_dif3d_inp == 'yes ') then
+                  Read_DIF3D = .TRUE.
+              end if
+             
+          case('TD_method') ! which time dependent method
+              td_method_type = iread(i0,iret)
+          
+          case('Feedback_Method')
+              feedback_method  = iread(i0,iret)
+
+          case('Step_Perturbation')
+              read_step = aread(i4, iret) 
+              if ( read_step == 'no ' ) then
+                  step_flag = .FALSE.
+              end if
+              if ( read_step == 'yes ' ) then
+                  step_flag = .TRUE.
+              end if
+          
+          case('Ramp_Perturbation')
+              read_ramp = aread(i4, iret)
+              if( read_ramp == 'no ') then
+                  ramp_flag = .FALSE.
+              end if
+              if( read_ramp == 'yes' ) then
+                  ramp_flag = .TRUE.
+              end if
+           
+           case('ZigZag_Perturbation=')
+              read_zag = aread(i4, iret)
+              if( read_zag == 'no ') then
+                  zag_flag = .FALSE.
+              end if
+              if( read_zag == 'yes' ) then
+                  zag_flag = .TRUE.
+              end if
+          case ('Time_Step')
+              delta_t = dread(i0, iret)
+          
+          case ('Time_Start')
+              t_initial  = fread(i0, iret)
+          
+          case ('Total_Time')
+              tmax  = fread(i0, iret)
+          
+          case ('Num_Elements')
+              num_elem = iread(i0, iret)
+          case ('Nodes_Per_Element')
+              nodes_per_elem = iread(i0, iret)         
+          
+         !---Define heat exchanger location
+          case('hexs')
+               Heat_Exchanger_Start = fread(i0,iret)     
+          case('hexe')
+               Heat_Exchanger_End = fread(i0,iret)
+          
+             
           case ('time') ! decide if we are doing a time solve
               read_time = aread(i4, iret) 
               if ( read_time == 'no ' ) then
@@ -54,16 +135,7 @@
               if (read_debug == 'yes ') then
                   DEBUG = .TRUE.
               end if
-           case('dif3') ! DEBUG option
-              read_dif3d_inp = aread(i4, iret)
-              if (read_dif3d_inp == 'no ') then
-                  Read_DIF3D = .FALSE.
-              end if
-              if (read_dif3d_inp == 'yes ') then
-                  Read_DIF3D = .TRUE.
-              end if
-         
-   
+              
           case('meth') ! which time dependent method
               td_method_type = iread(i0,iret)
           case('feed')
@@ -129,11 +201,6 @@
               Area_Core = fread(i0,iret)
           case('apip') 
                Area_Pipe = fread(i0,iret)
-         !---Define heat exchanger location
-          case('hexs')
-               Heat_Exchanger_Start = fread(i0,iret)     
-          case('hexe')
-               Heat_Exchanger_End = fread(i0,iret)
           
           case('mflo')
               mass_flow=fread(i0,iret)
@@ -152,8 +219,8 @@
           case('reac')
               reactivity_input = dread(i0,iret)
           case('save') ! time intervale to write spatial solutions out
-            save_time_interval = fread(i0,iret)
-        end select
+save_time_interval = fread(i0,iret)
+
 
       end do
 

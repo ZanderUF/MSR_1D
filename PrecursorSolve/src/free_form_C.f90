@@ -268,9 +268,6 @@
 !
 !     type statements
 !
-!     Build TDKENO with gcc NOTE
-!     Removed intent(OUT) from char_str 
-!     gcc is confused when used --zanderm
       integer          :: ibr, return_value
       character(len=4) :: char_str
       char_str = str_read ( ibr, return_value, len(char_str) )
