@@ -24,7 +24,8 @@ msr1d : assemble_matrix_ss.o \
       density_corr_msfr.o \
 	  driver_solve.o \
       element_matrices_M.o \
-      error_functions.o \
+      evaluate_beta.o \
+	  error_functions.o \
       flags_M.o \
       free_form_C.o \
       gauss_integration_M.o \
@@ -88,6 +89,9 @@ element_matrices_M.o: element_matrices_M.f90 global_parameters_M.o
 
 error_functions.o : error_functions.f90 common_unit.o
 	$(F90) $(FFLAGS) -c error_functions.f90
+
+evaluate_beta.o : evaluate_beta.f90 global_parameters_M.o
+	$(F90) $(FFLAGS) -c evaluate_beta.f90
 
 flags_M.o: flags_M.f90
 	$(F90) $(FFLAGS) -c flags_M.f90

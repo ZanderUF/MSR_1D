@@ -24,7 +24,7 @@ implicit none
     integer :: abs_max_nl_iter
     character(len=20) :: ss_file_name
 	real(dp) :: total_precursors_fuel, total_power
-	real(dp), dimension(num_elem) :: precursors_lambda_vec
+	real(dp), dimension(num_isotopes,num_delay_group) :: precursors_lambda_vec
 
 !---------------------------------------------------------------
 
@@ -143,12 +143,13 @@ implicit none
 
 !---Calculate new beta for this mass flow
 !---Calculate total precursor concentration*lamda over system
+    precursors_lambda_vec(:,:) = 0.0_dp
     do f = 1, num_isotopes
        do g = 1, num_delay_group
-            do i = 1, num_elem
+            do i = Fuel_Inlet_Start, Fuel_Outlet_End 
                 do j = 1, nodes_per_elem
                    !---Precursors*lambda
-                   precursors_lambda_vec(i) = precursors_lambda_vec(i) + &
+                   precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
                                       lamda_i_mat(f,g)*&
                                       elem_vol_int(i,j)*&
                                       precursor_soln_prev(f,g,i,j)
@@ -163,19 +164,31 @@ implicit none
         do j = 1, nodes_per_elem
             total_power = total_power + &
                         power_amplitude_prev*&
-                        spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                       total_power_read_in*spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
 
-!---Compare
-    total_precursors_fuel = sum(precursors_lambda_vec(Fuel_Inlet_Start:Fuel_Outlet_End))
+!---Calc new beta per delay group
+    do f = 1, num_isotopes
+        do g = 1, num_delay_group
+            beta_initial_vec(f,g) = gen_time*precursors_lambda_vec(f,g)/total_power
+        end do
+    end do
+   
+    beta_correction = sum(beta_initial_vec)
 
-!---Calc beta correction per delay group
-    beta_initial = gen_time*total_precursors_fuel/total_power
-	
+!---Write out the new beta info
 	write(outfile_unit,fmt='(a)'), ' '	
-	write(outfile_unit,fmt='(a,f15.8)'), 'Initial_Beta ',beta_initial
-	write(outfile_unit,fmt='(a,f15.2)'), 'Mass Flow    ',mass_flow
+    write(outfile_unit,fmt='(a,f15.2)'), 'Mass Flow    ', mass_flow
+    write(outfile_unit,fmt='(a)'), 'Starting beta values are: '  
+    do f = 1, num_isotopes
+	    write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a,1I2)') 'Isotope #: ', f 
+        write(outfile_unit,fmt='(12f15.8)') &
+            (beta_initial_vec(f,g),g=1,num_delay_group)
+	end do
+    write(outfile_unit,fmt='(a)'), ' '
+    write(outfile_unit, fmt='(a,f15.8)'), 'Total beta is: ', sum(beta_initial_vec)
 
 !---Set steady state flag off 
     steady_state_flag = .FALSE.

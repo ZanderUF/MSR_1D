@@ -22,20 +22,60 @@ subroutine transient_forward_euler()
 
 !---Local
     integer :: f,g,n,i,j
-    real(dp)    :: t1 
+    real(dp)    :: event_time,event_time_previous, t1 
     integer :: power_write_unit
     character(len=24) :: time_soln_name
     character(len=10) :: time_characters
     real(kind=4) :: temp_time
+    integer :: event_counter
+    real(dp) :: time_constant
+    logical :: event_occuring 
 
 !---Start time-dependent solve
     temperature_soln_prev = temperature_soln_new
+    time_constant = -0.2_dp
 
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
         write(outfile_unit, fmt='(a)'), ' ' 
         write(outfile_unit, fmt='(a)'), 'In transient loop'
-        timeloop: do 
+        timeloop: do
+           
+           !---This determines the first 'event' time for the whole transient
+            if( t0 == 0.0) then
+                event_counter = 1
+                event_time = 0.0_dp 
+                event_time_previous = 0.0_dp
+                event_occuring = .TRUE.
+            !end if 
+            else 
+                !---Very the flow rate with time
+                if(event_occuring .eqv. .TRUE.) then
+                    !mass_flow = mass_flow_initial*exp(time_constant*t0)
+                    mass_flow = 0.5*mass_flow_initial 
+                end if
+                
+                !---Evaluate pump coast down 
+                if( mass_flow > 0.2*mass_flow_initial) then
+                    event_counter = 1    
+                    End_Event = .FALSE. 
+                    event_time = delta_t 
+                    event_time_previous = event_time - delta_t
+
+                    event_occuring = .TRUE.
+                
+                    call evaluate_beta_change(event_time, event_time_previous, &
+                                              event_counter, event_occuring)
+                else
+                    print *, 'other part'
+                    !---No more 'event's happening so this is the last event time
+                    event_time = 0.0_dp 
+                    event_occuring = .FALSE.
+                    call evaluate_beta_change(event_time,event_time_previous,&
+                                              event_counter,event_occuring)
+                end if
+
+            end if 
             !---Create element matrices and assemble
             elements_loop: do n = 1 , num_elem 
                 !---Generate spatial matrices
@@ -50,7 +90,6 @@ subroutine transient_forward_euler()
                     enddo delay_loop 
                 enddo isotope_loop 
             
-
                 if( mass_flow > 0.0 ) then
                     !---Solve for temperature
                     call solve_temperature(n)
@@ -61,12 +100,14 @@ subroutine transient_forward_euler()
             enddo elements_loop 
             
             !---Swap solutions
-            precursor_soln_prev   = precursor_soln_new
-            power_amplitude_prev  = power_amplitude_new
+            !precursor_soln_prev   = precursor_soln_new
+            !power_amplitude_prev  = power_amplitude_new
            
             !---Solve for total power after spatial sweep through precursors
             call solve_power_backward_euler(1,t0) 
             
+            !---Adjust the beta for time step
+
             !---Write solution to a file periodically
             transient_save_flag = .TRUE.
             if( modulo(t0,save_time_interval) < delta_t) then
@@ -105,7 +146,7 @@ subroutine transient_forward_euler()
                  Density Rho|   Mass flow'
 	        end if
 	        write(power_outfile_unit, ('(f12.8 ,f15.8,f15.8, f12.8,&
-                                         f12.8,f12.8,f12.8,f12.2)')), &
+                                         f15.12,f12.8,f12.8,f12.2)')), &
 	          t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
               reactivity, beta_correction,total_temperature_feedback,&
               total_density_feedback, mass_flow 

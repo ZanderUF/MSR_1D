@@ -31,7 +31,6 @@ implicit none
     last_time_file_name         = 'last_t_soln.txt'
     power_soln_file_name        = 'power_amp_soln.txt'
     input_file                  = 'input_t'
-
 !---Open file for writing out debug information
     open (unit=outfile_unit, file=outfile_name,status='unknown',&
     	  form='formatted',position='asis')
@@ -70,6 +69,14 @@ implicit none
              Density_Reactivity_Feedback(num_elem,nodes_per_elem), &
              Temperature_Reactivity_Feedback(num_elem,nodes_per_elem) )
 
+allocate(beta_initial_vec(num_isotopes,num_delay_group))
+allocate(beta_j(num_isotopes,num_delay_group), &
+         beta_j_minus_1(num_isotopes,num_delay_group),&
+         beta_j_plus_1(num_isotopes,num_delay_group) )
+allocate(beta_change_all_previous(num_isotopes,num_delay_group),&
+         beta_change(num_isotopes,num_delay_group))
+
+allocate(beta_correction_vec(num_isotopes,num_delay_group))
 !---Create 1D mesh
     call mesh_creation
     

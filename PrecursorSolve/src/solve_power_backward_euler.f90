@@ -24,9 +24,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Local
     integer :: i,j,f,g
-    real(dp), dimension(num_delay_group,num_elem) :: precursors_vec
+    real(dp), dimension(num_isotopes,num_delay_group) :: precursors_lambda_vec
     real(dp), dimension(num_delay_group) :: test_fuel_prec, test_total_prec
-    real(dp), dimension(num_elem) :: precursors_lambda_vec
     real(dp):: power_new_total, total_precursor_ref,&
                total_precursor_ref_sum, total_spatial_fcn,&
                total_precursors_fuel, &
@@ -36,54 +35,58 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     real(dp) :: total_power
 
 !---Initialize to zero
-    precursors_lambda_vec(:) = 0.0_dp
-    total_precursor_ref      = 0.0_dp
-    precursors_vec           = 0.0_dp
+    precursors_lambda_vec(:,:) = 0.0_dp
 
-!---Calculate total precursor concentration*lamda over system 
-    do f = 1, num_isotopes 
+!---Calculate precursors in the fuel region per isotope and group
+    do f = 1, num_isotopes
        do g = 1, num_delay_group
-            do i = 1, num_elem 
+            do i = Fuel_Inlet_Start, Fuel_Outlet_End 
                 do j = 1, nodes_per_elem
                    !---Precursors*lambda
-                   precursors_lambda_vec(i) = precursors_lambda_vec(i) + &
+                   precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
                                       lamda_i_mat(f,g)*&
                                       elem_vol_int(i,j)*&
                                       precursor_soln_prev(f,g,i,j)
-                   !--Just precursor concentration 
-                   precursors_vec(g,i) = precursors_vec(g,i) + &
-                                       elem_vol_int(i,j)*  &
-                                       precursor_soln_prev(f,g,i,j)
                 end do
             end do
        end do
-    end do
-   
-    total_power = 0.0
+    end do   
 
 !---Get contribution of power from assumed spatial profile 
     total_spatial_fcn = 0.0
-    
+    total_power = 0.0
+
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
-                        power_amplitude_prev*&
-                        spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                          power_amplitude_prev*&
+                          total_power_read_in*spatial_power_fcn(i,j)*elem_vol_int(i,j)
             
             total_spatial_fcn = total_spatial_fcn + &
-                                spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                               total_power_read_in*spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
 
-!---Compare 
-    total_precursor_ref_sum   = sum(precursors_lambda_vec)
-    total_precursors_fuel     = sum(precursors_lambda_vec(Fuel_Inlet_Start:Fuel_Outlet_End))
+!---Calc total precursors fuel 
+    total_precursors_fuel = 0.0_dp
+    do f = 1, num_isotopes
+        do g = 1, num_delay_group
+            total_precursors_fuel = total_precursors_fuel + precursors_lambda_vec(f,g)
+        end do
+    end do
     
 !---Calc beta correction per delay group
-    if(t0 == 0.0) then
-        beta_correction = gen_time*total_precursors_fuel/total_power 
-    end if
-    
+    !if(t0 == 0.0) then
+    !    beta_correction = gen_time*total_precursors_fuel/total_power 
+    !end if
+    !print *,'precursor total',total_precursors_fuel
+
+    !print *,'total power    ', total_power
+    !print *,'reactivity     ', reactivity_feedback
+    !print *,'reactivity     ', reactivity
+    !print *,'beta correction', beta_correction
+    !print *,' '
+
 !---Hardcoded times to start perturbation - should read from input
     step_start_time = 0.0 
     step_end_time = 1.0 

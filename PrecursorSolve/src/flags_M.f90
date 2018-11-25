@@ -20,5 +20,6 @@ implicit none
     logical :: zag_flag = .FALSE.
     logical :: read_power_from_file = .FALSE.
     logical :: Read_DIF3D = .FALSE.
+    logical :: End_Event 
 
 end module flags_M

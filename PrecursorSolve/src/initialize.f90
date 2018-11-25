@@ -153,6 +153,11 @@ implicit none
     temperature_soln_starting = temperature_soln_new
     power_soln_starting       = power_soln_new 
 
+!---Get longest lived precursor group constant
+    !---For now just grab off of the first itosope.  Later could have it select
+    !   based on largest between all isotopes
+    Long_Decay_Constant = lamda_i_mat(1,1)
+
 !-------------------------------------------------------------------------------
 !---Write out initial solution
     write(outfile_unit,fmt='(a)'), ' '
