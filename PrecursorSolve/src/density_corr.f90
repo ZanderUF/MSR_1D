@@ -7,10 +7,14 @@
 ! 
 ! Valid from 1017 - 1174 K
 !
-! Taube and Ligou had 2.344 g/cc density @ 984 C for UCl3
+! Taube and Ligou had 2.344 g/cc density @ 984 C for PuCl3
 !
 ! Adjusted KCl-MgCl2 to better align with Taube correlation
-! 
+!
+!---**************UPDATED
+!  From paper evaluating UCl3-NaCl
+! https://link.springer.com/content/pdf/10.1007/BF01121527.pdf
+
 ! Input:
 !       T - temperature to evaluate density at 
 ! Output:
@@ -31,9 +35,11 @@ implicit none
    
     !a = 2007.0_dp
     ! 2800 is not correct but this correlation is wrong for our temp range
-    a = 2800.0_dp
-    b= -0.4571_dp
+    !a = 2800.0_dp
+    !b= -0.4571_dp
+     a =  3226.8_dp
+     b = -0.7247_dp
 
-    density = (a + b*T)*0.001_dp
+    density = (a + b*T)
     
 end

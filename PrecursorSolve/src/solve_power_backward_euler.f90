@@ -80,7 +80,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     !    beta_correction = gen_time*total_precursors_fuel/total_power 
     !end if
     !print *,'precursor total',total_precursors_fuel
-
+         
     !print *,'total power    ', total_power
     !print *,'reactivity     ', reactivity_feedback
     !print *,'reactivity     ', reactivity

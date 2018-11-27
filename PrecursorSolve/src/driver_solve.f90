@@ -77,6 +77,9 @@ allocate(beta_change_all_previous(num_isotopes,num_delay_group),&
          beta_change(num_isotopes,num_delay_group))
 
 allocate(beta_correction_vec(num_isotopes,num_delay_group))
+
+beta_change_all_previous(:,:) = 0.0_dp
+        beta_change(:,:) = 0.0_dp
 !---Create 1D mesh
     call mesh_creation
     
