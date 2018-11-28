@@ -76,7 +76,7 @@ subroutine spatial_matrices (n, nl_iter)
                                  shape_fcn(i)*velocity_soln_prev(n,i)
             
             evaluated_spatial_power = evaluated_spatial_power + &
-                                      total_power_read_in*shape_fcn(i)*spatial_power_fcn(n,i)*&
+                                      shape_fcn(i)*spatial_power_fcn(n,i)*&
                                       power_amplitude_prev
         end do
         

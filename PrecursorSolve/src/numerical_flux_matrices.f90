@@ -41,7 +41,7 @@ subroutine numerical_flux_matrices (n, nl_iter)
         do j = 1, nodes_per_elem
             elem_vec_q(i) = elem_vec_q(i) + &
                             elem_matrix_A(i,j)*&
-                            total_power_read_in*spatial_power_fcn(n,j)*&
+                            spatial_power_fcn(n,j)*&
                             power_amplitude_prev
                             ! try just working with the fractional power
                             ! not the 'power' in Watts itself

@@ -164,7 +164,7 @@ implicit none
         do j = 1, nodes_per_elem
             total_power = total_power + &
                         power_amplitude_prev*&
-                       total_power_read_in*spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                       spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
 
@@ -174,7 +174,7 @@ implicit none
             beta_initial_vec(f,g) = gen_time*precursors_lambda_vec(f,g)/total_power
         end do
     end do
-   
+    
     beta_correction = sum(beta_initial_vec)
 
 !---Write out the new beta info
@@ -184,7 +184,7 @@ implicit none
     do f = 1, num_isotopes
 	    write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a,1I2)') 'Isotope #: ', f 
-        write(outfile_unit,fmt='(12f15.8)') &
+        write(outfile_unit,fmt='(12f15.10)') &
             (beta_initial_vec(f,g),g=1,num_delay_group)
 	end do
     write(outfile_unit,fmt='(a)'), ' '

@@ -63,25 +63,33 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
             beta_interp_current(f,g) = mid*beta_2 + (1.0_dp - mid)*beta_1
         end do
     end do
-
-    current_time  = t0
-
-    !print *,'current time ',current_time, ' event time ', event_time    
-   if(current_time ==  event_time ) then
-        print *,'INITIAL'
-        do f = 1, num_isotopes 
+  
+    !---Do instant change in beta as function of flow speed
+    if(event_counter == 2) then
+        do f = 1, num_isotopes
             do g = 1, num_delay_group
-                beta_j_minus_1(f,g) = beta_initial_vec(f,g)
-                beta_j(f,g)         = beta_interp_current(f,g)
-                beta_change(f,g) = 0.0_dp
-                beta_change_all_previous(f,g) = 0.0_dp
-                beta_correction_vec(f,g) = beta_initial_vec(f,g)
+                beta_correction_vec(f,g) = beta_interp_current(f,g)
             end do
         end do
     end if
-    
+
+   current_time  = t0
+
     !---If very first event, initialize based on starting beta
     if(event_counter == 1) then
+        
+        if(current_time ==  event_time ) then
+            do f = 1, num_isotopes 
+                do g = 1, num_delay_group
+                    beta_j_minus_1(f,g) = beta_initial_vec(f,g)
+                    beta_j(f,g)         = beta_interp_current(f,g)
+                    beta_change(f,g) = 0.0_dp
+                    beta_change_all_previous(f,g) = 0.0_dp
+                    beta_correction_vec(f,g) = beta_initial_vec(f,g)
+                end do
+            end do
+        end if
+        
         do f = 1, num_isotopes
             do g = 1, num_delay_group
                 
@@ -130,10 +138,13 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
             end do
         end do
         !---Count number of events
-        event_counter_last = event_counter
-        event_counter = event_counter + 1
+        !event_counter_last = event_counter
+        !event_counter = event_counter + 1
+    end if
+
     
-    else !---Every event after the 'first'
+
+    if(1==2) then !---Every event after the 'first'
         !print *,' herhe'
         do f = 1, num_isotopes
             do g = 1, num_delay_group

@@ -35,7 +35,7 @@ subroutine transient_forward_euler()
     temperature_soln_prev = temperature_soln_new
     time_constant = -0.2_dp
     
-    event_start_time = delta_t 
+    event_start_time = 0.0_dp 
 
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
@@ -56,13 +56,12 @@ subroutine transient_forward_euler()
                 !---Very the flow rate with time
                 if(event_occuring .eqv. .TRUE.) then
                     mass_flow = mass_flow_initial*exp(time_constant*t0)
-                    !mass_flow = 0.5*mass_flow_initial 
                 end if
                 !---Evaluate pump coast down 
                 !---Stop after get to 80% of starting flow rate
                 if( mass_flow > 0.2*mass_flow_initial) then
                     
-                    event_counter = 1    
+                    event_counter = 2    
                     End_Event = .FALSE. 
                     event_occuring = .TRUE.
                 
@@ -72,10 +71,8 @@ subroutine transient_forward_euler()
                     event_time          = t0  
                     event_time_previous = event_time - delta_t
                 else
-                    event_counter = 1
-                    !print *, 'other part'
-                    !!---No more 'event's happening so this is the last event time
-                    !event_time = 0.0_dp 
+                    !---No more 'event's happening so this is the last event time
+                    event_counter = 2 
                     event_occuring = .FALSE.
                     call evaluate_beta_change(event_time,event_time_previous,&
                                               event_counter,event_occuring)

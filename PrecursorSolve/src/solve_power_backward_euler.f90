@@ -60,10 +60,10 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
         do j = 1, nodes_per_elem
             total_power = total_power + &
                           power_amplitude_prev*&
-                          total_power_read_in*spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                          spatial_power_fcn(i,j)*elem_vol_int(i,j)
             
             total_spatial_fcn = total_spatial_fcn + &
-                               total_power_read_in*spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                               spatial_power_fcn(i,j)*elem_vol_int(i,j)
         end do
     end do
 
@@ -79,6 +79,9 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     !if(t0 == 0.0) then
     !    beta_correction = gen_time*total_precursors_fuel/total_power 
     !end if
+    !print *,'mass flow', mass_flow
+    !print *,' beta_correction',beta_correction
+    !print *,' ' 
     !print *,'precursor total',total_precursors_fuel
          
     !print *,'total power    ', total_power
