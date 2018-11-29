@@ -1,0 +1,2 @@
+ls ../../precursor_soln_at_time_step_* | sort -n +0.34 | pbcopy
+
