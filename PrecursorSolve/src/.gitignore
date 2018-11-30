@@ -1,3 +1,5 @@
 *.o
+msr1d
+msr1d/*
 a.out
 a.out/*
