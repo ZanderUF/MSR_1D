@@ -53,9 +53,10 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
             inverse_matrix(i,j) = elem_matrix_G(i,j)
         end do 
     end do
-    
+   
     !---Compute RHS vector
     do i = 1, nodes_per_elem
+        !print *,'elem vec q final ', elem_vec_q_final(isotope,delay_group,i)
         rhs_final_vec(i) = elem_vec_q_final(isotope,delay_group,i) + elem_vec_w_left_face(i)
     end do
     
@@ -68,6 +69,7 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
     precursor_soln_new(isotope,delay_group,n,:) = matmul(inverse_matrix,rhs_final_vec)
     
     do i = 1, nodes_per_elem
+
         if( precursor_soln_new(isotope,delay_group,n,i) < 1E-16_dp) then
             precursor_soln_new(isotope,delay_group,n,i) = 0.0_dp
     !        write(outfile_unit, fmt='(a,I6,a,I6)'), 'Negative precursor conc. &
@@ -91,6 +93,16 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
                     ( inverse_matrix(j,i) ,i=1,nodes_per_elem )             
         end do
 
+write(outfile_unit,fmt='(a)'), ' '
+        write(outfile_unit,fmt='(a,1I3,a,1I6,a,1I3)'),&
+            'Previous Solution | element --> ', n, ' Isotope ',isotope,&
+             ' Delayed Group ',delay_group
+            do j=1,nodes_per_elem 
+                write(outfile_unit,fmt='(a,1I6,12es14.3)'), 'Node --> ', n-1+j,&
+                  precursor_soln_prev(isotope,delay_group,n,j)         
+         
+        end do
+ 
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a,1I3,a,1I6,a,1I3)'),&
             'Solution | element --> ', n, ' Isotope ',isotope,&

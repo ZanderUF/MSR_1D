@@ -65,6 +65,7 @@ subroutine spatial_matrices (n, nl_iter)
         xi = gauspt(g)
         wt = gauswt(g)
         h  = global_coord(n,3) - global_coord(n,1) 
+        
         !---Evaluate shape functions at gauss pt
         call inter_shape_fcns(xi,h)
         cnst = g_jacobian*wt
@@ -79,11 +80,13 @@ subroutine spatial_matrices (n, nl_iter)
                                       shape_fcn(i)*spatial_power_fcn(n,i)*&
                                       power_amplitude_prev
         end do
-        
+
         do i=1, nodes_per_elem
             
             elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
             
+            elem_vec_q(i) = elem_vec_q(i)+ &
+                    evaluated_spatial_power*cnst*shape_fcn(i)  
             do j = 1, nodes_per_elem
                  !---Determine A matrix - only needs to be done once
                 elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
@@ -95,7 +98,9 @@ subroutine spatial_matrices (n, nl_iter)
             end do !---End loop over j matrix entries
         end do !---End loop over i matrix entries
      enddo gaussintegration!---end do over gauss pts
-    
+   
+    !elem_matrix_A = elem_matrix_A*2.0_dp
+
     !---Invert A matrix, only needs to be done once
     if ( (n < 2) .and. (nl_iter < 2) ) then
         do i = 1, nodes_per_elem
@@ -109,7 +114,7 @@ subroutine spatial_matrices (n, nl_iter)
         !---Compute the inverse matrix.
         call dgetri ( length, inverse_A_matrix, lda, ipiv, work, lwork, info ) 
     end if
-
+    
 !-------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE. ) then
         write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0
@@ -129,6 +134,7 @@ subroutine spatial_matrices (n, nl_iter)
                write(outfile_unit,fmt='(12es14.3)') &
                     (inverse_A_matrix(j,i),i=1,nodes_per_elem)             
         end do
+
         write(outfile_unit,fmt='(a)'),' '
         write(outfile_unit,fmt='(a,4I6)'),'[U] element Matrix gaussian integration | element --> ',n
         do j=1,nodes_per_elem 

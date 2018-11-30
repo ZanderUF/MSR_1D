@@ -71,7 +71,8 @@ subroutine read_power
     counter_power_input = 1
     !---Project from dif3d domain to FE one in this code 
     do i = 1, num_elem
-        if( Fuel_Inlet_Start < i .AND. i <= Fuel_Outlet_End ) then
+        if( i <= Fuel_Outlet_End ) then
+        !if( Fuel_Inlet_Start < i .AND. i <= Fuel_Outlet_End ) then
                 current_z = global_coord(i,1)
                 !---Find power value
                 do k = 2, number_entries

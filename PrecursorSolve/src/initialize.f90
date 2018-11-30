@@ -121,7 +121,7 @@ implicit none
                 !---Beginning piping 
                 if( i <= Fuel_Inlet_Start) then
                     area_variation(i,j)    = Area_Pipe 
-                    spatial_power_fcn(i,j) = 0.0_dp 
+                    spatial_power_fcn(i,j) = 1.0_dp 
                 !---Fuel region
                 else if (i <=Fuel_Outlet_End) then
                     area_variation(i,j)    = Area_Core 
@@ -134,8 +134,10 @@ implicit none
                 
                 power_soln_new(i,j)    = spatial_power_fcn(i,j)*&
                                         power_amplitude_new
-                temperature_soln_new   = inlet_temperature
-                temperature = temperature_soln_new(i,j)
+                
+                temperature_soln_new(i,j)   = inlet_temperature
+                !temperature = temperature_soln_new(i,j)
+                temperature = inlet_temperature 
                 call density_corr(temperature,density)
                 density_soln_new(i,j)  = density
                 velocity_soln_new(i,j) = mass_flow/(area_variation(i,j)*&

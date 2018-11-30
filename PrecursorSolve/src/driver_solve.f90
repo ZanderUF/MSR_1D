@@ -24,6 +24,7 @@ implicit none
     character(len=20) :: last_time_file_name
     character(len=20) :: power_soln_file_name
     character(len=7)  :: input_file
+    character(len=20) :: beta_special_name
 
 !---Name the files to write out something sensible
     outfile_name                = 'outfile.txt'
@@ -31,12 +32,16 @@ implicit none
     last_time_file_name         = 'last_t_soln.txt'
     power_soln_file_name        = 'power_amp_soln.txt'
     input_file                  = 'input_t'
+    beta_special_name           = 'beta_flowspeed.txt'
+
 !---Open file for writing out debug information
     open (unit=outfile_unit, file=outfile_name,status='unknown',&
     	  form='formatted',position='asis')
     open (unit=soln_outfile_unit, file=steady_state_soln_file_name,&
     	  status='unknown',form='formatted',position='asis')
     open (unit=power_outfile_unit, file=power_soln_file_name,&
+    	  status='unknown',form='formatted',position='asis')
+    open (unit=beta_special_unit, file=beta_special_name,&
     	  status='unknown',form='formatted',position='asis')
     
 !---Read in problem parameters here
@@ -85,9 +90,8 @@ beta_change_all_previous(:,:) = 0.0_dp
     
     if(Read_DIF3D .eqv. .TRUE.) then
         call read_power
+        call read_beta_flow
     end if
-    
-    call read_beta_flow
 
 !---Steady state solve for temperature 
     call steady_state

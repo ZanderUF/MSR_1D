@@ -61,7 +61,7 @@ msr1d : assemble_matrix_ss.o \
 
 assemble_matrix_ss.o: assemble_matrix_ss.f90 global_parameters_M.o \
 		      flags_M.o material_info_M.o solution_vectors_M.o \
-		      mesh_info_M.o element_matrices_M.o
+		      time_info_M.o mesh_info_M.o element_matrices_M.o
 	$(F90) $(FFLAGS) -c assemble_matrix_ss.f90 
 
 assemble_matrix_transient.o: assemble_matrix_transient.f90 global_parameters_M.o \

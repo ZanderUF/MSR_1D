@@ -18,11 +18,13 @@ module element_matrices_M
     real(dp) , dimension(3,3) :: matrix_W_left_face
     real(dp) , dimension(3,3) :: matrix_W_right_face
     real(dp) , dimension(3)   :: interp_fcn_rhs, interp_fcn_lhs
-    
+    real(dp) , dimension(3) :: vol_int
+
     data interp_fcn_lhs / 1,0,0/
     data interp_fcn_rhs / 0,0,1/
     data identity_matrix /1,0,0,&
                          0,1,0,&
                          0,0,1/
+    data vol_int /0.166666666667, 0.6666666666667, 0.166666666667/
 
 end module element_matrices_M

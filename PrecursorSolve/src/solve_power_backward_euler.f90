@@ -25,6 +25,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 !---Local
     integer :: i,j,f,g
     real(dp), dimension(num_isotopes,num_delay_group) :: precursors_lambda_vec
+    real(dp), dimension(num_elem) :: precursors_elem
+
     real(dp), dimension(num_delay_group) :: test_fuel_prec, test_total_prec
     real(dp):: power_new_total, total_precursor_ref,&
                total_precursor_ref_sum, total_spatial_fcn,&
@@ -36,15 +38,20 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
 
 !---Initialize to zero
     precursors_lambda_vec(:,:) = 0.0_dp
+    precursors_elem(:) = 0.0_dp
 
 !---Calculate precursors in the fuel region per isotope and group
     do f = 1, num_isotopes
        do g = 1, num_delay_group
-            do i = Fuel_Inlet_Start, Fuel_Outlet_End 
+            do i = Fuel_Inlet_Start , Fuel_Outlet_End
                 do j = 1, nodes_per_elem
                    !---Precursors*lambda
+                   precursors_elem(i) = precursors_elem(i) + &
+                        lamda_i_mat(f,g)*&
+                        elem_vol_int(i,j)*&
+                        precursor_soln_prev(f,g,i,j)
+
                    precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
-                                      lamda_i_mat(f,g)*&
                                       elem_vol_int(i,j)*&
                                       precursor_soln_prev(f,g,i,j)
                 end do
@@ -63,7 +70,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           spatial_power_fcn(i,j)*elem_vol_int(i,j)
             
             total_spatial_fcn = total_spatial_fcn + &
-                               spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                           spatial_power_fcn(i,j)*elem_vol_int(i,j)
+
         end do
     end do
 
@@ -71,9 +79,17 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     total_precursors_fuel = 0.0_dp
     do f = 1, num_isotopes
         do g = 1, num_delay_group
-            total_precursors_fuel = total_precursors_fuel + precursors_lambda_vec(f,g)
+            total_precursors_fuel = total_precursors_fuel + &
+                    lamda_i_mat(f,g)*precursors_lambda_vec(f,g)
         end do
     end do
+
+    !--- Need for benchmarks
+    if(Read_DIF3D .eqv. .FALSE. ) then
+        if(t0 == 0.0) then
+            beta_correction = gen_time*total_precursors_fuel/total_power
+        end if
+    end if
     
 !---Calc beta correction per delay group
     !if(t0 == 0.0) then
@@ -95,7 +111,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     step_end_time = 1.0 
     
     ramp_start_time = 0.0 
-    ramp_end_time = 0.5
+    ramp_end_time   = 0.01
 
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then
@@ -157,6 +173,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     
     reactivity_feedback = total_temperature_feedback + total_density_feedback
 
+    !print *,' nliter     ',nl_iter
+    !print *,' amp        ',power_amplitude_prev
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &
@@ -166,7 +184,9 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel
     end if
+   
     
+
     if(td_method_type == 1) then ! Backward Euler
         power_amplitude_new = power_amplitude_last_time + &
                           delta_t*(( reactivity  &
@@ -174,17 +194,33 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel
     end if
+    
+    !print *,'beta corr      ', beta_correction
+    !print *,'total precursors fuel ', total_precursors_fuel    
+    !print *,'First term   ', delta_t*(( reactivity  &
+    !    - beta_correction )/gen_time)*power_amplitude_prev 
+    !    
+    !print *,'Second term  ', delta_t*(1.0_dp/total_spatial_fcn)*&
+    !    total_precursors_fuel
 
+    !print *,' power amp new ', power_amplitude_new, ' at ', t0
+    !print *,'  ' 
+    !print *,' starting p ',power_amplitude_last_time
+    !print *,' total prec ',total_precursors_fuel
+    !print *,' amp new    ',power_amplitude_new
+    !print *,' ' 
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
     do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
-            power_soln_new(i,j) = total_power_read_in* &
+            power_soln_new(i,j) = total_power_initial* &
                                   power_amplitude_new* &
                                   spatial_power_fcn(i,j)      
         end do
     end do
-
+    
 !---End power solve
+
+    power_amplitude_prev = power_amplitude_new
 
 end subroutine solve_power_backward_euler

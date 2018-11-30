@@ -42,7 +42,8 @@ implicit none
     write(outfile_unit, fmt='(a)'), 'Start steady state calculation'
     
     nl_iter = 1 
-    
+    precursor_soln_prev  = 0.0_dp
+
     nonlinearloop: do !---Nonlinear loop
         elements_loop: do n = 1, num_elem
             !---Computer spatial matrices 
@@ -137,9 +138,8 @@ implicit none
     !---For backward euler, need to keep the last value at the time step
     power_amplitude_last_time = power_amplitude_new
 
-
 !---Write precursor solution outfile
-    call write_out_soln(outfile_unit,num_elem,transient_save_flag)
+    call write_out_soln(soln_outfile_unit,num_elem,transient_save_flag)
 
 !---Calculate new beta for this mass flow
 !---Calculate total precursor concentration*lamda over system
@@ -151,7 +151,7 @@ implicit none
                    !---Precursors*lambda
                    precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
                                       lamda_i_mat(f,g)*&
-                                      elem_vol_int(i,j)*&
+                                      elem_vol_int_fe(j)*&
                                       precursor_soln_prev(f,g,i,j)
                 end do
             end do
@@ -164,7 +164,7 @@ implicit none
         do j = 1, nodes_per_elem
             total_power = total_power + &
                         power_amplitude_prev*&
-                       spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                        spatial_power_fcn(i,j)*elem_vol_int_fe(j)
         end do
     end do
 
@@ -174,7 +174,11 @@ implicit none
             beta_initial_vec(f,g) = gen_time*precursors_lambda_vec(f,g)/total_power
         end do
     end do
-    
+
+    print *,' precursors ', precursors_lambda_vec
+    print *,' total power', total_power
+    print *,' beta_initial ', beta_initial_vec
+
     beta_correction = sum(beta_initial_vec)
 
 !---Write out the new beta info
@@ -184,11 +188,18 @@ implicit none
     do f = 1, num_isotopes
 	    write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a,1I2)') 'Isotope #: ', f 
-        write(outfile_unit,fmt='(12f15.10)') &
+        
+        write(outfile_unit,fmt='(12f15.4,12f15.10)'), mass_flow , &
             (beta_initial_vec(f,g),g=1,num_delay_group)
 	end do
     write(outfile_unit,fmt='(a)'), ' '
     write(outfile_unit, fmt='(a,f15.8)'), 'Total beta is: ', sum(beta_initial_vec)
+    
+   !---Write out to make tabulation of beta vs. flow speed easier 
+    do f = 1, num_isotopes
+        write(beta_special_unit,fmt='(12f15.4,12f15.10)'), mass_flow , &
+            (beta_initial_vec(f,g),g=1,num_delay_group)
+    end do
 
 !---Set steady state flag off 
     steady_state_flag = .FALSE.

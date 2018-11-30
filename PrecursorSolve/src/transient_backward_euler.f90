@@ -20,18 +20,24 @@ subroutine transient_backward_euler()
 
 !---Local
     integer :: f,g,n,i,j,nl_iter, power_write_unit
-    real(dp)    :: t1
     character(len=24) :: time_soln_name
     character(len=10) :: time_characters
     real(kind=4) :: temp_time
     real(dp), dimension(num_isotopes, num_delay_group) :: L2_norm_current, L2_norm_prev
     real(dp) :: nl_iter_tolerance, difference_L2
     integer :: difference_counter, abs_max_nl_iter    
+    integer :: event_counter
+    real(dp) :: time_constant
+    logical :: event_occuring 
+    real(dp)    :: event_start_time, event_time,event_time_previous, t1
 
 !---Set to make sure we don't iterate forever if we are not converging
-    max_nl_iter = 2 
+    max_nl_iter = 5 
     abs_max_nl_iter = 600 
     nl_iter_tolerance = 1E-12_dp
+    
+    time_constant = -10.0_dp
+    event_start_time = delta_t 
 
 !---Start time-dependent solve
     transient = .TRUE.
@@ -43,9 +49,62 @@ subroutine transient_backward_euler()
             L2_norm_prev = 0.0
             L2_norm_current = 0.0
             difference_counter = 0
+            
+            !if(Read_DIF3D .eqv. .TRUE.) then
+                !---Logic for evaluating beta over time
+                !---This determines the first 'event' time for the whole transient
+                !if( t0 == event_start_time) then
+                !    event_counter = 1
+                !    event_time = event_start_time 
+                !    event_time_previous = event_start_time - delta_t 
+                !    event_occuring = .TRUE.
+                !end if 
+                !
+                !if(t0 >= event_start_time) then
+                !    !---Very the flow rate with time
+                !    if(event_occuring .eqv. .TRUE.) then
+                !        mass_flow = mass_flow_initial*exp(time_constant*t0)
+                !    end if
+                !    !---Evaluate pump coast down 
+                !    !---Stop after get to 80% of starting flow rate
+                !    if( mass_flow > 0.001*mass_flow_initial) then
+                !       
+                !        !--Event counter = 2 --> instant | 1 --> lagged
+                !        event_counter = 1    
+                !        
+                !        End_Event = .FALSE. 
+                !        event_occuring = .TRUE.
+                !    
+                !        call evaluate_beta_change(event_time, event_time_previous, &
+                !                                  event_counter, event_occuring)
+                !        
+                !        event_time          = t0  
+                !        event_time_previous = event_time - delta_t
+                !    else
+                !        !---No more 'event's happening so this is the last event time
+                !        event_counter = 1 
+                !        event_occuring = .FALSE.
+                !        call evaluate_beta_change(event_time,event_time_previous,&
+                !                                  event_counter,event_occuring)
+                !    end if
+
+                !end if 
+            !else
+                if(mass_flow > 0.5*mass_flow_initial) then
+                    mass_flow = mass_flow_initial*exp(time_constant*t0)
+                end if
+            !end if
+            
             nonlinearloop: do  
                 !---Create element matrices and assemble
+                
                 elements_loop: do n = 1 , num_elem 
+                    
+                    
+                    if( mass_flow > 0.0) then
+                        call solve_temperature(n)
+                        call solve_velocity(n)
+                    end if
                     !---Generate spatial matrices
                     call spatial_matrices(n,nl_iter)
                     call numerical_flux_matrices(n,nl_iter)
@@ -57,20 +116,27 @@ subroutine transient_backward_euler()
                             call solve_precursor_backward_euler(f,g,n,nl_iter)
                         enddo delay_loop 
                     enddo isotope_loop 
-                   
-                    if( mass_flow > 0.0) then
-                        !call solve_temperature(n)
-                        !call solve_velocity(n)
-                    end if
-
                 enddo elements_loop 
                 
+                !temperature_soln_prev = temperature_soln_new
+                !velocity_soln_prev    = velocity_soln_new
+
                 !precursor_soln_last_time  = precursor_soln_new
-                precursor_soln_prev = precursor_soln_new
+                !power_amplitude_prev      = power_amplitude_new
+                !precursor_soln_last_time  = precursor_soln_new
+                !power_amplitude_last_time = power_amplitude_new
+            
+                if(mass_flow > 0.0 ) then
+                    temperature_soln_prev = temperature_soln_new
+                    velocity_soln_prev    = velocity_soln_new
+                end if
                 
+                precursor_soln_prev = precursor_soln_new
+
+                !power_amplitude_prev = power_amplitude_new
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_backward_euler(nl_iter,t0) 
-                power_amplitude_prev = power_amplitude_new
+                
                 !---Calculate L2 norm of precursor solution
                 if(nl_iter > 1) then
                     do f = 1, num_isotopes
@@ -94,11 +160,9 @@ subroutine transient_backward_euler()
                     if ( difference_counter == num_delay_group) then
                         max_nl_iter = nl_iter - 1
                     end if
-                !    
-                !    !print *,'difference_L2',difference_L2
-                !    !---Swap for next iteration
+                    
+                !---Swap for next iteration
                     L2_norm_prev = L2_norm_current
-
                 end if
 
                 nl_iter = nl_iter + 1 !---Nonlinear iteration counter
@@ -121,9 +185,9 @@ subroutine transient_backward_euler()
                 end if 
             
             enddo nonlinearloop 
-            
+            !***************************************************
             transient_save_flag = .TRUE.
-            
+
             !---Write solution to a file periodically
             if( modulo(t0,save_time_interval) < delta_t) then
                 
@@ -154,29 +218,30 @@ subroutine transient_backward_euler()
                 close(power_write_unit)
 
             end if !---End write out solution
+            
             !---Write power amp out @ every time step
             if(t0 == 0.0) then
-                write(power_outfile_unit, ('(a)')),&
-                      'Time (s) | Power Amp | Norm Power | Reactivity | &
-                       Beta Correction | Reactivity Feedback'
-            end if
-
-            write(power_outfile_unit, ('(es23.16 ,es23.16,es23.16, es23.16,&
-                                         es23.16)')), &
-	          t0,power_amplitude_new,power_amplitude_new/power_amplitude_start,&
-              reactivity, beta_correction
+	            write(power_outfile_unit, ('(a)')), &
+				'   Time (s)|     Power Amp|    Norm Power| &
+                  Reactivity|       Beta|   Temp Rho|&
+                 Density Rho|   Mass flow'
+	        end if
+	        write(power_outfile_unit, ('(f15.8 ,f15.8,f15.8, f12.8,&
+                                         f15.12,f12.8,f12.8,f12.2)')), &
+	          t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
+              reactivity, beta_correction,total_temperature_feedback,&
+              total_density_feedback, mass_flow 
             
 
-
             !---Swap solutions
-            precursor_soln_prev       = precursor_soln_new 
+            !precursor_soln_prev       = precursor_soln_new 
             power_amplitude_prev      = power_amplitude_new
             precursor_soln_last_time  = precursor_soln_new
             power_amplitude_last_time = power_amplitude_new
             
             if(mass_flow > 0.0 ) then
-                !temperature_soln_prev = temperature_soln_new
-                !velocity_soln_prev    = velocity_soln_new
+                temperature_soln_prev = temperature_soln_new
+                velocity_soln_prev    = velocity_soln_new
             end if
 
            !---Stop if we've exceeded TMAX.
@@ -190,6 +255,6 @@ subroutine transient_backward_euler()
 
        enddo timeloop
 
-    end if!---End transient if
+    end if !---End transient if
 
 end subroutine transient_backward_euler

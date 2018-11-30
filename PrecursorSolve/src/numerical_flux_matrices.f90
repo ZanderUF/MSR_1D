@@ -34,15 +34,16 @@ subroutine numerical_flux_matrices (n, nl_iter)
 !---Initialize
     matrix_W_right_face = 0.0_dp
     matrix_W_left_face  = 0.0_dp
-    elem_vec_q          = 0.0_dp
+    !elem_vec_q          = 0.0_dp
 
 !---Create source vector 'q', and W - 
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
-            elem_vec_q(i) = elem_vec_q(i) + &
-                            elem_matrix_A(i,j)*&
-                            spatial_power_fcn(n,j)*&
-                            power_amplitude_prev
+            !elem_vec_q(i) = elem_vec_q(i) + &
+            !                spatial_power_fcn(n,j)*&
+            !                power_amplitude_prev!*&
+            !                elem_matrix_A(i,j)
+
                             ! try just working with the fractional power
                             ! not the 'power' in Watts itself
 
@@ -52,10 +53,10 @@ subroutine numerical_flux_matrices (n, nl_iter)
                 !---rhs of previous element
                  matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
                                             interp_fcn_rhs(i)*interp_fcn_rhs(j)  
-                 matrix_W_left_face(i,j)  = velocity_soln_prev(n-1,i)*&
+                 matrix_W_left_face(i,j)  = velocity_soln_new(n-1,i)*&
                                             interp_fcn_lhs(i)*interp_fcn_lhs(j)
             else!---First element case, need to connect with end element 
-                 matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
+                 matrix_W_right_face(i,j) = velocity_soln_new(n,i)*&
                                             interp_fcn_rhs(i)*interp_fcn_rhs(j)  
                  matrix_W_left_face(i,j)  = velocity_soln_prev(num_elem,i)*&
                                             interp_fcn_lhs(i)*interp_fcn_lhs(j)
@@ -78,6 +79,10 @@ subroutine numerical_flux_matrices (n, nl_iter)
              write(outfile_unit,fmt='(12es14.3)') &
                   (matrix_W_left_face(j,i),i=1,nodes_per_elem)             
        end do
+       write(outfile_unit,fmt='(a,4I6)'),'{q} vector  --> ',n
+             write(outfile_unit,fmt='(12es14.3)') &
+                  (elem_vec_q(i),i=1,nodes_per_elem)             
+        
     end if
 
 end subroutine numerical_flux_matrices

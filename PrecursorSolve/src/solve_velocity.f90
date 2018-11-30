@@ -66,8 +66,8 @@ implicit none
         density_soln_new(n,j)  = density_eval
        
         !---New velocity
-        velocity_soln_new(n,j) = mass_flow / &
-                                 (area_variation(n,j)*density_eval)
+        velocity_soln_new(n,j) = (mass_flow / &
+                                 (area_variation(n,j)*density_eval))
         
         !---Evaluate feedback based on density change
         Density_Reactivity_Feedback(n,j) = (spatial_expansion_fcn(n,j) / &

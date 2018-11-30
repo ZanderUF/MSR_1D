@@ -29,7 +29,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     real(dp) :: Large_Lambda
     integer :: event_counter_last
      
-    time_constant = -0.2_dp
+    time_constant = -0.5_dp
     number_half_lifes = log(2.0_dp) 
   
     !---Get cutoff time to stop looking at differences between 
@@ -63,7 +63,9 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
             beta_interp_current(f,g) = mid*beta_2 + (1.0_dp - mid)*beta_1
         end do
     end do
-  
+    
+    !print *,'beta_interp ',beta_interp_current
+
     !---Do instant change in beta as function of flow speed
     if(event_counter == 2) then
         do f = 1, num_isotopes
@@ -95,19 +97,11 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                 
                 beta_j(f,g)         = beta_interp_current(f,g) 
                 
-                !print *,'beta_j-  ', beta_j_minus_1
-                !print *,'beta_j   ', beta_j
-                !print *,'event time prev ',event_time_previous
-                !print *,'current time',current_time
-                !print *,'prev time   ',event_time
- 
                 Large_Lambda = lamda_i_mat(f,g)*number_half_lifes
                
                 beta_change_all_current(f,g) = &
                     (1.0_dp - exp(-Large_Lambda*(current_time - event_time)))
                 
-                !print *,'beta change all ',beta_change_all_current 
-
                 if( event_occuring .eqv. .TRUE.) then
                     
                     beta_change(f,g)   = beta_change(f,g) + &
@@ -116,24 +110,27 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                      !+ &
                      !( beta_j_minus_1(f,g) - beta_initial_vec(f,g))*&
                      !beta_change_all_previous(f,g)
+                
+                    !print *,'beta_j-  ', beta_j_minus_1
+                    !print *,'beta_j   ', beta_j
+                    !print *,'event time prev ',event_time_previous
+                    !print *,'current time',current_time
+                    !print *,'prev time   ',event_time
+                
+
                 else
                     beta_change(f,g)   = beta_change(f,g) + &
                      ( beta_j(f,g) - beta_initial_vec(f,g) )*&
                      ( beta_change_all_current(f,g) - beta_change_all_previous(f,g) )
                 end if
                 
-                !print *,' change diff ',(beta_change_all_current(f,g) - beta_change_all_previous(f,g))
-                
-                !print *,'beta change', beta_change 
                 !---Store correction per delay group and isotope 
                 beta_correction_vec(f,g) = beta_initial_vec(f,g) + beta_change(f,g) 
-                !print *,'  '                
                 !---Keep a running sum of the changes 
                 beta_change_all_previous(f,g) = &
                             beta_change_all_current(f,g)
                 
                 beta_j_minus_1(f,g) = beta_initial_vec(f,g)
-                !beta_j_minus_1(f,g) = beta_j(f,g)
 
             end do
         end do
