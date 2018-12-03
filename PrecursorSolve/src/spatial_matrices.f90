@@ -90,10 +90,8 @@ subroutine spatial_matrices (n, nl_iter)
             
             do j = 1, nodes_per_elem
                  !---Determine A matrix - only needs to be done once
-                if( (n < 2) .and. (nl_iter < 2) ) then
                     elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                      cnst*shape_fcn(i)*shape_fcn(j)
-                end if
                 !---Determine U matrix
                 elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                      evaluated_velocity*cnst*shape_fcn(j)*&

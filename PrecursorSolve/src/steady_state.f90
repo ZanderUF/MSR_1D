@@ -158,7 +158,7 @@ implicit none
        end do
     end do   
  
-!--Calculate initial total power
+!---Calculate initial total power
     total_power = 0.0_dp 
 	do i = 1, num_elem
         do j = 1, nodes_per_elem
@@ -174,10 +174,6 @@ implicit none
             beta_initial_vec(f,g) = gen_time*precursors_lambda_vec(f,g)/total_power
         end do
     end do
-
-    print *,' precursors ', precursors_lambda_vec
-    print *,' total power', total_power
-    print *,' beta_initial ', beta_initial_vec
 
     beta_correction = sum(beta_initial_vec)
 
