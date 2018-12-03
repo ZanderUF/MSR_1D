@@ -36,7 +36,7 @@ subroutine transient_backward_euler()
     abs_max_nl_iter = 600 
     nl_iter_tolerance = 1E-12_dp
     
-    time_constant = -10.0_dp
+    time_constant = -0.2_dp
     event_start_time = delta_t 
 
 !---Start time-dependent solve
@@ -50,50 +50,50 @@ subroutine transient_backward_euler()
             L2_norm_current = 0.0
             difference_counter = 0
             
-            !if(Read_DIF3D .eqv. .TRUE.) then
+            if(Read_DIF3D .eqv. .TRUE.) then
                 !---Logic for evaluating beta over time
                 !---This determines the first 'event' time for the whole transient
-                !if( t0 == event_start_time) then
-                !    event_counter = 1
-                !    event_time = event_start_time 
-                !    event_time_previous = event_start_time - delta_t 
-                !    event_occuring = .TRUE.
-                !end if 
-                !
-                !if(t0 >= event_start_time) then
-                !    !---Very the flow rate with time
-                !    if(event_occuring .eqv. .TRUE.) then
-                !        mass_flow = mass_flow_initial*exp(time_constant*t0)
-                !    end if
-                !    !---Evaluate pump coast down 
-                !    !---Stop after get to 80% of starting flow rate
-                !    if( mass_flow > 0.001*mass_flow_initial) then
-                !       
-                !        !--Event counter = 2 --> instant | 1 --> lagged
-                !        event_counter = 1    
-                !        
-                !        End_Event = .FALSE. 
-                !        event_occuring = .TRUE.
-                !    
-                !        call evaluate_beta_change(event_time, event_time_previous, &
-                !                                  event_counter, event_occuring)
-                !        
-                !        event_time          = t0  
-                !        event_time_previous = event_time - delta_t
-                !    else
-                !        !---No more 'event's happening so this is the last event time
-                !        event_counter = 1 
-                !        event_occuring = .FALSE.
-                !        call evaluate_beta_change(event_time,event_time_previous,&
-                !                                  event_counter,event_occuring)
-                !    end if
+                if( t0 == event_start_time) then
+                    event_counter = 1
+                    event_time = event_start_time 
+                    event_time_previous = event_start_time - delta_t 
+                    event_occuring = .TRUE.
+                end if 
+                
+                if(t0 >= event_start_time) then
+                    !---Very the flow rate with time
+                    if(event_occuring .eqv. .TRUE.) then
+                        mass_flow = mass_flow_initial*exp(time_constant*t0)
+                    end if
+                    !---Evaluate pump coast down 
+                    !---Stop after get to 80% of starting flow rate
+                    if( mass_flow > 0.001*mass_flow_initial) then
+                       
+                        !--Event counter = 2 --> instant | 1 --> lagged
+                        event_counter = 1    
+                        
+                        End_Event = .FALSE. 
+                        event_occuring = .TRUE.
+                    
+                        call evaluate_beta_change(event_time, event_time_previous, &
+                                                  event_counter, event_occuring)
+                        
+                        event_time          = t0  
+                        event_time_previous = event_time - delta_t
+                    else
+                        !---No more 'event's happening so this is the last event time
+                        event_counter = 1 
+                        event_occuring = .FALSE.
+                        call evaluate_beta_change(event_time,event_time_previous,&
+                                                  event_counter,event_occuring)
+                    end if
 
-                !end if 
-            !else
-                if(mass_flow > 0.5*mass_flow_initial) then
-                    mass_flow = mass_flow_initial*exp(time_constant*t0)
-                end if
-            !end if
+                end if 
+            else
+                !if(mass_flow > 0.5*mass_flow_initial) then
+                !    mass_flow = mass_flow_initial*exp(time_constant*t0)
+                !end if
+            end if
             
             nonlinearloop: do  
                 !---Create element matrices and assemble

@@ -34,8 +34,8 @@ subroutine transient_forward_euler()
     temperature_soln_prev = temperature_soln_new
     time_constant = -0.2_dp
     
-    event_start_time = 0.0_dp 
-
+    event_start_time = delta_t 
+print *,' mass flow', mass_flow
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
         write(outfile_unit, fmt='(a)'), ' ' 

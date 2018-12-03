@@ -193,12 +193,12 @@ implicit none
             (beta_initial_vec(f,g),g=1,num_delay_group)
 	end do
     write(outfile_unit,fmt='(a)'), ' '
-    write(outfile_unit, fmt='(a,f15.8)'), 'Total beta is: ', sum(beta_initial_vec)
+    write(outfile_unit, fmt='(a,f12.8)'), 'Total beta is: ', sum(beta_initial_vec)
     
    !---Write out to make tabulation of beta vs. flow speed easier 
     do f = 1, num_isotopes
-        write(beta_special_unit,fmt='(12f15.4,12f15.10)'), mass_flow , &
-            (beta_initial_vec(f,g),g=1,num_delay_group)
+        write(beta_special_unit,fmt='(es12.6,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10)') &
+            mass_flow , (beta_initial_vec(f,g),g=1,num_delay_group),sum(beta_initial_vec)
     end do
 
 !---Set steady state flag off 
