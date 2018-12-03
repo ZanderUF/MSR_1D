@@ -15,6 +15,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     USE mesh_info_M
     USE material_info_M
     USE flags_M
+    USE element_matrices_M
 
     implicit none
 
@@ -47,11 +48,11 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                    !---Precursors*lambda
                    precursors_elem(i) = precursors_elem(i) + &
                         lamda_i_mat(f,g)*&
-                        elem_vol_int(i,j)*&
+                        vol_int(j)*&
                         precursor_soln_prev(f,g,i,j)
 
                    precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
-                                      elem_vol_int(i,j)*&
+                                      vol_int(j)*&
                                       precursor_soln_prev(f,g,i,j)
                 end do
             end do
@@ -66,10 +67,10 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
         do j = 1, nodes_per_elem
             total_power = total_power + &
                           power_amplitude_prev*&
-                          spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                          spatial_power_fcn(i,j)*vol_int(j)
             
             total_spatial_fcn = total_spatial_fcn + &
-                           spatial_power_fcn(i,j)*elem_vol_int(i,j)
+                           spatial_power_fcn(i,j)*vol_int(j)
 
         end do
     end do

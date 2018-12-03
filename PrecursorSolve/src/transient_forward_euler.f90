@@ -150,7 +150,7 @@ subroutine transient_forward_euler()
                   Reactivity|       Beta|   Temp Rho|&
                  Density Rho|   Mass flow'
 	        end if
-	        write(power_outfile_unit, ('(f15.8 ,f15.8,f15.8, f12.8,&
+	        write(power_outfile_unit, ('(f15.8 ,es14.3,es14.3, f12.8,&
                                          f15.12,f12.8,f12.8,f12.2)')), &
 	          t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
               reactivity, beta_correction,total_temperature_feedback,&

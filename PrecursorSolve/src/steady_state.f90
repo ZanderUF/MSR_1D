@@ -11,7 +11,8 @@ subroutine steady_state()
     USE mesh_info_M
     USE solution_vectors_M
     USE material_info_M
-    
+    USE element_matrices_M
+
 implicit none
 
 !---Dummy
@@ -151,7 +152,7 @@ implicit none
                    !---Precursors*lambda
                    precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
                                       lamda_i_mat(f,g)*&
-                                      elem_vol_int_fe(j)*&
+                                      vol_int(j)*&
                                       precursor_soln_prev(f,g,i,j)
                 end do
             end do
@@ -164,7 +165,7 @@ implicit none
         do j = 1, nodes_per_elem
             total_power = total_power + &
                         power_amplitude_prev*&
-                        spatial_power_fcn(i,j)*elem_vol_int_fe(j)
+                        spatial_power_fcn(i,j)*vol_int(j)
         end do
     end do
 

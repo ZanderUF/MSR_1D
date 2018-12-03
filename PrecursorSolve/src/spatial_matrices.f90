@@ -53,11 +53,14 @@ subroutine spatial_matrices (n, nl_iter)
     matrix_W_right_face = 0.0_dp
     matrix_W_left_face  = 0.0_dp
     elem_matrix_U       = 0.0_dp
-    elem_matrix_A       = 0.0_dp
     elem_matrix_F       = 0.0_dp
     elem_vec_f          = 0.0_dp
     elem_vec_q          = 0.0_dp    
     elem_vol_int(n,:)   = 0.0_dp 
+
+    if( (n==1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then
+        elem_matrix_A       = 0.0_dp
+    end if
 
 !---Integrate over Gauss pts 
     gaussintegration: do g = 1 , num_gaus_pts 
@@ -83,27 +86,30 @@ subroutine spatial_matrices (n, nl_iter)
 
         do i=1, nodes_per_elem
             
+            !---Only needed if we are changing length of elements
             elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
             
             elem_vec_q(i) = elem_vec_q(i)+ &
                     evaluated_spatial_power*cnst*shape_fcn(i)  
             
             do j = 1, nodes_per_elem
-                 !---Determine A matrix - only needs to be done once
+                !---Determine A matrix - only needs to be done once
+                
+                if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0) ) then 
                     elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                      cnst*shape_fcn(i)*shape_fcn(j)
-                !---Determine U matrix
-                elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
-                                     evaluated_velocity*cnst*shape_fcn(j)*&
+                end if
+                   elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
+                                    evaluated_velocity*cnst*shape_fcn(j)*&
                                      global_der_shape_fcn(i)
+                
             end do !---End loop over j matrix entries
         end do !---End loop over i matrix entries
      enddo gaussintegration!---end do over gauss pts
    
-    !elem_matrix_A = elem_matrix_A*2.0_dp
 
     !---Invert A matrix, only needs to be done once
-    if ( (n < 2) .and. (nl_iter < 2) ) then
+    if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then  
         do i = 1, nodes_per_elem
             do j = 1, nodes_per_elem
                 inverse_A_matrix(i,j) = elem_matrix_A(i,j)
