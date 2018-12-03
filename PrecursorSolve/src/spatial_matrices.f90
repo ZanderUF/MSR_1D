@@ -87,6 +87,7 @@ subroutine spatial_matrices (n, nl_iter)
             
             elem_vec_q(i) = elem_vec_q(i)+ &
                     evaluated_spatial_power*cnst*shape_fcn(i)  
+            
             do j = 1, nodes_per_elem
                  !---Determine A matrix - only needs to be done once
                 elem_matrix_A(i,j) = elem_matrix_A(i,j) + &

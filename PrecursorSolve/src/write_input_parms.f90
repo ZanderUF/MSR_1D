@@ -78,7 +78,7 @@ subroutine write_out_parms()
 
     write(outfile_unit, fmt='(a,f10.8)'), 'Reactivity input: ', reactivity_input
 
-    write(outfile_unit, fmt='(a,f10.8)'), 'Save the spatial solution vectors at &
+    write(outfile_unit, fmt='(a,f12.4)'), 'Save the spatial solution vectors at &
                             this interval: ', save_time_interval 
     write(outfile_unit, fmt='(a)'), ' '
 

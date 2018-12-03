@@ -86,7 +86,16 @@
               if( read_ramp == 'yes' ) then
                   ramp_flag = .TRUE.
               end if
-           
+           !--
+           case('rmpb') 
+              ramp_start_time = dread(i0,iret)  
+
+           case('rmpe')
+              ramp_end_time = dread(i0,iret)
+           case('stpb')
+                step_start_time = dread(i0,iret)
+           case('stpe')
+                step_end_time = dread(i0,iret)
            case('zag=')
               read_zag = aread(i4, iret)
               if( read_zag == 'no ') then

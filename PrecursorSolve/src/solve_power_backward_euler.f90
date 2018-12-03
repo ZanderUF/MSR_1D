@@ -32,7 +32,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                total_precursor_ref_sum, total_spatial_fcn,&
                total_precursors_fuel, &
                rho_initial, step_time
-    real(dp) :: ramp_end_time, ramp_start_time, step_end_time, step_start_time
     real(dp) :: first_zag, second_zag, third_zag, reactivity_zag
     real(dp) :: total_power
 
@@ -107,11 +106,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     !print *,' '
 
 !---Hardcoded times to start perturbation - should read from input
-    step_start_time = 0.0 
-    step_end_time = 1.0 
-    
-    ramp_start_time = 0.0 
-    ramp_end_time   = 0.01
 
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then
@@ -173,8 +167,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     
     reactivity_feedback = total_temperature_feedback + total_density_feedback
 
-    !print *,' nliter     ',nl_iter
-    !print *,' amp        ',power_amplitude_prev
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &
@@ -195,20 +187,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           total_precursors_fuel
     end if
     
-    !print *,'beta corr      ', beta_correction
-    !print *,'total precursors fuel ', total_precursors_fuel    
-    !print *,'First term   ', delta_t*(( reactivity  &
-    !    - beta_correction )/gen_time)*power_amplitude_prev 
-    !    
-    !print *,'Second term  ', delta_t*(1.0_dp/total_spatial_fcn)*&
-    !    total_precursors_fuel
-
-    !print *,' power amp new ', power_amplitude_new, ' at ', t0
-    !print *,'  ' 
-    !print *,' starting p ',power_amplitude_last_time
-    !print *,' total prec ',total_precursors_fuel
-    !print *,' amp new    ',power_amplitude_new
-    !print *,' ' 
+     
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0
     do i = Fuel_Inlet_Start, Fuel_Outlet_End 

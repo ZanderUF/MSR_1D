@@ -35,7 +35,7 @@ subroutine transient_forward_euler()
     time_constant = -0.2_dp
     
     event_start_time = delta_t 
-print *,' mass flow', mass_flow
+    
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
         write(outfile_unit, fmt='(a)'), ' ' 
@@ -105,7 +105,7 @@ print *,' mass flow', mass_flow
             
              
             !---Swap solutions
-            !precursor_soln_prev   = precursor_soln_new
+            precursor_soln_prev   = precursor_soln_new
            
             !---Solve for total power after spatial sweep through precursors
             call solve_power_backward_euler(1,t0) 

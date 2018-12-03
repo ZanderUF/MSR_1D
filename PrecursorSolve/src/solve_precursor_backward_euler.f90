@@ -40,10 +40,13 @@ subroutine solve_precursor_backward_euler(isotope,delay_group,n, nl_iter )
 !---Solve for new precursor at delta t
     if(td_method_type == 0) then
         do i = 1, nodes_per_elem
-            precursor_soln_new(isotope,delay_group, n,i) = &
+        
+        precursor_soln_new(isotope,delay_group, n,i) = &
                 precursor_soln_prev(isotope, delay_group, n,i) + &
-                delta_t*(RHS_transient_final_vec(i) )
-
+                delta_t*(H_times_soln_vec(i) + &
+                (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
+                A_times_W_times_upwind_elem_vec(i))
+        !
         !---test to make sure values are not too small
         !if(precursor_soln_new(isotope, delay_group, n, i) < 1E-16_dp) then
         !    precursor_soln_new(isotope, delay_group, n, i) = 0.0
