@@ -25,8 +25,10 @@ implicit none
     character(len=20) :: power_soln_file_name
     character(len=7)  :: input_file
     character(len=20) :: beta_special_name
+    real(dp) :: start, finish
 
 !---Name the files to write out something sensible
+
     outfile_name                = 'outfile.txt'
     steady_state_soln_file_name = 'ss_precursor_soln.txt'
     last_time_file_name         = 'last_t_soln.txt'
@@ -93,6 +95,7 @@ beta_change_all_previous(:,:) = 0.0_dp
         call read_beta_flow
     end if
 
+    call cpu_time(start)
 !---Steady state solve for temperature 
     call steady_state
     
@@ -114,6 +117,11 @@ beta_change_all_previous(:,:) = 0.0_dp
             call transient_backward_euler
         end if
     end if
+
+    !---Print timing information
+    call cpu_time(finish)
+    
+    write(outfile_unit, fmt=('(a,es16.4,a)')) 'Calculation time = ',finish-start , ' seconds' 
 
  deallocate(precursor_soln_new, &
             power_soln_new, &

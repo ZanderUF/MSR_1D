@@ -110,7 +110,7 @@ subroutine transient_forward_euler()
             !---Solve for total power after spatial sweep through precursors
             call solve_power_backward_euler(1,t0) 
             
-            power_amplitude_prev  = power_amplitude_new
+            !power_amplitude_prev  = power_amplitude_new
             !---Adjust the beta for time step
 
             !---Write solution to a file periodically

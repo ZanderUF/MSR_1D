@@ -95,17 +95,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     !if(t0 == 0.0) then
     !    beta_correction = gen_time*total_precursors_fuel/total_power 
     !end if
-    !print *,'mass flow', mass_flow
-    !print *,' beta_correction',beta_correction
-    !print *,' ' 
-    !print *,'precursor total',total_precursors_fuel
-         
-    !print *,'total power    ', total_power
-    !print *,'reactivity     ', reactivity_feedback
-    !print *,'reactivity     ', reactivity
-    !print *,'beta correction', beta_correction
-    !print *,' '
-
+    
 !---Hardcoded times to start perturbation - should read from input
 
 !---STEP perturbation
@@ -177,8 +167,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel
     end if
-   
-    
 
     if(td_method_type == 1) then ! Backward Euler
         power_amplitude_new = power_amplitude_last_time + &
@@ -187,7 +175,6 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                           + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel
     end if
-    
      
 !---Project power onto spatial shape
     power_soln_new(:,:) = 0.0

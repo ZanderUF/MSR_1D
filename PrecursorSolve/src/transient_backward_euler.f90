@@ -32,7 +32,7 @@ subroutine transient_backward_euler()
     real(dp)    :: event_start_time, event_time,event_time_previous, t1
 
 !---Set to make sure we don't iterate forever if we are not converging
-    max_nl_iter = 5 
+    max_nl_iter = 50 
     abs_max_nl_iter = 600 
     nl_iter_tolerance = 1E-12_dp
     
@@ -226,7 +226,7 @@ subroutine transient_backward_euler()
                   Reactivity|       Beta|   Temp Rho|&
                  Density Rho|   Mass flow'
 	        end if
-	        write(power_outfile_unit, ('(f15.8 ,f15.8,f15.8, f12.8,&
+	        write(power_outfile_unit, ('(f15.8 ,es14.3,es14.3, f12.8,&
                                          f15.12,f12.8,f12.8,f12.2)')), &
 	          t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
               reactivity, beta_correction,total_temperature_feedback,&

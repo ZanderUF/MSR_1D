@@ -46,12 +46,14 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
             exit
         end if
     end do
+
     !---Interpolate to get beta for each group for the mass flow
      do f = 1, num_isotopes
         do g = 1, num_delay_group
             if(i == 1) then
-                mass_flow_2 = Beta_Fcn_Flow(i,1)
-                mass_flow_1 = Beta_Fcn_Flow(i+1,1)
+               
+                mass_flow_1 = Beta_Fcn_Flow(i,1)
+                mass_flow_2 = Beta_Fcn_Flow(i+1,1)
                 
                 beta_1 = Beta_Fcn_Flow(i,g+1)
                 beta_2 = Beta_Fcn_Flow(i+1,  g+1)
@@ -60,8 +62,8 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                 mass_flow_1 = Beta_Fcn_Flow(i-1,  1)
                 mass_flow_2 = Beta_Fcn_Flow(i,1)
                 
-                beta_1 = Beta_Fcn_Flow(i-1,g+1)
-                beta_2 = Beta_Fcn_Flow(i,  g+1)
+                beta_1 = Beta_Fcn_Flow(i,g+1)
+                beta_2 = Beta_Fcn_Flow(i-1,  g+1)
 
             end if
             
