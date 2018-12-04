@@ -34,6 +34,6 @@ module global_parameters_M
     data elem_vol_int_fe / 0.16666667198838597,0.66666665602322805, &
                           0.16666667198838597 /
     
-
+    integer :: beta_counter
 
 end module global_parameters_M 

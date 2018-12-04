@@ -34,7 +34,7 @@ subroutine transient_forward_euler()
     temperature_soln_prev = temperature_soln_new
     time_constant = -0.2_dp
     
-    event_start_time = delta_t 
+    event_start_time =  delta_t
     
     transient = .TRUE.
     if ( transient .eqv. .TRUE. ) then
@@ -59,7 +59,7 @@ subroutine transient_forward_euler()
                     end if
                     !---Evaluate pump coast down 
                     !---Stop after get to 80% of starting flow rate
-                    if( mass_flow > 0.2*mass_flow_initial) then
+                    if( mass_flow > 0.4*mass_flow_initial) then
                         
                         event_counter = 1    
                         End_Event = .FALSE. 
@@ -96,7 +96,7 @@ subroutine transient_forward_euler()
                
                 if( mass_flow > 0.0 ) then
                     !---Solve for temperature
-                    call solve_temperature(n)
+                    !call solve_temperature(n)
                     !---Solve for velocity
                     call solve_velocity(n)
                 end if

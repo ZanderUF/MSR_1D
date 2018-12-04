@@ -103,19 +103,19 @@ beta_change_all_previous(:,:) = 0.0_dp
 
 !---Time dependent calculation
     if(time_solve .eqv. .TRUE. ) then
+        
         if( td_method_type == 0) then
             write(outfile_unit, fmt=('(a)')) ' '
             write(outfile_unit, fmt=('(a)')) 'Performing forward Euler time integration' 
-            !---Transient solve forward Euler method 
-            call transient_forward_euler
         end if
         
         if( td_method_type == 1) then
             write(outfile_unit, fmt=('(a)')) ' '
             write(outfile_unit, fmt=('(a)')) 'Performing backward Euler time integration'
-            !---Transient solve backward Euler method
-            call transient_backward_euler
-        end if
+        end if    
+        
+        call transient_euler
+    
     end if
 
     !---Print timing information

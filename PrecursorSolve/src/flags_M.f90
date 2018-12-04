@@ -21,5 +21,7 @@ implicit none
     logical :: read_power_from_file = .FALSE.
     logical :: Read_DIF3D = .FALSE.
     logical :: End_Event 
+    logical :: BetaFeedback
+    logical :: nl_iter_flag = .TRUE.
 
 end module flags_M

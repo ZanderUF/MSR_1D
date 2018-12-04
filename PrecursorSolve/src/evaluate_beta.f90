@@ -1,5 +1,5 @@
+
 !----Evaluate change in beta due to changes in flow speed
-!    
 
 subroutine evaluate_beta_change(event_time, event_time_previous, &
                                 event_counter, event_occuring)
@@ -39,19 +39,20 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
             time_cutoff(f,g) = 10.0*(log(2.0_dp)/lamda_i_mat(f,g))
         end do
     end do
-   
+     
     !---Get Beta for the current mass flow
     do i = 1, number_entries_beta
-        if( mass_flow <=  Beta_Fcn_Flow(i,1) ) then
+        if( mass_flow >=  Beta_Fcn_Flow(i,1) ) then
             exit
         end if
     end do
-
+        beta_counter = i
+        
     !---Interpolate to get beta for each group for the mass flow
      do f = 1, num_isotopes
         do g = 1, num_delay_group
             if(i == 1) then
-               
+
                 mass_flow_1 = Beta_Fcn_Flow(i,1)
                 mass_flow_2 = Beta_Fcn_Flow(i+1,1)
                 
@@ -59,14 +60,14 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                 beta_2 = Beta_Fcn_Flow(i+1,  g+1)
 
             else
-                mass_flow_1 = Beta_Fcn_Flow(i-1,  1)
-                mass_flow_2 = Beta_Fcn_Flow(i,1)
+
+                mass_flow_2 = Beta_Fcn_Flow(i-1,  1)
+                mass_flow_1 = Beta_Fcn_Flow(i,1)
                 
-                beta_1 = Beta_Fcn_Flow(i,g+1)
-                beta_2 = Beta_Fcn_Flow(i-1,  g+1)
+                beta_2 = Beta_Fcn_Flow(i,g+1)
+                beta_1 = Beta_Fcn_Flow(i-1,  g+1)
 
             end if
-            
                         
             a = mass_flow   - mass_flow_1
             b = mass_flow_2 - mass_flow
@@ -76,8 +77,6 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
         end do
     end do
     
-    !print *,'beta_interp ',beta_interp_current
-
     !---Do instant change in beta as function of flow speed
     if(event_counter == 2) then
         do f = 1, num_isotopes
@@ -128,7 +127,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                     !print *,'event time prev ',event_time_previous
                     !print *,'current time',current_time
                     !print *,'prev time   ',event_time
-                
+                    !print *,'beta change ', beta_change
 
                 else
                     beta_change(f,g)   = beta_change(f,g) + &
