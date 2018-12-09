@@ -14,6 +14,7 @@ subroutine transient_euler()
     USE time_info_M
     USE mesh_info_M
     USE material_info_M
+    USE element_matrices_M
 
     implicit none
 
@@ -21,14 +22,22 @@ subroutine transient_euler()
 
 !---Local
     integer :: f,g,n,i,j,nl_iter
-    real(dp), dimension(num_isotopes, num_delay_group) :: L2_norm_current, L2_norm_prev
+    real(dp), dimension(num_isotopes, num_delay_group) :: L2_norm_current, L2_norm_prev,&
+                                                          l2_residual
     real(dp) :: t1
     integer :: difference_counter
+    real(dp) :: sum_residual
+   
+    !if(feedback_method == 3) then
+    !    BetaFeedback = .TRUE.
+    !else
 
-    BetaFeedback = .FALSE.
+    !    BetaFeedback = .FALSE.
+    !end if
 
 !---Start time-dependent solve
     if ( time_solve .eqv. .TRUE. ) then
+        
         write(outfile_unit, fmt='(a)'), ' ' 
         write(outfile_unit, fmt='(a)'), 'In backward Euler transient loop'
         
@@ -43,19 +52,23 @@ subroutine transient_euler()
             call beta_feedback 
            
             !---Decide if we are doing backward or forward euler
-                
             nl_iter_flag = .TRUE. 
-            
+            residual(:,:,:,:) = 0.0_dp
+           
             nonlinearloop: do  
                 if(nl_iter_flag .eqv. .TRUE.) then 
                     !---Create element matrices and assemble
                     elements_loop: do n = 1 , num_elem 
                         
-                        if( mass_flow > 0.0) then
-                            !call solve_temperature(n)
-                            call solve_velocity(n)
-                        end if
-                        
+                            if( mass_flow > 0.0) then
+                                if(feedback_method == 1) then
+                                    call solve_temperature(n)
+                                    call solve_velocity(n)
+                                else
+                                    call solve_velocity(n)    
+                                end if
+                            end if
+
                         !---Generate spatial matrices
                         call spatial_matrices(n,nl_iter)
                         call numerical_flux_matrices(n,nl_iter)
@@ -77,19 +90,51 @@ subroutine transient_euler()
                     if(td_method_type == 0 ) then
                         nl_iter_flag = .FALSE. 
                     else
+                        difference_counter = 0             
                         !---Calculate the l2 norm
                         call l2_norm(nl_iter, difference_counter, &
                                      L2_norm_prev,L2_norm_current)
                     end if
-                
                 nl_iter = nl_iter + 1 
                 
                 else
                     exit
                 end if
+                
+                precursor_soln_prev       = precursor_soln_new 
+                power_amplitude_prev      = power_amplitude_new
+                precursor_soln_last_time  = precursor_soln_new
+                power_amplitude_last_time = power_amplitude_new
+                
+                power_soln_prev       = power_soln_new
+                temperature_soln_prev = temperature_soln_new
+                velocity_soln_prev    = velocity_soln_new
+                density_soln_prev     = density_soln_new
 
             enddo nonlinearloop 
             !***************************************************
+            
+            !---Only automate time stepping
+            if(td_method_type == 1) then
+                sum_residual = 0.0
+                do f = 1, num_isotopes 
+                    do g = 1, num_delay_group
+                        l2_residual(f,g) = sqrt( sum(residual(f,g,:,:)*&
+                                                     residual(f,g,:,:)))
+                        do i = 1, num_elem
+                           do j = 1, nodes_per_elem
+                                !sum_residual(f,g,i) = sum_residual(f,g,i) + & 
+                                !               residual(f,g,i,j)*vol_int(j)
+                           end do
+                        end do
+                    
+                    end do
+                end do
+            end if
+           
+            !write(nl_outfile_unit, fmt='(es16.6 ,1I6,16es16.6,16es16.6,&
+            !                                16es16.6,16es16.6,16es16.6,16es16.6)'),&
+            !                                t0,nl_iter, (l2_residual(1,g), g=1,num_delay_group)
             
             transient_save_flag = .TRUE.
             
@@ -104,14 +149,20 @@ subroutine transient_euler()
 
             !---Only want to calculate velocity if mass flow is defined
             if(mass_flow > 0.0 ) then
+                power_soln_starting   = power_soln_new
+                !temperature_soln_starting = temperature_soln_new
+                !density_soln_starting = density_soln_new
+                
+                power_soln_prev       = power_soln_new
                 temperature_soln_prev = temperature_soln_new
                 velocity_soln_prev    = velocity_soln_new
+                density_soln_prev     = density_soln_new
             end if
 
-           !---Stop if we've exceeded TMAX.
-           if ( tmax <= t0 ) then
-               exit
-           end if
+            !---Stop if we've exceeded TMAX.
+            if ( tmax <= t0 ) then
+                exit
+            end if
           
            !---Increment the time step
            t1 = t0 + delta_t

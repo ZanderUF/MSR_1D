@@ -36,11 +36,11 @@ subroutine write_periodic
  
         write(power_write_unit,fmt='(a,es23.16)'), &
         'Power distribution at time:',t0
-        write(power_write_unit,fmt='(a)'), 'Position(x) Power [n/cm^3*s]'
+        write(power_write_unit,fmt='(a)'), 'Position(x) | Power [n/cm^3*s]'
         
         do i = 1,num_elem
             do j = 1, nodes_per_elem
-                write(power_write_unit, fmt='(f6.3, es23.16)') &
+                write(power_write_unit, fmt='(f10.3, es23.16)') &
                       global_coord(i,j), power_soln_new(i,j)
             end do
         end do

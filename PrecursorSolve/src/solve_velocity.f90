@@ -59,24 +59,20 @@ implicit none
     !end if
 
     !---Loop over all nodes in element
-    do j = 1, nodes_per_elem
+    do j = 1, nodes_per_elem 
         temperature_eval       = temperature_soln_prev(n,j)
         !---Evaluate density based on temperature
         call density_corr(temperature_eval, density_eval)
-        density_soln_new(n,j)  = density_eval
-       
-        !---New velocity
-        velocity_soln_new(n,j) = (mass_flow / &
+   
+            density_soln_new(n,j)  = density_eval
+            !---New velocity
+            velocity_soln_new(n,j) = (mass_flow / &
                                  (area_variation(n,j)*density_eval))
         
-        !---Evaluate feedback based on density change
-        Density_Reactivity_Feedback(n,j) = (spatial_expansion_fcn(n,j) / &
+            !---Evaluate feedback based on density change
+            Density_Reactivity_Feedback(n,j) = (spatial_expansion_fcn(n,j) / &
                         (density_soln_starting(n,j)*total_density_change)) * &
-                        ( density_soln_new(n,j) - density_soln_starting(n,j) )
-
-    end do
-
+                        ( density_soln_starting(n,j) - density_soln_new(n,j) )
+        end do
+    
 end subroutine solve_velocity
-
-
-

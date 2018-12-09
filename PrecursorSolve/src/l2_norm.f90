@@ -1,6 +1,5 @@
 
 
-
 !---Calculate the l2 norm of the precursor soln
 
 subroutine l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
@@ -27,7 +26,7 @@ subroutine l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
     integer  :: abs_max_nl_iter
     
 
-    max_nl_iter = 50
+    max_nl_iter = 30 
     abs_max_nl_iter = 600
     nl_iter_tolerance = 1E-12_dp
     
@@ -35,11 +34,11 @@ subroutine l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
     if(nl_iter > 1) then
         do f = 1, num_isotopes
             do g = 1, num_delay_group
-                L2_norm_current(f,g) = sqrt( sum( precursor_soln_new(f,g,:,:)*&
-                                       precursor_soln_new(f,g,:,:) ) ) 
+                L2_norm_current(f,g) = sqrt(sum( precursor_soln_new(f,g,:,:)*&
+                                       precursor_soln_new(f,g,:,:) ))   
             end do
         end do
-        
+
         !---Calculate the difference in the L2 norms between iterations
         do f = 1, num_isotopes
             do g = 1, num_delay_group
@@ -48,6 +47,7 @@ subroutine l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
                 if( difference_L2 < nl_iter_tolerance) then
                     difference_counter = difference_counter + 1
                 end if
+            
             end do
         end do
         !---Need to make sure the L2 norm converges for all precursor groups

@@ -12,6 +12,7 @@ subroutine initialize()
     USE material_info_M
     USE flags_M
     USE solution_vectors_M
+    USE element_matrices_M
 
 implicit none
 
@@ -51,7 +52,7 @@ implicit none
         do i = 1, num_elem
             do j = 1, nodes_per_elem
                 !---Beginning piping 
-                if( i <= Fuel_Inlet_Start )      then
+                if( i < Fuel_Inlet_Start )      then
                     area_variation(i,j)    = Area_Pipe 
                     temperature_soln_new(i,j) = inlet_temperature  
                 !---Fuel inlet plenum
@@ -71,13 +72,16 @@ implicit none
                     temperature_soln_new(i,j) = &
                     (outlet_temperature - inlet_temperature)/&
                     (Fuel_Core_End - Fuel_Core_Start)* &
-                    (i-Fuel_Core_End ) + &
-                    outlet_temperature 
-
+                    ( global_coord(i,j) - global_coord(Fuel_Core_End,3) ) + &
+                    outlet_temperature
+                    !( global_coord(i,j)-global_coord(Fuel_Core_End,1) ) + &
+                    !outlet_temperature 
+                    
                 !---Fuel outlet plenum
                 else if ( i <= Fuel_Outlet_End ) then
                     call Calculate_Plenum_Area(i,j,Area_Plenum)
                     area_variation(i,j) = Area_Plenum
+                    
                     temperature_soln_new(i,j) = outlet_temperature 
                 !---End piping
                 else if (i <= Heat_Exchanger_Start) then
@@ -88,7 +92,7 @@ implicit none
                     temperature_soln_new(i,j) = &
                     (inlet_temperature - outlet_temperature )/&
                     (Heat_Exchanger_End - Heat_Exchanger_Start)* &
-                    (i - Heat_Exchanger_End) + &
+                    (global_coord(i,j) - global_coord(Heat_Exchanger_End,3) ) + &
                     inlet_temperature 
                     
                     area_variation(i,j)    = Area_Pipe
@@ -121,7 +125,7 @@ implicit none
                 !---Beginning piping 
                 if( i <= Fuel_Inlet_Start) then
                     area_variation(i,j)    = Area_Pipe 
-                    spatial_power_fcn(i,j) = 1.0_dp 
+                    spatial_power_fcn(i,j) = 0.0_dp 
                 !---Fuel region
                 else if (i <=Fuel_Outlet_End) then
                     area_variation(i,j)    = Area_Core 
@@ -153,6 +157,7 @@ implicit none
     !---Need to keep the original density to see how far off from original we are
     density_soln_starting     = density_soln_new
     temperature_soln_starting = temperature_soln_new
+    power_soln_prev           = power_soln_new
     power_soln_starting       = power_soln_new 
 
 !---Get longest lived precursor group constant

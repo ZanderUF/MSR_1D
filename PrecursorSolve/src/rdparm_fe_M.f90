@@ -62,7 +62,6 @@
               if (read_dif3d_inp == 'yes ') then
                   Read_DIF3D = .TRUE.
               end if
-         
    
           case('meth') ! which time dependent method
               td_method_type = iread(i0,iret)

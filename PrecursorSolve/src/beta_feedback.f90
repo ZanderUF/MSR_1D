@@ -17,11 +17,11 @@ subroutine beta_feedback
     real(dp) :: event_start_time, event_time,event_time_previous, t1
     
     
-    time_constant = -0.2_dp
+    time_constant = -2.0_dp
     event_start_time = delta_t 
 
    !---Evaluate if
-    if(BetaFeedback .eqv. .TRUE.) then
+    if(feedback_method == 2 ) then
         !---Logic for evaluating beta over time
         !---This determines the first 'event' time for the whole transient
         if( t0 == event_start_time) then
@@ -38,7 +38,7 @@ subroutine beta_feedback
             end if
             !---Evaluate pump coast down 
             !---Stop after get to 80% of starting flow rate
-            if( mass_flow > 0.4*mass_flow_initial) then
+            if( mass_flow > 0.75*mass_flow_initial) then
                
                 !--Event counter = 2 --> instant | 1 --> lagged
                 event_counter = 1    
@@ -60,10 +60,12 @@ subroutine beta_feedback
             end if
     
         end if 
-    else
-        !if(mass_flow > 0.5*mass_flow_initial) then
-        !    mass_flow = mass_flow_initial*exp(time_constant*t0)
-        !end if
+    end if
+
+    if(feedback_method == 3) then 
+        if(mass_flow > 0.8333333_dp*mass_flow_initial) then
+            mass_flow = mass_flow_initial*exp(time_constant*t0)
+        end if
     end if
 
 end subroutine beta_feedback

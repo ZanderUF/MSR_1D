@@ -116,7 +116,7 @@ subroutine solve_power_euler(nl_iter, current_time)
               ((reactivity_input - rho_initial)*&
                (t0 - t_initial))/(ramp_end_time - t_initial)
         elseif ( t0 > ramp_end_time) then
-            reactivity = 0.0 
+            reactivity = reactivity_input 
         end if
     end if  
 !---End RAMP perturbation
@@ -170,7 +170,7 @@ subroutine solve_power_euler(nl_iter, current_time)
 
     if(td_method_type == 1) then ! Backward Euler
         power_amplitude_new = power_amplitude_last_time + &
-                          delta_t*(( reactivity  &
+                          delta_t*(( reactivity + reactivity_feedback  &
                           - beta_correction )/gen_time)*power_amplitude_prev &
                           + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel

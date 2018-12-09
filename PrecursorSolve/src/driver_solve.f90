@@ -25,6 +25,8 @@ implicit none
     character(len=20) :: power_soln_file_name
     character(len=7)  :: input_file
     character(len=20) :: beta_special_name
+    character(len=18) ::nl_out_name
+
     real(dp) :: start, finish
 
 !---Name the files to write out something sensible
@@ -35,6 +37,7 @@ implicit none
     power_soln_file_name        = 'power_amp_soln.txt'
     input_file                  = 'input_t'
     beta_special_name           = 'beta_flowspeed.txt'
+    nl_out_name                 = 'nl_conv_info.txt'
 
 !---Open file for writing out debug information
     open (unit=outfile_unit, file=outfile_name,status='unknown',&
@@ -45,7 +48,9 @@ implicit none
     	  status='unknown',form='formatted',position='asis')
     open (unit=beta_special_unit, file=beta_special_name,&
     	  status='unknown',form='formatted',position='asis')
-    
+    open (unit=nl_outfile_unit, file=nl_out_name,&
+    	  status='unknown',form='formatted',position='asis')
+
 !---Read in problem parameters here
     call datainput_fe(input_file)
 
@@ -84,6 +89,7 @@ allocate(beta_change_all_previous(num_isotopes,num_delay_group),&
          beta_change(num_isotopes,num_delay_group))
 
 allocate(beta_correction_vec(num_isotopes,num_delay_group))
+allocate(residual(num_isotopes,num_delay_group,num_elem,nodes_per_elem))
 
 beta_change_all_previous(:,:) = 0.0_dp
         beta_change(:,:) = 0.0_dp

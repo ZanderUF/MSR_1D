@@ -9,6 +9,7 @@ module solution_vectors_M
     real(dp) , allocatable :: precursor_soln_last_time(:,:,:,:)
     real(dp) , allocatable :: power_soln_last_time(:,:)
 
+    real(dp) , allocatable :: residual(:,:,:,:)
     real(dp) , allocatable :: elem_vec_q_final(:,:,:) 
     real(dp) , allocatable :: elem_vol_int(:,:)
     real(dp) , allocatable :: precursor_soln_new(:,:,:,:) ! isotope,group,node,value

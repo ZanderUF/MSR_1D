@@ -11,6 +11,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     USE global_parameters_M
     USE solution_vectors_M
     USE element_matrices_M
+    USE time_info_M
 
     implicit none
 
@@ -78,7 +79,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     end do
     
     !---Do instant change in beta as function of flow speed
-    if(event_counter == 2) then
+    if(feedback_method==2) then
         do f = 1, num_isotopes
             do g = 1, num_delay_group
                 beta_correction_vec(f,g) = beta_interp_current(f,g)

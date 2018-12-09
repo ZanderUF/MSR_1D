@@ -35,10 +35,12 @@ implicit none
    
     !a = 2007.0_dp
     ! 2800 is not correct but this correlation is wrong for our temp range
-    a = 2800.0_dp
-    b= -0.4571_dp
-     !a =  3226.8_dp
-     !b = -0.7247_dp
+    !a = 2800.0_dp
+    !b= -0.4571_dp
+    
+    !--Russian paper 1975
+    a =  3226.8_dp
+    b = -0.7247_dp
 
     density = (a + b*T)*0.001_dp
     

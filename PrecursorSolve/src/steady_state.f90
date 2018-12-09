@@ -47,6 +47,11 @@ implicit none
 
     nonlinearloop: do !---Nonlinear loop
         elements_loop: do n = 1, num_elem
+            
+            if(mass_flow > 0.0) then
+                call solve_temperature(n)
+                call solve_velocity(n)
+            end if 
             !---Computer spatial matrices 
 	        call spatial_matrices(n,nl_iter)
             call numerical_flux_matrices(n,nl_iter)
@@ -65,35 +70,11 @@ implicit none
         
         !---Swap for for next iteration
         precursor_soln_prev = precursor_soln_new
-        
-        !---Calculate L2 norm to decide when enough iterations are complete 
-        if(nl_iter > 1) then
-             do f = 1, num_isotopes
-                do g = 1, num_delay_group
-                    L2_norm_current(f,g) = sqrt ( sum ( precursor_soln_new(f,g,:,:)*&
-                                           precursor_soln_new(f,g,:,:) ))   ! L2 norm
-                end do
-            end do
+        temperature_soln_prev = temperature_soln_new
+        velocity_soln_prev = velocity_soln_new
 
-        !---Calculate the difference in the L2 norms between iterations 
-            do f = 1, num_isotopes
-                do g = 1, num_delay_group
-                    difference_L2 = abs( L2_norm_prev(f,g) - L2_norm_current(f,g) )
-                    if( difference_L2 < nl_iter_tolerance) then
-                        difference_counter = difference_counter + 1
-                    end if
-                end do
-            end do
-            
-            !---Need to make sure the L2 norm converges for all precursor groups
-            if ( difference_counter == num_delay_group) then
-                max_nl_iter = nl_iter - 1 
-            end if
+        call l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
 
-            !---Swap for next iteration
-            L2_norm_prev = L2_norm_current
-        end if
-        
         nl_iter = nl_iter + 1
     
         !---If we've gone thru too many nonlinear iterations exit
@@ -126,18 +107,27 @@ implicit none
         end do
     end do
    
-    !---Set 'previous' to new - to initialize for time dependent problem
-    do i = 1, num_elem
-        do j = 1,nodes_per_elem
-            power_soln_prev(i,j) = power_soln_new(i,j)
-            temperature_soln_prev(i,j) = temperature_soln_new(i,j)
-            velocity_soln_prev(i,j) = velocity_soln_new(i,j)
+   do i = Fuel_Inlet_Start, Fuel_Outlet_End 
+        do j = 1, nodes_per_elem
+            power_soln_new(i,j) = total_power_initial* &
+                                  power_amplitude_new* &
+                                  spatial_power_fcn(i,j)      
         end do
     end do
+    
+
     !---Set 'previous' to new
     power_amplitude_prev      = power_amplitude_new
     !---For backward euler, need to keep the last value at the time step
     power_amplitude_last_time = power_amplitude_new
+    power_soln_starting       = power_soln_new
+    temperature_soln_starting = temperature_soln_new
+    density_soln_starting     = density_soln_new
+    
+    power_soln_prev           = power_soln_new
+    temperature_soln_prev     = temperature_soln_new
+    velocity_soln_prev        = velocity_soln_new
+    density_soln_prev         = density_soln_new
 
 !---Write precursor solution outfile
     call write_out_soln(soln_outfile_unit,num_elem,transient_save_flag)

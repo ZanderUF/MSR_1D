@@ -19,11 +19,11 @@ module global_parameters_M
     integer :: power_outfile_unit = 20
     integer :: power_file_unit = 12 
     integer :: beta_special_unit = 64
+    integer :: nl_outfile_unit = 78
 
 !---Nonlinear variables
     integer :: max_iter = 1 ! max num of nonlinear iterations to do
     integer :: max_nl_iter  ! numer of nonllinear iterations to do
-    real(dp) :: residual
     real(dp) :: tolerance = 0.001 ! prescribed tolerance
 
 !---Math constants    

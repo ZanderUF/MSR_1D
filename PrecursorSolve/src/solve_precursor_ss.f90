@@ -56,7 +56,6 @@ subroutine solve_precursor_ss(isotope, delay_group, n, nl_iter )
    
     !---Compute RHS vector
     do i = 1, nodes_per_elem
-        !print *,'elem vec q final ', elem_vec_q_final(isotope,delay_group,i)
         rhs_final_vec(i) = elem_vec_q_final(isotope,delay_group,i) + elem_vec_w_left_face(i)
     end do
     

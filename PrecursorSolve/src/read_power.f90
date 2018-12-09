@@ -61,56 +61,74 @@ subroutine read_power
     starting_coordinate = global_coord(Fuel_Inlet_Start,3)
    
     !---Make core regions start at the same global coordinate
-    do i = 1, number_entries
-        original_location = dif3d_power_input(i,1)
-        dif3d_power_input(i,1) = original_location + starting_coordinate
-        dif3d_doppler_input(i,1) = original_location + starting_coordinate
-        dif3d_expansion_input(i,1) = original_location + starting_coordinate
-    end do
+    !do i = 1, number_entries
+    !    !original_location = dif3d_power_input(i,1)
+    !    original_location = 0.0
+    !    dif3d_power_input(i,1) = original_location + starting_coordinate
+    !    dif3d_doppler_input(i,1) = original_location + starting_coordinate
+    !    dif3d_expansion_input(i,1) = original_location + starting_coordinate
+    !end do
 
     counter_power_input = 1
     !---Project from dif3d domain to FE one in this code 
     do i = 1, num_elem
-        if( i <= Fuel_Outlet_End ) then
-        !if( Fuel_Inlet_Start < i .AND. i <= Fuel_Outlet_End ) then
-                current_z = global_coord(i,1)
+        !if( i <= Fuel_Outlet_End ) then
+        if( Fuel_Inlet_Start < i .AND. i < Fuel_Outlet_End ) then
+                current_z = global_coord(i,3)
                 !---Find power value
                 do k = 2, number_entries
-                     read_in_z = dif3d_power_input(k,1)
+                     read_in_z      = dif3d_power_input(k,1)
                      read_in_z_prev = dif3d_power_input(k-1,1)
                      !---Power fraction 
-                     read_in_pow_frac = dif3d_power_input(k,3)
+                     read_in_pow_frac      = dif3d_power_input(k,3)
                      read_in_pow_frac_prev = dif3d_power_input(k-1,3)
                      !---Doppler reactivity
-                     read_in_doppler = dif3d_doppler_input(k,2)
+                     read_in_doppler      = dif3d_doppler_input(k,2)
                      read_in_doppler_prev = dif3d_doppler_input(k-1,2)
                      !---Expansion reactivity
                      read_in_expansion = dif3d_expansion_input(k,2)
                      read_in_expansion_prev = dif3d_expansion_input(k-1,2)
-                     if( current_z < read_in_z) then
+                     if( current_z <= read_in_z) then
                          exit
                          !counter_power_input = counter_power_input + 1
                      end if
+               end do
+            
+            if( i < Fuel_Core_Start) then 
+                do j = 1, nodes_per_elem
+                    !---Reading in the power fraction.  Can multiply by the 
+                    !--- total power read in initially to get the total anywhere
+                    spatial_power_fcn(i,j) = abs(( (read_in_pow_frac_prev ) / &
+                                             (read_in_z - read_in_z_prev) )) !* &
+                                             !elem_vol_int_fe(j)) 
+                    spatial_doppler_fcn(i,j) = (( (read_in_doppler_prev) / &
+                                             (read_in_z - read_in_z_prev) ))!* &
+                                             !elem_vol_int_fe(j)) 
+                    spatial_expansion_fcn(i,j) = (( (read_in_expansion_prev ) / &
+                                             (read_in_z - read_in_z_prev) ))!* &
+                                             !elem_vol_int_fe(j)) 
                 end do
-       
-            do j = 1, nodes_per_elem
-                !---Reading in the power fraction.  Can multiply by the 
-                !--- total power read in initially to get the total anywhere
-                spatial_power_fcn(i,j) = abs(( (read_in_pow_frac ) / &
-                                         (read_in_z - read_in_z_prev) )) !* &
-                                         !elem_vol_int_fe(j)) 
-                spatial_doppler_fcn(i,j) = abs(( (read_in_doppler) / &
-                                         (read_in_z - read_in_z_prev) ))!* &
-                                         !elem_vol_int_fe(j)) 
-                spatial_expansion_fcn(i,j) = abs(( (read_in_expansion ) / &
-                                         (read_in_z - read_in_z_prev) ))!* &
-                                         !elem_vol_int_fe(j)) 
-            end do
+            else
+
+                do j = 1, nodes_per_elem
+                    !---Reading in the power fraction.  Can multiply by the 
+                    !--- total power read in initially to get the total anywhere
+                    spatial_power_fcn(i,j) = abs(( (read_in_pow_frac ) / &
+                                             (read_in_z - read_in_z_prev) )) !* &
+                                             !elem_vol_int_fe(j)) 
+                    spatial_doppler_fcn(i,j) = (( (read_in_doppler) / &
+                                             (read_in_z - read_in_z_prev) ))!* &
+                                             !elem_vol_int_fe(j)) 
+                    spatial_expansion_fcn(i,j) = (( (read_in_expansion ) / &
+                                             (read_in_z - read_in_z_prev) ))!* &
+                                             !elem_vol_int_fe(j)) 
+                end do
+            end if
        else
             !---Outside of core region, set power to zero
-            spatial_power_fcn(i,:) = 0.0 
-            spatial_doppler_fcn(i,:)   = 0.0
-            spatial_expansion_fcn(i,:) = 0.0
+            spatial_power_fcn(i,:)     = 0.0_dp 
+            spatial_doppler_fcn(i,:)   = 0.0_dp
+            spatial_expansion_fcn(i,:) = 0.0_dp
        end if
     
     end do
@@ -118,8 +136,8 @@ subroutine read_power
     !---Write out DIF3D power profile
     write(outfile_unit,fmt='(a)'),'Power profile read in from DIF3D: '
     do j=1,number_entries
-           write(outfile_unit,fmt='(12es14.3)') &
-                (dif3d_power_input(j,i),i=1,2)             
+        write(outfile_unit,fmt='(12es14.3)') &
+                (dif3d_power_input(j,i),i=1,4)             
     end do
 
     !---Check if projection from DIF3D to FE domain worked
