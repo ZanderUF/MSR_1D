@@ -30,7 +30,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     real(dp) :: Large_Lambda
     integer :: event_counter_last
      
-    time_constant = -0.5_dp
+    time_constant = -0.2_dp
     number_half_lifes = log(2.0_dp) 
   
     !---Get cutoff time to stop looking at differences between 

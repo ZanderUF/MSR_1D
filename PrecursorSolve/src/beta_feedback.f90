@@ -17,7 +17,7 @@ subroutine beta_feedback
     real(dp) :: event_start_time, event_time,event_time_previous, t1
     
     
-    time_constant = -2.0_dp
+    time_constant = -0.5_dp
     event_start_time = delta_t 
 
    !---Evaluate if
@@ -63,7 +63,7 @@ subroutine beta_feedback
     end if
 
     if(feedback_method == 3) then 
-        if(mass_flow > 0.8333333_dp*mass_flow_initial) then
+        if(mass_flow > 0.8_dp*mass_flow_initial) then
             mass_flow = mass_flow_initial*exp(time_constant*t0)
         end if
     end if
