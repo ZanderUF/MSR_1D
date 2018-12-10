@@ -49,8 +49,12 @@ implicit none
         elements_loop: do n = 1, num_elem
             
             if(mass_flow > 0.0) then
-                call solve_temperature(n)
-                call solve_velocity(n)
+                if( feedback_method == 1) then 
+                    call solve_temperature(n)
+                    call solve_velocity(n)
+                else
+                    call solve_velocity(n)
+                end if
             end if 
             !---Computer spatial matrices 
 	        call spatial_matrices(n,nl_iter)
