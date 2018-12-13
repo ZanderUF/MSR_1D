@@ -88,7 +88,7 @@ implicit none
        
        q_prime = spatial_power_fcn(n,j)/spatial_vol_fcn(n,j)
 
-       elem_vec_q_temp(j) = q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
+       elem_vec_q_temp(j) = vol_int(j)*q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
 
     end do
 !----Evaluate W*T_e-1

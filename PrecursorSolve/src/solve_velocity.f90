@@ -31,7 +31,7 @@ implicit none
 
     !---Loop over all nodes in element
     do j = 1, nodes_per_elem 
-        temperature_eval = temperature_soln_starting(n,j)
+        temperature_eval = temperature_soln_prev(n,j)
         !---Evaluate density based on temperature
         call density_corr(temperature_eval, density_eval)
    
