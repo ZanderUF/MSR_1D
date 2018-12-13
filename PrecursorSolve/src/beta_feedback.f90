@@ -17,7 +17,7 @@ subroutine beta_feedback
     real(dp) :: event_start_time, event_time,event_time_previous, t1
     
     
-    time_constant = -0.5_dp
+    time_constant = -0.2_dp
     event_start_time = delta_t 
 
    !---Evaluate if

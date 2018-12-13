@@ -67,6 +67,9 @@ implicit none
              temperature_soln_prev( num_elem,nodes_per_elem), &
              density_soln_prev( num_elem,nodes_per_elem),  &
              velocity_soln_prev( num_elem,nodes_per_elem), &
+             spatial_vol_fcn(num_elem,nodes_per_elem), &
+             spatial_area_fcn(num_elem,nodes_per_elem),&
+             spatial_power_frac_fcn(num_elem,nodes_per_elem), &
              spatial_power_fcn( num_elem, nodes_per_elem), &
              spatial_doppler_fcn(num_elem, nodes_per_elem), &
              spatial_expansion_fcn(num_elem, nodes_per_elem), &

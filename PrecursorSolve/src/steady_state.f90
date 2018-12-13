@@ -48,17 +48,19 @@ implicit none
     nonlinearloop: do !---Nonlinear loop
         elements_loop: do n = 1, num_elem
             
-            if(mass_flow > 0.0) then
-                if( feedback_method == 1) then 
-                    call solve_temperature(n)
-                    call solve_velocity(n)
-                else
-                    call solve_velocity(n)
-                end if
-            end if 
             !---Computer spatial matrices 
 	        call spatial_matrices(n,nl_iter)
             call numerical_flux_matrices(n,nl_iter)
+            
+            !---Solve for temperature and velocity if feedback is enabled 
+            if( mass_flow > 0.0 ) then
+                if( feedback_method == 1 ) then 
+                    call solve_temperature_ss(n,nl_iter)
+                end if
+            end if
+            !call solve_temperature_ss(n,nl_iter)
+
+            !call solve_velocity(n,nl_iter)
             !---Solve steady state system 
             isotope_loop: do f = 1, num_isotopes
                 delay_loop: do g = 1, num_delay_group
@@ -67,15 +69,16 @@ implicit none
                     call solve_precursor_ss(f,g,n,nl_iter)
                 enddo delay_loop!---Over delayed groups
             enddo isotope_loop !---Over isotopes
+        
         enddo elements_loop !---Over nodes
         
         !---This counted the convergence of each delayed group
         difference_counter = 0
         
         !---Swap for for next iteration
-        precursor_soln_prev = precursor_soln_new
+        precursor_soln_prev   = precursor_soln_new
         temperature_soln_prev = temperature_soln_new
-        velocity_soln_prev = velocity_soln_new
+        velocity_soln_prev    = velocity_soln_new
 
         call l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
 
@@ -113,8 +116,7 @@ implicit none
    
    do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
-            power_soln_new(i,j) = total_power_initial* &
-                                  power_amplitude_new* &
+            power_soln_new(i,j) = power_amplitude_new* &
                                   spatial_power_fcn(i,j)      
         end do
     end do
@@ -134,7 +136,7 @@ implicit none
     density_soln_prev         = density_soln_new
 
 !---Write precursor solution outfile
-    call write_out_soln(soln_outfile_unit,num_elem,transient_save_flag)
+    call write_out_soln(soln_outfile_unit,num_elem,.TRUE.)
 
 !---Calculate new beta for this mass flow
 !---Calculate total precursor concentration*lamda over system
@@ -158,10 +160,11 @@ implicit none
 	do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
-                        power_amplitude_prev*&
-                        spatial_power_fcn(i,j)*vol_int(j)
+                          spatial_power_fcn(i,j)*vol_int(j)
         end do
     end do
+    print *,'total power       ' , total_power
+    print *,'precursors total  ' , precursors_lambda_vec(1,:)
 
 !---Calc new beta per delay group
     do f = 1, num_isotopes

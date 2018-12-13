@@ -49,7 +49,8 @@ msr1d : assemble_matrix_ss.o \
       solve_precursor_euler.o \
       solve_precursor_ss.o \
       solve_temperature.o \
-      solve_velocity.o \
+      solve_temperature_ss.o \
+	  solve_velocity.o \
       spatial_matrices.o \
       steady_state.o \
       time_info_M.o \
@@ -186,6 +187,9 @@ steady_state.o : steady_state.f90 global_parameters_M.o
 
 solve_temperature.o : solve_temperature.f90 global_parameters_M.o
 	$(F90) $(FFLAGS) -c solve_temperature.f90
+
+solve_temperature_ss.o : solve_temperature_ss.f90 global_parameters_M.o
+	$(F90) $(FFLAGS) -c solve_temperature_ss.f90
 
 solve_velocity.o : solve_velocity.f90 global_parameters_M.o
 	$(F90) $(FFLAGS) -c solve_velocity.f90

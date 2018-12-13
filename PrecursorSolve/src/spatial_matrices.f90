@@ -83,15 +83,13 @@ subroutine spatial_matrices (n, nl_iter)
                                       shape_fcn(i)*spatial_power_fcn(n,i)*&
                                       power_amplitude_prev
         end do
-
         do i=1, nodes_per_elem
             
             !---Only needed if we are changing length of elements
             elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
             
             elem_vec_q(i) = elem_vec_q(i)+ &
-                    evaluated_spatial_power*cnst*shape_fcn(i)  
-            
+                            cnst*shape_fcn(i)  
             do j = 1, nodes_per_elem
                 !---Determine A matrix - only needs to be done once
                 
@@ -100,13 +98,18 @@ subroutine spatial_matrices (n, nl_iter)
                                      cnst*shape_fcn(i)*shape_fcn(j)
                 end if
                    elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
-                                    evaluated_velocity*cnst*shape_fcn(j)*&
+                                    cnst*shape_fcn(j)*&
                                      global_der_shape_fcn(i)
                 
             end do !---End loop over j matrix entries
         end do !---End loop over i matrix entries
      enddo gaussintegration!---end do over gauss pts
    
+    do i = 1, nodes_per_elem
+        do j = 1, nodes_per_elem
+            elem_matrix_U(i,j) = velocity_soln_new(n,j)*elem_matrix_U(i,j) 
+        end do
+    end do
 
     !---Invert A matrix, only needs to be done once
     if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then  
@@ -121,7 +124,7 @@ subroutine spatial_matrices (n, nl_iter)
         !---Compute the inverse matrix.
         call dgetri ( length, inverse_A_matrix, lda, ipiv, work, lwork, info ) 
     end if
-    
+
 !-------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE. ) then
         write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0

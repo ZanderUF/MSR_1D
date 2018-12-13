@@ -37,7 +37,7 @@ implicit none
     temperature_last = 0.0_dp
     power_current    = 0.0_dp
     !---Get last temperature value
-    if( n < 2) then
+    if( n < 1) then
         do j = 1, nodes_per_elem
             temperature_last = temperature_last + &
                                temperature_soln_new(num_elem,j)*vol_int(j)

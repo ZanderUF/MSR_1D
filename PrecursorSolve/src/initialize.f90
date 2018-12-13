@@ -42,11 +42,19 @@ implicit none
     steady_state_flag = .TRUE.
      
     !---Initial guesses 
-    inlet_temperature  = 900.0_dp
+    inlet_temperature  = 850.0_dp
     outlet_temperature = 1000.0_dp
     
     !---Test if reading power profile from file or not
-    
+    ! set inlet temperature
+    do i = 1, nodes_per_elem
+        temperature_soln_new(1,i) = inlet_temperature
+        
+        call density_corr(inlet_temperature,density)
+        velocity_soln_new(1,i) = mass_flow/(Area_Pipe*&
+                                 density)
+    end do
+
     if(Read_DIF3D .eqv. .TRUE.) then
         !---Create spatial power function
         do i = 1, num_elem
@@ -74,8 +82,6 @@ implicit none
                     (Fuel_Core_End - Fuel_Core_Start)* &
                     ( global_coord(i,j) - global_coord(Fuel_Core_End,3) ) + &
                     outlet_temperature
-                    !( global_coord(i,j)-global_coord(Fuel_Core_End,1) ) + &
-                    !outlet_temperature 
                     
                 !---Fuel outlet plenum
                 else if ( i <= Fuel_Outlet_End ) then
@@ -104,17 +110,15 @@ implicit none
                 end if
                 
                 power_soln_new(i,j) = &
-                           spatial_power_fcn(i,j)*power_amplitude_new*&
-                           total_power_read_in
-                
+                           spatial_power_fcn(i,j)*power_amplitude_new
+                temperature_soln_new(i,j) = inlet_temperature 
                 temperature = temperature_soln_new(i,j)
                 
-                !---Get density to set the velocity
                 call density_corr(temperature,density)
-                density_soln_new(i,j) = density
-                !---Need to get initial velocity distribution
-                velocity_soln_new(i,j) = mass_flow/(area_variation(i,j)*&
-                                         density)
+                density_soln_new(i,j) = density 
+                velocity_soln_new(i,j) = mass_flow/(spatial_area_fcn(i,j)*&
+                                 density)
+
             end do
         end do
     !----Test cases
@@ -138,18 +142,20 @@ implicit none
                 
                 power_soln_new(i,j)    = spatial_power_fcn(i,j)*&
                                         power_amplitude_new
-                
-                temperature_soln_new(i,j)   = inlet_temperature
-                !temperature = temperature_soln_new(i,j)
-                temperature = inlet_temperature 
+                temperature_soln_new(i,j) = inlet_temperature 
+                temperature = temperature_soln_new(i,j)
+
                 call density_corr(temperature,density)
-                density_soln_new(i,j)  = density
                 velocity_soln_new(i,j) = mass_flow/(area_variation(i,j)*&
-                                         density)
+                                 density)
+
+       
             end do
         end do
     end if
 
+
+    !temperature_soln_new(:,:) = 0.0
 !---Initilize both new and prev for iteration
     temperature_soln_prev     = temperature_soln_new
     velocity_soln_prev        = velocity_soln_new
