@@ -81,15 +81,13 @@ implicit none
         
        temperature_eval = temperature_soln_prev(n,j)
        call density_corr(temperature_eval, density_eval) 
-       
        call heat_capacity_corr(temperature_eval, heat_capacity_eval)
-        
        length_core = Fuel_Outlet_End - Fuel_Inlet_start
-       
-       q_prime = spatial_power_fcn(n,j)/spatial_vol_fcn(n,j)
-
+   
+        q_prime = spatial_power_fcn(n,j)/spatial_area_fcn(n,j)
+       !q_prime = (total_power_initial*power_amplitude_prev*spatial_power_frac_fcn(n,j))/spatial_vol_fcn(n,j)
        elem_vec_q_temp(j) = vol_int(j)*q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
-
+        
     end do
 !----Evaluate W*T_e-1
     do i = 1, nodes_per_elem

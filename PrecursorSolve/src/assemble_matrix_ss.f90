@@ -51,7 +51,7 @@ subroutine assemble_matrix_ss (isotope,delay_group,n,nl_iter)
         !---Calculate q vector
         !if(nl_iter == 1) then
             elem_vec_q_final(isotope,delay_group,i) = &
-                  (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_q(i) 
+                 total_power_initial*spatial_power_frac_fcn(n,i)*(beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_q(i) 
         !end if
 
         do j = 1, nodes_per_elem

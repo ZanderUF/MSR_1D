@@ -117,7 +117,7 @@ implicit none
    do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
             power_soln_new(i,j) = power_amplitude_new* &
-                                  spatial_power_fcn(i,j)      
+                                  spatial_power_frac_fcn(i,j)      
         end do
     end do
     
@@ -154,17 +154,18 @@ implicit none
             end do
        end do
     end do   
- 
+
+
 !---Calculate initial total power
     total_power = 0.0_dp 
 	do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
-                          spatial_power_fcn(i,j)*vol_int(j)
+                          total_power_initial*spatial_power_frac_fcn(i,j)*vol_int(j)
         end do
     end do
-    print *,'total power       ' , total_power
-    print *,'precursors total  ' , precursors_lambda_vec(1,:)
+    print *,' total power', total_power
+    print *,'prec tot    ',precursors_lambda_vec(1,:)
 
 !---Calc new beta per delay group
     do f = 1, num_isotopes

@@ -50,17 +50,16 @@ subroutine spatial_matrices (n, nl_iter)
     lwork = length
 
 !---Initialize
-    matrix_W_right_face = 0.0_dp
     matrix_W_left_face  = 0.0_dp
     elem_matrix_U       = 0.0_dp
+    elem_matrix_A       = 0.0_dp
     elem_matrix_F       = 0.0_dp
-    elem_vec_f          = 0.0_dp
     elem_vec_q          = 0.0_dp    
     elem_vol_int(n,:)   = 0.0_dp 
 
-    if( (n==1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then
-        elem_matrix_A       = 0.0_dp
-    end if
+    !if( (n==1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then
+    !    elem_matrix_A       = 0.0_dp
+    !end if
 
 !---Integrate over Gauss pts 
     gaussintegration: do g = 1 , num_gaus_pts 
@@ -73,16 +72,17 @@ subroutine spatial_matrices (n, nl_iter)
         call inter_shape_fcns(xi,h)
         cnst = g_jacobian*wt
         !---Evaluate velocity and power at gauss pt
-        evaluated_velocity      = 0.0_dp
-        evaluated_spatial_power = 0.0_dp
-        do i = 1, nodes_per_elem
-            evaluated_velocity = evaluated_velocity + &
-                                 shape_fcn(i)*velocity_soln_prev(n,i)
-            
-            evaluated_spatial_power = evaluated_spatial_power + &
-                                      shape_fcn(i)*spatial_power_fcn(n,i)*&
-                                      power_amplitude_prev
-        end do
+        !evaluated_velocity      = 0.0_dp
+        !evaluated_spatial_power = 0.0_dp
+        !do i = 1, nodes_per_elem
+        !    evaluated_velocity = evaluated_velocity + &
+        !                         shape_fcn(i)*velocity_soln_prev(n,i)
+        !    
+        !    evaluated_spatial_power = evaluated_spatial_power + &
+        !                              shape_fcn(i)*spatial_power_frac_fcn(n,i)*&
+        !                              total_power_initial*power_amplitude_prev
+        !end do
+        
         do i=1, nodes_per_elem
             
             !---Only needed if we are changing length of elements
@@ -92,11 +92,10 @@ subroutine spatial_matrices (n, nl_iter)
                             cnst*shape_fcn(i)  
             do j = 1, nodes_per_elem
                 !---Determine A matrix - only needs to be done once
-                
-                if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0) ) then 
+                !if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0) ) then 
                     elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                      cnst*shape_fcn(i)*shape_fcn(j)
-                end if
+                !end if
                    elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                     cnst*shape_fcn(j)*&
                                      global_der_shape_fcn(i)
@@ -112,7 +111,7 @@ subroutine spatial_matrices (n, nl_iter)
     end do
 
     !---Invert A matrix, only needs to be done once
-    if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then  
+    !if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then  
         do i = 1, nodes_per_elem
             do j = 1, nodes_per_elem
                 inverse_A_matrix(i,j) = elem_matrix_A(i,j)
@@ -123,7 +122,7 @@ subroutine spatial_matrices (n, nl_iter)
         call dgetrf ( length, length, inverse_A_matrix, lda, ipiv, info )
         !---Compute the inverse matrix.
         call dgetri ( length, inverse_A_matrix, lda, ipiv, work, lwork, info ) 
-    end if
+    !end if
 
 !-------------------------------------------------------------------------------
     if (DEBUG .eqv. .TRUE. ) then

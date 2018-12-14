@@ -27,61 +27,99 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     integer,intent(in) :: n
 !---Local variables
     integer :: i, j, ii, jj, nr,nc, ncl,length   
-    double precision, dimension(3,3) :: inverse_matrix,temp_matrix
-    double precision, dimension(3) :: elem_vec_q_times_beta_lambda, U_times_soln_vec, &
-                          A_times_lambda_times_soln_vec, W_left_times_upwind_soln, &
-                          W_right_times_soln
+    real(dp), dimension(3) :: H_times_soln_vec, beta_lambda_times_q_vec,&
+                                      W_left_times_prev_elem_soln_vec
 
-!---Initialize
-    elem_matrix_H                   = 0.0_dp
-    A_times_W_times_upwind_elem_vec = 0.0_dp
-    elem_matrix_A_times_W           = 0.0_dp
-    H_times_soln_vec                = 0.0_dp
-    elem_vec_A_times_q              = 0.0_dp
+    elem_matrix_H = 0.0_dp 
+!---Calculate [U - lambda*A - W_r]
+    !do i = 1, nodes_per_elem
+    !    do j = 1, nodes_per_elem
+    !        elem_matrix_H(i,j) = elem_matrix_U(i,j) - &
+    !                            lamda_i_mat(isotope,delay_group)*elem_matrix_A(i,j) - &
+    !                            matrix_W_right_face(i,j)
+    !    end do
+    !end do
 
-    elem_matrix_A_times_W = matmul(inverse_A_matrix, matrix_W_left_face)
+        H_times_soln_vec = matmul(elem_matrix_U,precursor_soln_prev(isotope,delay_group,n,:)) - &
+        matmul(lamda_i_mat(isotope,delay_group)*elem_matrix_A,precursor_soln_prev(isotope,delay_group,n,:)) - &
+        matmul(matrix_W_right_face,precursor_soln_prev(isotope,delay_group,n,:))
 
-    !---Calculate H matrix, will be inverted later on
-    elem_matrix_H = matmul(inverse_A_matrix,elem_matrix_U) - &
-                    lamda_i_mat(isotope,delay_group)*identity_matrix - &
-                    matmul(inverse_A_matrix,matrix_W_right_face)
-    
-    elem_vec_A_times_q = matmul(inverse_A_matrix,elem_vec_q)
 
-    !---Multiply H matrix by previous soln vec
+    !H_times_soln_vec = 0.0_dp
+!---!Calculate [U - lambda*A - W_r]*c_e
+    !do i = 1, nodes_per_elem
+    !    do j = 1, nodes_per_elem
+    !        H_times_soln_vec(i) = H_times_soln_vec(i) + elem_matrix_H(i,j)*&
+    !                              precursor_soln_prev(isotope,delay_group,n,j)
+    !    end do
+    !end do
+    !H_times_soln_vec = matmul(elem_matrix_H,precursor_soln_prev(isotope,delay_group,n,:))
+
+!---Calculate Beta/Gen Time * {q}
+    do i = 1, nodes_per_elem
+        beta_lambda_times_q_vec(i) = power_amplitude_prev*&
+                                    total_power_initial*spatial_power_frac_fcn(n,i)*&
+                           (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_q(i) 
+    end do
+
+    W_left_times_prev_elem_soln_vec = 0.0_dp
+!---Calculate W_l*c_e-l
     if ( n > 1) then
         do i = 1, nodes_per_elem
             do j = 1, nodes_per_elem
-                H_times_soln_vec(i) = H_times_soln_vec(i) + &
-                        elem_matrix_H(i,j)*&
-                        precursor_soln_prev(isotope,delay_group,n,j)
-                
-                A_times_W_times_upwind_elem_vec(i) = &
-                        A_times_W_times_upwind_elem_vec(i) + &
-                        elem_matrix_A_times_W(i,j)*&
-                        precursor_soln_new(isotope,delay_group,n-1,3)
-        
+                W_left_times_prev_elem_soln_vec(i) = W_left_times_prev_elem_soln_vec(i) + &
+                                                 matrix_W_left_face(i,j)*&
+                             precursor_soln_new(isotope,delay_group,n-1,3)
             end do
-        end do
-    !---Last element -- connect last to first in next loops
+        end do 
     else
         do i = 1, nodes_per_elem
             do j = 1, nodes_per_elem
-                H_times_soln_vec(i) = H_times_soln_vec(i) + &
-                        elem_matrix_H(i,j)*&
-                        precursor_soln_prev(isotope,delay_group,n,j)
-                    
-                A_times_W_times_upwind_elem_vec(i) = &
-                        A_times_W_times_upwind_elem_vec(i) + &
-                        elem_matrix_A_times_W(i,j)*&
-                        precursor_soln_new(isotope,delay_group, num_elem,3)
+                W_left_times_prev_elem_soln_vec(i) = W_left_times_prev_elem_soln_vec(i) + &
+                                                 matrix_W_left_face(i,j)*&
+                             precursor_soln_new(isotope,delay_group,num_elem,3)
             end do
         end do
     end if
 
+!---RHS final
+    do i = 1, nodes_per_elem
+        RHS_transient_final_vec(i) = H_times_soln_vec(i) + &
+                                     beta_lambda_times_q_vec(i) +&
+                                     W_left_times_prev_elem_soln_vec(i) 
+    end do
+
+!    DEBUG = .TRUE.
+    
     if (DEBUG .eqv. .TRUE.) then
-        
+       
+       write(outfile_unit,fmt='(a)'),' '
+       write(outfile_unit,fmt='(a,4I6)'),'[U] element Matrix gaussian integration &
+                                          | element --> ',n
+       do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(12es14.3)') &
+                   (elem_matrix_U(j,i),i=1,nodes_per_elem)             
+       end do
+       
+       write(outfile_unit,fmt='(a)'), ' '
+       write(outfile_unit,fmt='(a,I6)'),'[W] right Matrix | element --> ',n
+       do j=1,nodes_per_elem 
+             write(outfile_unit,fmt='(12es14.3)') &
+                  (matrix_W_right_face(j,i),i=1,nodes_per_elem)             
+       end do
+       
+       write(outfile_unit,fmt='(a)'), ' '
+       write(outfile_unit,fmt='(a,4I6)'),'[W] left Matrix | element --> ',n
+       do j=1,nodes_per_elem 
+             write(outfile_unit,fmt='(12es14.3)') &
+                  (matrix_W_left_face(j,i),i=1,nodes_per_elem)             
+       end do
+       write(outfile_unit,fmt='(a,4I6)'),'{q} vector  --> ',n
+             write(outfile_unit,fmt='(12es14.3)') &
+                  (elem_vec_q(i),i=1,nodes_per_elem)             
+ 
         write(outfile_unit,fmt='(a,12es14.3)'), '@ time = ', t0
+        
         write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a,1I2)'),'H Matrix | element --> ',n
         do i=1,nodes_per_elem
@@ -94,31 +132,25 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
         do j=1,nodes_per_elem
               write(outfile_unit,fmt='(12es14.3)')H_times_soln_vec(j)
         end do
+       
         write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I3)'),' [A-1]*[W_l] | element --> ', n
-        do i=1,nodes_per_elem
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (elem_matrix_A_times_W(i,j),j=1,nodes_per_elem)
-        end do
-
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I3)'),' [A^-1][W_l]*{c_e-1} | element --> ', n
+        write(outfile_unit,fmt='(a,1I3)'),' [W_l]*{c_e-1} | element --> ', n
         do j=1,nodes_per_elem
-              write(outfile_unit,fmt='(12es14.3)')A_times_W_times_upwind_elem_vec(j)
-        end do
-
-        write(outfile_unit,fmt='(a)'), ' '
-        write(outfile_unit,fmt='(a,1I2)'),'-lambda*I Matrix | element --> ',n
-        do j=1,nodes_per_elem
-              write(outfile_unit,fmt='(12es14.3)') &
-                   (-lamda_i_mat(1,1)*identity_matrix(j,i),i=1,nodes_per_elem)
+              write(outfile_unit,fmt='(12es14.3)')W_left_times_prev_elem_soln_vec(j)
         end do
 
         write(outfile_unit,fmt='(a)'),' '
         write(outfile_unit,fmt='(a,1I2)'),'{q} element source vector | element --> ',n
-        write(outfile_unit,fmt='(12es14.3)') ((beta_i_mat(isotope,delay_group)/gen_time)*&
-        elem_vec_A_times_q(i),i=1,nodes_per_elem)
+        write(outfile_unit,fmt='(12es14.3)') (beta_lambda_times_q_vec(i),i=1,nodes_per_elem)
+
+        write(outfile_unit,fmt='(a)'),' '
+        write(outfile_unit,fmt='(a,1I2)'),'RHS vector | element --> ',n
+        write(outfile_unit,fmt='(12es14.3)') (RHS_transient_final_vec(i),i=1,nodes_per_elem)
+
+        write(outfile_unit,fmt='(a)'),'*****************************************'
+       
     end if
+!DEBUG = .FALSE.
 
 end 
 

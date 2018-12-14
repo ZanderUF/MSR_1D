@@ -20,7 +20,6 @@ subroutine write_periodic
 
 !---Write solution to a file periodically
     if( modulo(t0,save_time_interval) < delta_t) then
-        
         call write_out_soln(12, num_elem, transient_save_flag )
         
         transient_save_flag = .FALSE.

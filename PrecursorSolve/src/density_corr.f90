@@ -41,7 +41,7 @@ implicit none
     !--Russian paper 1975
     a =  3226.8_dp
     b = -0.7247_dp
-
-    density = (a + b*T)*0.001_dp
     
+    density = (a + b*T)*0.001_dp
+    density = 2.6 
 end

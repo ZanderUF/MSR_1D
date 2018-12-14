@@ -53,7 +53,7 @@ subroutine solve_power_euler(nl_iter, current_time)
 
                    precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
                                       vol_int(j)*&
-                                      precursor_soln_prev(f,g,i,j)
+                                      precursor_soln_new(f,g,i,j)
                 end do
             end do
        end do
@@ -67,10 +67,10 @@ subroutine solve_power_euler(nl_iter, current_time)
         do j = 1, nodes_per_elem
             total_power = total_power + &
                           power_amplitude_prev*&
-                          spatial_power_fcn(i,j)*vol_int(j)
+                          spatial_power_frac_fcn(i,j)*vol_int(j)
             
             total_spatial_fcn = total_spatial_fcn + &
-                           spatial_power_fcn(i,j)*vol_int(j)
+                           spatial_power_frac_fcn(i,j)*vol_int(j)
 
         end do
     end do
@@ -91,13 +91,6 @@ subroutine solve_power_euler(nl_iter, current_time)
         end if
     end if
     
-!---Calc beta correction per delay group
-    !if(t0 == 0.0) then
-    !    beta_correction = gen_time*total_precursors_fuel/total_power 
-    !end if
-    
-!---Hardcoded times to start perturbation - should read from input
-
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then
         if(step_start_time < t0 .and. t0 < step_end_time ) then
@@ -158,6 +151,13 @@ subroutine solve_power_euler(nl_iter, current_time)
     
     reactivity_feedback = total_temperature_feedback + total_density_feedback
 
+    !print *,' t0                    ', t0
+    !print *,' amp                   ', power_amplitude_prev
+    !print *,' total precursors fuel ', total_precursors_fuel
+    !print *,' total power           ', total_power
+    !print *,' reactivity_ feedback ', reactivity_feedback
+    !print *,' ' 
+
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &
@@ -180,14 +180,11 @@ subroutine solve_power_euler(nl_iter, current_time)
     power_soln_new(:,:) = 0.0
     do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
-            power_soln_new(i,j) = total_power_initial* &
-                                  power_amplitude_new* &
-                                  spatial_power_fcn(i,j)      
+            power_soln_new(i,j) = power_amplitude_new* &
+                                  vol_int(j)*spatial_power_frac_fcn(i,j)      
         end do
     end do
     
 !---End power solve
-
-    power_amplitude_prev = power_amplitude_new
 
 end subroutine solve_power_euler

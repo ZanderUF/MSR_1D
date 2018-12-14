@@ -25,7 +25,6 @@ subroutine l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
     real(dp) :: nl_iter_tolerance, difference_L2
     integer  :: abs_max_nl_iter
     
-
     max_nl_iter = 30 
     abs_max_nl_iter = 600
     nl_iter_tolerance = 1E-12_dp

@@ -34,20 +34,11 @@ subroutine numerical_flux_matrices (n, nl_iter)
 !---Initialize
     matrix_W_right_face = 0.0_dp
     matrix_W_left_face  = 0.0_dp
-    !elem_vec_q          = 0.0_dp
 
 !---Create source vector 'q', and W - 
     do i = 1, nodes_per_elem
-        elem_vec_q(i) = elem_vec_q(i)*spatial_power_fcn(n,i)
+        
         do j = 1, nodes_per_elem
-            !elem_vec_q(i) = elem_vec_q(i) + &
-            !                spatial_power_fcn(n,j)*&
-            !                power_amplitude_prev!*&
-            !                elem_matrix_A(i,j)
-
-                            ! try just working with the fractional power
-                            ! not the 'power' in Watts itself
-
             !---Applies for all elements except the first one
             if(n > 1) then !--- n - element #
                 !---Grab previous precursor conc. + velocity at 
@@ -85,5 +76,4 @@ subroutine numerical_flux_matrices (n, nl_iter)
                   (elem_vec_q(i),i=1,nodes_per_elem)             
         
     end if
-
 end subroutine numerical_flux_matrices

@@ -27,50 +27,40 @@ subroutine solve_precursor_euler(isotope,delay_group,n, nl_iter )
     integer :: i,j,f,g
     real(dp), dimension(3) :: A_inv_times_RHS
   
+!---    
     A_inv_times_RHS(:) = 0.0
+    !do i = 1, nodes_per_elem
+    !    do j = 1, nodes_per_elem
+    !        A_inv_times_RHS(i) = A_inv_times_RHS(i) + inverse_A_matrix(i,j)*&
+    !                             RHS_transient_final_vec(i)
+    !    end do
+    !end do
 
-    
+    A_inv_times_RHS = matmul(inverse_A_matrix,RHS_transient_final_vec)
+
 !---Solve for new precursor at delta t
     if(td_method_type == 0) then
         do i = 1, nodes_per_elem
-        
-        precursor_soln_new(isotope,delay_group, n,i) = &
+            precursor_soln_new(isotope,delay_group, n,i) = &
                 precursor_soln_prev(isotope, delay_group, n,i) + &
-                delta_t*(H_times_soln_vec(i) + &
-                (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
-                A_times_W_times_upwind_elem_vec(i))
-        !
-        !---test to make sure values are not too small
-        !if(precursor_soln_new(isotope, delay_group, n, i) < 1E-16_dp) then
-        !    precursor_soln_new(isotope, delay_group, n, i) = 0.0
-        !end if
-        
+                delta_t*( RHS_transient_final_vec(i) )
         end do
     end if
     
     if(td_method_type == 1) then
         do i = 1, nodes_per_elem
-        
             precursor_soln_new(isotope,delay_group, n,i) = &
                 precursor_soln_last_time(isotope, delay_group, n,i) + &
-                delta_t*(H_times_soln_vec(i) + &
-                (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_A_times_q(i) + &
-                A_times_W_times_upwind_elem_vec(i))
-       
-            residual(isotope,delay_group,n,i) = precursor_soln_new(isotope,delay_group,n,i) - &
-                                                precursor_soln_last_time(isotope,delay_group,n,i) - &
-                                                delta_t*(H_times_soln_vec(i) + &
-                                                (beta_i_mat(isotope,delay_group)/gen_time)*&
-                                                 elem_vec_A_times_q(i) + &
-                                                 A_times_W_times_upwind_elem_vec(i))
-
-            !---test to make sure values are not too small
-            !if(precursor_soln_new(isotope, delay_group, n, i) < 1E-8_dp) then
-            !    precursor_soln_new(isotope, delay_group, n, i) = 0.0
-            !end if
+                delta_t*( A_inv_times_RHS(i))
+                 
+            !residual(isotope,delay_group,n,i) = precursor_soln_new(isotope,delay_group,n,i) - &
+            !                                 precursor_soln_last_time(isotope,delay_group,n,i) - &
+            !                                 delta_t*(H_times_soln_vec(i) + &
+            !                                 (beta_i_mat(isotope,delay_group)/gen_time)*&
+            !                                 elem_vec_A_times_q(i) + &
+            !                                 A_times_W_times_upwind_elem_vec(i))
 
         end do
-        
     end if
 
 !---End precursor solve    

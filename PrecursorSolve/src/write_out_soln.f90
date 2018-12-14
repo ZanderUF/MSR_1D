@@ -27,7 +27,7 @@ subroutine write_out_soln(file_unit,range_elem,transient_save)
     character(len=26) :: time_density_name
     character(len=10) :: name_precursor_file, name_temperature_file,&
                          name_velocity_file, name_density_file
-    real(kind=4) :: temp_time
+    real(kind=8) :: temp_time
     integer :: time_counter
 
     temp_time = t0
@@ -42,10 +42,10 @@ subroutine write_out_soln(file_unit,range_elem,transient_save)
         time_temperature_name = 'temperature_soln_at_time_step_'
         time_velocity_name    = 'velocity_soln_at_time_step_'
         time_density_name     = 'density_soln_at_time_step_' 
-        write(name_precursor_file,   '(f10.2)' ) temp_time 
-        write(name_temperature_file, '(f10.2)' ) temp_time
-        write(name_velocity_file,    '(f10.2)' ) temp_time
-        write(name_density_file,     '(f10.2)' ) temp_time
+        write(name_precursor_file,   '(f10.4)' ) temp_time 
+        write(name_temperature_file, '(f10.4)' ) temp_time
+        write(name_velocity_file,    '(f10.4)' ) temp_time
+        write(name_density_file,     '(f10.4)' ) temp_time
 
         name_precursor_file   = adjustl(name_precursor_file) 
         name_temperature_file = adjustl(name_temperature_file)

@@ -67,7 +67,6 @@ module solution_vectors_M
     real(dp) :: center_power_initial
 
     real , dimension(3)   :: A_times_W_times_upwind_elem_vec
-    real , dimension(3)   :: H_times_soln_vec
 
     real(dp) , dimension(3)   :: elem_matrix_A_times_W_RHS
     real(dp) , dimension(3)   :: elem_vec_A_times_q

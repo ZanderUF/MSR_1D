@@ -26,7 +26,7 @@ implicit none
     real(dp) :: constant_velocity
     logical  :: constant_flag
     real(dp) :: inlet_temperature, outlet_temperature
-    real(dp) :: fuel_elem_len
+    real(dp) :: length_core, fuel_elem_len
     
     !---Set starting point for coast down transients 
     mass_flow_initial = mass_flow
@@ -40,20 +40,15 @@ implicit none
     power_amplitude_start = power_amplitude_new 
     
     steady_state_flag = .TRUE.
-     
+
+    !---Calculate length of core
+    length_core = global_coord(Fuel_Outlet_End,1) - global_coord(Fuel_Inlet_Start,1) 
+    
     !---Initial guesses 
     inlet_temperature  = 850.0_dp
     outlet_temperature = 1000.0_dp
     
     !---Test if reading power profile from file or not
-    ! set inlet temperature
-    do i = 1, nodes_per_elem
-        temperature_soln_new(1,i) = inlet_temperature
-        
-        call density_corr(inlet_temperature,density)
-        velocity_soln_new(1,i) = mass_flow/(Area_Pipe*&
-                                 density)
-    end do
 
     if(Read_DIF3D .eqv. .TRUE.) then
         !---Create spatial power function
@@ -61,7 +56,7 @@ implicit none
             do j = 1, nodes_per_elem
                 !---Beginning piping 
                 if( i < Fuel_Inlet_Start )      then
-                    area_variation(i,j)    = Area_Pipe 
+                    spatial_area_fcn(i,j)    = Area_Pipe 
                     temperature_soln_new(i,j) = inlet_temperature  
                 !---Fuel inlet plenum
                 else if ( i <= Fuel_Core_Start)  then
@@ -70,12 +65,12 @@ implicit none
                                   (Fuel_Core_Start - Fuel_Inlet_Start)*&
                                   (i - Fuel_Inlet_Start) + &
                                   Area_Pipe
-                    area_variation(i,j) = Area_Plenum 
+                    spatial_area_fcn(i,j) = Area_Plenum 
                     
                     temperature_soln_new(i,j) = inlet_temperature    
                 !---Fuel main core
                 else if ( i <= Fuel_Core_End )   then
-                    area_variation(i,j) = Area_Core
+                    spatial_area_fcn(i,j) = Area_Core
                 !---linearly interpolate temperature rise over the core
                     temperature_soln_new(i,j) = &
                     (outlet_temperature - inlet_temperature)/&
@@ -86,12 +81,12 @@ implicit none
                 !---Fuel outlet plenum
                 else if ( i <= Fuel_Outlet_End ) then
                     call Calculate_Plenum_Area(i,j,Area_Plenum)
-                    area_variation(i,j) = Area_Plenum
+                    spatial_area_fcn(i,j) = Area_Plenum
                     
                     temperature_soln_new(i,j) = outlet_temperature 
                 !---End piping
                 else if (i <= Heat_Exchanger_Start) then
-                    area_variation(i,j)    = Area_Pipe
+                    spatial_area_fcn(i,j)    = Area_Pipe
                     temperature_soln_new(i,j) = outlet_temperature
                 !---Start heat exchanger 
                 else if (i <= Heat_Exchanger_End) then
@@ -101,16 +96,16 @@ implicit none
                     (global_coord(i,j) - global_coord(Heat_Exchanger_End,3) ) + &
                     inlet_temperature 
                     
-                    area_variation(i,j)    = Area_Pipe
+                    spatial_area_fcn(i,j)    = Area_Pipe
                 !---Rest of the external piping
                 else
                     temperature_soln_new(i,j) = inlet_temperature
                 
-                    area_variation(i,j)    = Area_Pipe
+                    spatial_area_fcn(i,j)    = Area_Pipe
                 end if
                 
                 power_soln_new(i,j) = &
-                           spatial_power_fcn(i,j)*power_amplitude_new
+                           spatial_power_frac_fcn(i,j)*power_amplitude_new
                 temperature_soln_new(i,j) = inlet_temperature 
                 temperature = temperature_soln_new(i,j)
                 
@@ -128,34 +123,31 @@ implicit none
                 
                 !---Beginning piping 
                 if( i <= Fuel_Inlet_Start) then
-                    area_variation(i,j)    = Area_Pipe 
-                    spatial_power_fcn(i,j) = 0.0_dp 
+                    spatial_area_fcn(i,j)    = Area_Pipe 
+                    spatial_power_frac_fcn(i,j) = 0.0_dp 
                 !---Fuel region
                 else if (i <=Fuel_Outlet_End) then
-                    area_variation(i,j)    = Area_Core 
-                    spatial_power_fcn(i,j) = 1.0_dp 
+                    spatial_area_fcn(i,j)    = Area_Core 
+                    spatial_power_frac_fcn(i,j) = 1.0_dp
                 !---End piping
                 else
-                    area_variation(i,j)    = Area_Pipe
-                    spatial_power_fcn(i,j) = 0.0_dp
+                    spatial_area_fcn(i,j)    = Area_Pipe
+                    spatial_power_frac_fcn(i,j) = 0.0_dp
                 end if
                 
-                power_soln_new(i,j)    = spatial_power_fcn(i,j)*&
+                power_soln_new(i,j)    = spatial_power_frac_fcn(i,j)*&
                                         power_amplitude_new
                 temperature_soln_new(i,j) = inlet_temperature 
                 temperature = temperature_soln_new(i,j)
 
                 call density_corr(temperature,density)
-                velocity_soln_new(i,j) = mass_flow/(area_variation(i,j)*&
+                velocity_soln_new(i,j) = mass_flow/(spatial_area_fcn(i,j)*&
                                  density)
-
        
             end do
         end do
     end if
 
-
-    !temperature_soln_new(:,:) = 0.0
 !---Initilize both new and prev for iteration
     temperature_soln_prev     = temperature_soln_new
     velocity_soln_prev        = velocity_soln_new
@@ -222,7 +214,7 @@ implicit none
     write(outfile_unit,fmt='(a)'), '------------------------------------'
     do i = 1, num_elem 
         do j = 1, nodes_per_elem
-            write(outfile_unit, fmt='(12es14.3, 12es14.3)')  global_coord(i,j), area_variation(i,j)
+            write(outfile_unit, fmt='(12es14.3, 12es14.3)')  global_coord(i,j), spatial_area_fcn(i,j)
         end do
     end do
 
