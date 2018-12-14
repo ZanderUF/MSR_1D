@@ -111,9 +111,18 @@ Input file structure to read in from DIF3D
 
 Values from DIF3D can be read in and projected onto the domain in the 1D problem
 Right now it reads in the power, power fraction, doppler reactivity worth, and density reactivity worth. These are all spatially dependent.  These values are integrated across the AREA specificed in the DIF3D problem. 
+It will read in the values and project them up to that axial height.  For example:
+
+Z-Coord   Power     Frac Power    Doppler      Expansion
+10        0.00E+00  0.0+00        0            0   
+20        1.85E+06  6.1-03        -3.31E-07   -1.02E-06
+30        3.08E+06  1.0-02        -1.01E-06   -5.11E-07
+
+This would project from locations 10 - 20 a power of 1.85E+06/(20-10).
+Similalrly, from 20 - 30 a power of 3.08E+06/(30-20)
 
 The file read in is assumed to be titled: dif3d_values.txt
-It assumes the file is read in as follows
+It assumes the file is read in as follows:
 
 ====== ================================================ =========================
 Line   Value                                            Units
