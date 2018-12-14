@@ -79,14 +79,15 @@ subroutine read_power
     starting_coordinate = global_coord(Fuel_Inlet_Start,3)
     
     do i = 1,number_entries
-        !dif3d_axial_input(i) = dif3d_axial_input(i) + starting_coordinate
+!        dif3d_axial_input(i) = dif3d_axial_input(i) + starting_coordinate
     end do
 
     counter_power_input = 1
     !---Project from dif3d domain to FE one in this code 
     do i = 1, num_elem
-        if( Fuel_Inlet_Start < i .AND. i <= Fuel_Outlet_End ) then
+        if( Fuel_Inlet_Start <= i .AND. i <= Fuel_Outlet_End ) then
                 current_z = global_coord(i,3)
+                print *,' current z ', current_z
                 !---Find power value
                 do k = 2, number_entries
                      !---Axial location
@@ -116,16 +117,16 @@ subroutine read_power
                      end if
                end do
             
-            if( i < Fuel_Core_Start) then 
+            if( i <= Fuel_Inlet_Start) then 
                     do j = 1, nodes_per_elem
-                        spatial_vol_fcn(i,j)  = abs(( (read_in_vol_prev ) / &
+                        spatial_vol_fcn(i,j)  = abs(( (read_in_vol) / &
                                                  (read_in_z - read_in_z_prev) ))
                         
                         spatial_area_fcn(i,j) = read_in_area 
                         
                         !---Reading in the power fraction.  Can multiply by the 
                         !--- total power read in initially to get the total anywhere
-                        spatial_power_fcn(i,j) = ( (read_in_pow_prev ) / &
+                        spatial_power_fcn(i,j) = ( (read_in_pow_prev) / &
                                                  (read_in_z - read_in_z_prev))
                        
                         spatial_power_frac_fcn(i,j) = ((read_in_pow_frac_prev) / &
@@ -144,7 +145,7 @@ subroutine read_power
                     
                     spatial_area_fcn(i,j)  = read_in_area 
                     
-                    spatial_power_fcn(i,j) = abs(( (read_in_pow ) / &
+                    spatial_power_fcn(i,j) = abs(( (read_in_pow) / &
                                              (read_in_z - read_in_z_prev)))
                     
                     spatial_power_frac_fcn(i,j) = abs(((read_in_pow_frac) / &
@@ -157,8 +158,9 @@ subroutine read_power
                                              (read_in_z - read_in_z_prev) ))!* &
                 end do
             end if
-            
+            print *,i ,' ',  ' Z coords ',  read_in_z- read_in_z_prev, read_in_pow 
        else
+            print *,'  i ', i
             spatial_vol_fcn(i,:)       = Area_Pipe*elem_size
             spatial_area_fcn(i,:)      = Area_Pipe 
             !---Outside of core region, set power to zero
@@ -196,12 +198,12 @@ subroutine read_power
     end do
 
     !----Check sums 
-    total_vol_check      = 0.0_dp  
-    total_area_check     = 0.0_dp 
-    total_power_check    = 0.0_dp
+    total_vol_check           = 0.0_dp  
+    total_area_check          = 0.0_dp 
+    total_power_check         = 0.0_dp
     total_power_frac_check    = 0.0_dp
-    total_doppler_check  = 0.0_dp 
-    total_expansion_check= 0.0_dp 
+    total_doppler_check       = 0.0_dp 
+    total_expansion_check     = 0.0_dp 
 
     do i = Fuel_Inlet_Start, Fuel_Outlet_End
         do j = 1, nodes_per_elem
@@ -216,7 +218,7 @@ subroutine read_power
 
     write(outfile_unit, fmt='(a)') '  '
 !---Check if projection from DIF3D to FE domain worked
-    if( (total_vol_check - sum(dif3d_volume_input)) < 1E8 ) then
+    if( (total_vol_check - sum(dif3d_volume_input)) < 1E-8 ) then
         write(outfile_unit,fmt='(a,es23.16)') 'Total fractional vol ', &
                                 total_vol_check
         write(outfile_unit,fmt='(a)'), 'Input vol is read in properly' 
@@ -226,11 +228,12 @@ subroutine read_power
                                         properly'
     end if
     
+    print *,' sum inp' , sum(dif3d_power_input), ' ' , total_power_check
 
     !---Check if projection from DIF3D to FE domain worked
-    if( (total_power_check - sum(dif3d_power_input)) < 1E8 ) then
+    if( (total_power_check - sum(dif3d_power_input)) < 1E-8 ) then
         write(outfile_unit,fmt='(a,es23.16)') 'Total  power ', &
-                                total_power_check 
+                                sum(dif3d_power_input) 
         write(outfile_unit,fmt='(a)'), 'Input power is read in properly' 
         write(outfile_unit,fmt='(a)'), ' '
     else
@@ -239,7 +242,7 @@ subroutine read_power
     end if
 
     !---Check if projection from DIF3D to FE domain worked
-    if( (total_power_frac_check - sum(dif3d_power_frac_input)) < 1E8 ) then
+    if( (total_power_frac_check - sum(dif3d_power_frac_input)) < 1E-8 ) then
         write(outfile_unit,fmt='(a,es23.16)') 'Total fractional  power ', &
                                 total_power_frac_check
         write(outfile_unit,fmt='(a)'), 'Input fractional power is read in properly' 
@@ -251,7 +254,7 @@ subroutine read_power
     
 
     !---Check if projection is working 
-    if( ( total_doppler_check - sum(dif3d_doppler_input)) < 1E8 ) then
+    if( ( total_doppler_check - sum(dif3d_doppler_input)) < 1E-8 ) then
         write(outfile_unit,fmt='(a,es23.16)') 'Total doppler reactivity worth is: ', &
                                 sum(dif3d_doppler_input)
         write(outfile_unit,fmt='(a)'), 'Input doppler reactivity worth is read in properly' 
@@ -261,7 +264,7 @@ subroutine read_power
                                          and projected properly'
     end if
     !---Check if projection is working 
-    if( (total_expansion_check - sum(dif3d_expansion_input)) < 1E8 ) then
+    if( (total_expansion_check - sum(dif3d_expansion_input)) < 1E-8 ) then
         write(outfile_unit,fmt='(a,es23.16)') 'Total fuel expansion reactivity worth is: ', &
                                  total_expansion_check
         write(outfile_unit,fmt='(a)'), 'Input fuel expansion reactivity is read in properly' 
