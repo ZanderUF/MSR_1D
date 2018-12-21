@@ -89,6 +89,10 @@ subroutine transient_euler()
                         call l2_norm(nl_iter, difference_counter, &
                                      L2_norm_prev,L2_norm_current)
                     end if
+                if ( nl_iter == 3) then
+                    exit
+                end if
+
                 nl_iter = nl_iter + 1 
                 
                 else

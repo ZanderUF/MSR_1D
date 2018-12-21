@@ -165,7 +165,7 @@ implicit none
         end do
     end do
     print *,' total power', total_power
-    print *,'prec tot    ',precursors_lambda_vec(1,:)
+    print *,'prec tot    ',sum(precursors_lambda_vec(1,:))
 
 !---Calc new beta per delay group
     do f = 1, num_isotopes

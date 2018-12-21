@@ -79,15 +79,14 @@ subroutine read_power
     starting_coordinate = global_coord(Fuel_Inlet_Start,3)
     
     do i = 1,number_entries
-!        dif3d_axial_input(i) = dif3d_axial_input(i) + starting_coordinate
+        !dif3d_axial_input(i) = dif3d_axial_input(i) - starting_coordinate
     end do
 
     counter_power_input = 1
     !---Project from dif3d domain to FE one in this code 
     do i = 1, num_elem
-        if( Fuel_Inlet_Start <= i .AND. i <= Fuel_Outlet_End ) then
+        if( Fuel_Inlet_Start < i .AND. i <= Fuel_Outlet_End ) then
                 current_z = global_coord(i,3)
-                print *,' current z ', current_z
                 !---Find power value
                 do k = 2, number_entries
                      !---Axial location
@@ -116,51 +115,26 @@ subroutine read_power
                          !counter_power_input = counter_power_input + 1
                      end if
                end do
-            
-            if( i <= Fuel_Inlet_Start) then 
-                    do j = 1, nodes_per_elem
-                        spatial_vol_fcn(i,j)  = abs(( (read_in_vol) / &
-                                                 (read_in_z - read_in_z_prev) ))
-                        
-                        spatial_area_fcn(i,j) = read_in_area 
-                        
-                        !---Reading in the power fraction.  Can multiply by the 
-                        !--- total power read in initially to get the total anywhere
-                        spatial_power_fcn(i,j) = ( (read_in_pow_prev) / &
-                                                 (read_in_z - read_in_z_prev))
-                       
-                        spatial_power_frac_fcn(i,j) = ((read_in_pow_frac_prev) / &
-                                                 (read_in_z - read_in_z_prev))
-                        
-                        spatial_doppler_fcn(i,j) = (( (read_in_doppler_prev) / &
-                                                 (read_in_z - read_in_z_prev)))
-                        spatial_expansion_fcn(i,j) =(((read_in_expansion_prev) / &
-                                             (read_in_z - read_in_z_prev)))
-                    end do
-            else
-                do j = 1, nodes_per_elem
-                       
-                    spatial_vol_fcn(i,j)  = abs(( (read_in_vol ) / &
-                                             (read_in_z - read_in_z_prev) ))
-                    
-                    spatial_area_fcn(i,j)  = read_in_area 
-                    
-                    spatial_power_fcn(i,j) = abs(( (read_in_pow) / &
-                                             (read_in_z - read_in_z_prev)))
-                    
-                    spatial_power_frac_fcn(i,j) = abs(((read_in_pow_frac) / &
-                                             (read_in_z - read_in_z_prev)))
-                    
-                    spatial_doppler_fcn(i,j) = (( (read_in_doppler) / &
-                                             (read_in_z - read_in_z_prev) ))!* &
-                    
-                    spatial_expansion_fcn(i,j) = (( (read_in_expansion ) / &
-                                             (read_in_z - read_in_z_prev) ))!* &
+
+               do j = 1, nodes_per_elem
+                   spatial_vol_fcn(i,j)  = abs(( (read_in_vol) / &
+                                            (read_in_z - read_in_z_prev) ))
+                   spatial_area_fcn(i,j) = read_in_area 
+                   !---Reading in the power fraction.  Can multiply by the 
+                   !---Total power read in initially to get the total anywhere
+                   spatial_power_fcn(i,j) = ( (read_in_pow) / &
+                                            (read_in_z - read_in_z_prev))
+                   
+                   spatial_power_frac_fcn(i,j) = ((read_in_pow_frac) / &
+                                            (read_in_z - read_in_z_prev))
+                   
+                   spatial_doppler_fcn(i,j) = (( (read_in_doppler) / &
+                                            (read_in_z - read_in_z_prev)))
+                   
+                   spatial_expansion_fcn(i,j) =(((read_in_expansion) / &
+                                        (read_in_z - read_in_z_prev)))
                 end do
-            end if
-            print *,i ,' ',  ' Z coords ',  read_in_z- read_in_z_prev, read_in_pow 
        else
-            print *,'  i ', i
             spatial_vol_fcn(i,:)       = Area_Pipe*elem_size
             spatial_area_fcn(i,:)      = Area_Pipe 
             !---Outside of core region, set power to zero
@@ -216,6 +190,8 @@ subroutine read_power
         end do
     end do
 
+    total_power_initial = total_power_check
+    
     write(outfile_unit, fmt='(a)') '  '
 !---Check if projection from DIF3D to FE domain worked
     if( (total_vol_check - sum(dif3d_volume_input)) < 1E-8 ) then
@@ -229,7 +205,7 @@ subroutine read_power
     end if
     
     print *,' sum inp' , sum(dif3d_power_input), ' ' , total_power_check
-
+    print *,' total_power_frac_check', total_power_frac_check
     !---Check if projection from DIF3D to FE domain worked
     if( (total_power_check - sum(dif3d_power_input)) < 1E-8 ) then
         write(outfile_unit,fmt='(a,es23.16)') 'Total  power ', &

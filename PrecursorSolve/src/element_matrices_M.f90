@@ -25,6 +25,6 @@ module element_matrices_M
     data identity_matrix /1,0,0,&
                          0,1,0,&
                          0,0,1/
-    data vol_int /0.16666667198838,0.66666665602322, 0.16666667198838/
+    data vol_int /0.16666667198838597, 0.66666665602322805, 0.16666667198838597/
 
 end module element_matrices_M

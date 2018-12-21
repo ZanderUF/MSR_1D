@@ -66,11 +66,11 @@ subroutine solve_power_euler(nl_iter, current_time)
     do i = 1, num_elem
         do j = 1, nodes_per_elem
             total_power = total_power + &
-                          power_amplitude_prev*&
+                          total_power_initial*power_amplitude_prev*&
                           spatial_power_frac_fcn(i,j)*vol_int(j)
             
             total_spatial_fcn = total_spatial_fcn + &
-                           spatial_power_frac_fcn(i,j)*vol_int(j)
+                           total_power_initial*spatial_power_frac_fcn(i,j)*vol_int(j)
 
         end do
     end do
