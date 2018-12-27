@@ -206,6 +206,7 @@ subroutine read_power
     
     print *,' sum inp' , sum(dif3d_power_input), ' ' , total_power_check
     print *,' total_power_frac_check', total_power_frac_check
+    
     !---Check if projection from DIF3D to FE domain worked
     if( (total_power_check - sum(dif3d_power_input)) < 1E-8 ) then
         write(outfile_unit,fmt='(a,es23.16)') 'Total  power ', &

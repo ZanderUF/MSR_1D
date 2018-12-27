@@ -130,22 +130,22 @@ implicit none
     end if
 
 !---Boundary condition after heat exchanger
-    if( n == Heat_Exchanger_End) then 
-        do i = 1, nodes_per_elem
-            temperature_soln_new(n,i) = 850.0_dp   
-        end do 
-    end if
+    !if( n == Heat_Exchanger_End) then 
+    !    do i = 1, nodes_per_elem
+    !        temperature_soln_new(n,i) = 850.0_dp   
+    !    end do 
+    !end if
 
 !---Fix delta T across heat exchanger
-    !do j = 1, nodes_per_elem    
-    !    !---Start heat exchanger
-    !    if ( Heat_Exchanger_Start <= n  .and.  n < Heat_Exchanger_End) then
-    !        temperature_soln_new(n,j) = (100.0_dp)/&
-    !        (Heat_Exchanger_End - Heat_Exchanger_Start)* &
-    !        (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,j) ) - 100.0_dp + &
-    !        temperature_soln_new(Heat_Exchanger_Start-1,1)
-    !    end if
-    !end do 
+    do j = 1, nodes_per_elem    
+        !---Start heat exchanger
+        if ( Heat_Exchanger_Start <= n  .and.  n < Heat_Exchanger_End) then
+            temperature_soln_new(n,j) = (100.0_dp)/&
+            (Heat_Exchanger_End - Heat_Exchanger_Start)* &
+            (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,j) ) - 100.0_dp + &
+            temperature_soln_new(Heat_Exchanger_Start-1,1)
+        end if
+    end do 
 
     Temperature_Reactivity_Feedback(n,:)=0.0 
     !---Calculate doppler feedback for current element
