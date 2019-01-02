@@ -28,7 +28,6 @@ implicit none
                                 A_inv_times_q_wl, elem_vec_q_temp,&
                                 A_inv_times_q_wl_vec,A_inv_U_W_times_T_vec,&
                                 U_W_times_T
-    real(dp), dimension(3,3) :: U_minus_W_right_mat 
     real(dp) :: volume, heat_capacity_eval, density_eval,& 
                 salt_mass, q_prime, length_core
     real(dp), dimension(3)   :: U_times_T_vec,Wr_times_T_vec,Wl_times_T_vec,A_inv_times_rhs_vec
@@ -47,13 +46,11 @@ implicit none
     lwork  = length
 
 !---Temperature SOLVE
-    U_minus_W_right_mat  = 0.0_dp
     rhs_final_vec        = 0.0_dp
     elem_vec_q_temp      = 0.0_dp
     elem_vec_w_left      = 0.0_dp
     U_W_times_T          = 0.0_dp
     A_inv_times_q_wl_vec = 0.0_dp
-
 
 !---Calc 1/rho*C_p * q'''
     elem_vec_q_temp = 0.0
@@ -65,7 +62,6 @@ implicit none
         q_prime = total_power_initial*power_amplitude_prev*(&
                   spatial_power_frac_fcn(n,j)/spatial_area_fcn(n,j))
         elem_vec_q_temp(j) = elem_vec_q(j)*q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
-
     end do
 
 !---[U*T^k-1]
@@ -85,17 +81,16 @@ implicit none
     if( n == 1 ) then
         do i = 1, nodes_per_elem
             Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_prev(n,2)*&
-                                temperature_soln_prev(n,3) 
+                                temperature_soln_prev(num_elem,3) 
         end do
-        !Wl_times_T_vec = matmul(matrix_W_left_face,temperature_soln_prev(n,:)) 
     end if
+    
     !---All other elements 
     if( n > 1 ) then
         do i = 1, nodes_per_elem
             Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_prev(n,2)*&
-                                temperature_soln_prev(n-1,3)
+                                temperature_soln_new(n-1,3)
         end do
-        !Wl_times_T_vec = matmul(matrix_W_left_face,temperature_soln_prev(n-1,:))
     end if
 
     rhs_final_vec = 0.0_dp
@@ -123,11 +118,11 @@ implicit none
     end if
 
 !---Inlet boundary conditions
-    if( n == Fuel_Inlet_start) then 
-        do i = 1, nodes_per_elem
-            temperature_soln_new(n,i) = 850.0_dp   
-        end do 
-    end if
+    !if( n == Fuel_Inlet_start) then 
+    !    do i = 1, nodes_per_elem
+    !        temperature_soln_new(n,i) = 850.0_dp   
+    !    end do 
+    !end if
 
 !---Boundary condition after heat exchanger
     !if( n == Heat_Exchanger_End) then 
@@ -147,12 +142,12 @@ implicit none
         end if
     end do 
 
-    Temperature_Reactivity_Feedback(n,:)=0.0 
+    Temperature_Reactivity_Feedback(n,:) = 0.0 
     !---Calculate doppler feedback for current element
     !Temperature_Reactivity_Feedback(n,j) = spatial_doppler_fcn(n,j)* &
     !            ( temperature_soln_prev(n,j) - temperature_soln_starting(n,j) )
 
-!DEBUG = .TRUE.
+!    DEBUG = .TRUE.
 if( DEBUG .eqv. .TRUE.) then
       
        write(outfile_unit,fmt='(a,4I6)'), 'nl iter ',nl_iter

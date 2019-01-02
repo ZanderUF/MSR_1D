@@ -67,12 +67,12 @@ subroutine transient_euler()
                         enddo isotope_loop 
                       
                         if( mass_flow > 0.0) then
-                            if(feedback_method == 1) then
+                            !if(feedback_method == 1 .OR. feedback_method == 3) then
                                 call solve_velocity(n)
                                 call solve_temperature_euler(n,nl_iter)
-                            else
-                                call solve_velocity(n)    
-                            end if
+                            !else
+                            !    call solve_velocity(n)    
+                            !end if
                         end if
                     
                     enddo elements_loop 
@@ -99,7 +99,7 @@ subroutine transient_euler()
                     exit
                 end if
                
-               !---Swap for next nonlinear iteration
+                !---Swap for next nonlinear iteration
                 precursor_soln_prev       = precursor_soln_new 
                 power_amplitude_prev      = power_amplitude_new
                 

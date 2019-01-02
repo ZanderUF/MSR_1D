@@ -32,28 +32,9 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
 
     elem_matrix_H = 0.0_dp 
 !---Calculate [U - lambda*A - W_r]
-    !do i = 1, nodes_per_elem
-    !    do j = 1, nodes_per_elem
-    !        elem_matrix_H(i,j) = elem_matrix_U(i,j) - &
-    !                            lamda_i_mat(isotope,delay_group)*elem_matrix_A(i,j) - &
-    !                            matrix_W_right_face(i,j)
-    !    end do
-    !end do
-
-        H_times_soln_vec = matmul(elem_matrix_U,precursor_soln_prev(isotope,delay_group,n,:)) - &
+    H_times_soln_vec = matmul(elem_matrix_U,precursor_soln_prev(isotope,delay_group,n,:)) - &
         matmul(lamda_i_mat(isotope,delay_group)*elem_matrix_A,precursor_soln_prev(isotope,delay_group,n,:)) - &
         matmul(matrix_W_right_face,precursor_soln_prev(isotope,delay_group,n,:))
-
-
-    !H_times_soln_vec = 0.0_dp
-!---!Calculate [U - lambda*A - W_r]*c_e
-    !do i = 1, nodes_per_elem
-    !    do j = 1, nodes_per_elem
-    !        H_times_soln_vec(i) = H_times_soln_vec(i) + elem_matrix_H(i,j)*&
-    !                              precursor_soln_prev(isotope,delay_group,n,j)
-    !    end do
-    !end do
-    !H_times_soln_vec = matmul(elem_matrix_H,precursor_soln_prev(isotope,delay_group,n,:))
 
 !---Calculate Beta/Gen Time * {q}
     do i = 1, nodes_per_elem
@@ -90,7 +71,6 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     end do
 
 !    DEBUG = .TRUE.
-    
     if (DEBUG .eqv. .TRUE.) then
        
        write(outfile_unit,fmt='(a)'),' '

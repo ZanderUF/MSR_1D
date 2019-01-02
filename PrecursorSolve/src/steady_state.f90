@@ -54,9 +54,9 @@ implicit none
             
             !---Solve for temperature and velocity if feedback is enabled 
             if( mass_flow > 0.0 ) then
-                if( feedback_method == 1 ) then 
+                !if( feedback_method == 1 ) then 
                     call solve_temperature_ss(n,nl_iter)
-                end if
+                !end if
             end if
             !call solve_temperature_ss(n,nl_iter)
 

@@ -181,7 +181,7 @@ subroutine solve_power_euler(nl_iter, current_time)
     do i = Fuel_Inlet_Start, Fuel_Outlet_End 
         do j = 1, nodes_per_elem
             power_soln_new(i,j) = power_amplitude_new* &
-                                  vol_int(j)*spatial_power_frac_fcn(i,j)      
+                                  spatial_power_frac_fcn(i,j)      
         end do
     end do
     
