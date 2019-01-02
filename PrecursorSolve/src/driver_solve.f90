@@ -82,7 +82,9 @@ implicit none
              temperature_soln_starting(num_elem,nodes_per_elem), &
              power_soln_starting(num_elem,nodes_per_elem), &
              Density_Reactivity_Feedback(num_elem,nodes_per_elem), &
-             Temperature_Reactivity_Feedback(num_elem,nodes_per_elem) )
+             Temperature_Reactivity_Feedback(num_elem,nodes_per_elem),&
+             density_soln_ss(num_elem,nodes_per_elem),&
+             temperature_soln_ss(num_elem,nodes_per_elem) )
 
 allocate(beta_initial_vec(num_isotopes,num_delay_group))
 allocate(beta_j(num_isotopes,num_delay_group), &

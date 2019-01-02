@@ -89,7 +89,7 @@ implicit none
     if( n > 1 ) then
         do i = 1, nodes_per_elem
             Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_prev(n,2)*&
-                                temperature_soln_new(n-1,3)
+                                temperature_soln_prev(n-1,3)
         end do
     end if
 

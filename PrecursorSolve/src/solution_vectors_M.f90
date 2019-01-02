@@ -26,6 +26,8 @@ module solution_vectors_M
     real(dp) , allocatable :: temperature_soln_prev(:,:)
     real(dp) , allocatable :: density_soln_prev(:,:)
     real(dp) , allocatable :: velocity_soln_prev(:,:) 
+    real(dp) , allocatable :: density_soln_ss(:,:)
+    real(dp) , allocatable :: temperature_soln_ss(:,:)
     !---Spatially varying values read in from DIF3D    
     
     real(dp) , allocatable :: spatial_vol_fcn(:,:)

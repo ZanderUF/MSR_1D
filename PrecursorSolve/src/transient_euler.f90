@@ -52,7 +52,6 @@ subroutine transient_euler()
                 if(nl_iter_flag .eqv. .TRUE.) then 
                     !---Create element matrices and assemble
                     elements_loop: do n = 1 , num_elem 
-                        
                         !---Generate spatial matrices
                         call spatial_matrices(n,nl_iter)
                         call numerical_flux_matrices(n,nl_iter)
@@ -68,7 +67,7 @@ subroutine transient_euler()
                       
                         if( mass_flow > 0.0) then
                             !if(feedback_method == 1 .OR. feedback_method == 3) then
-                                call solve_velocity(n)
+                                call solve_velocity(n,nl_iter)
                                 call solve_temperature_euler(n,nl_iter)
                             !else
                             !    call solve_velocity(n)    

@@ -56,6 +56,7 @@ implicit none
             if( mass_flow > 0.0 ) then
                 !if( feedback_method == 1 ) then 
                     call solve_temperature_ss(n,nl_iter)
+                    call solve_velocity(n,nl_iter)
                 !end if
             end if
             !call solve_temperature_ss(n,nl_iter)
