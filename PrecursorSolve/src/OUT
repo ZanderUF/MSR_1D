@@ -1,8 +1,0 @@
-gfortran -v -g -fbounds-check  -c free_form_C.f90
-gfortran -v -g -fbounds-check  -c rdparm_fe_M.f90
-gfortran -v -g -fbounds-check  -c rddelay_M.f90 
-gfortran -v -g -fbounds-check  -c rdmesh_M.f90 
-gfortran -v -g -fbounds-check  -c datainput_fe_M.f90 
-gfortran -v -g -fbounds-check  -c driver_solve.f90
-gfortran -v -g -fbounds-check  -c spatial_matrices.f90
-gfortran -v -g -fbounds-check  main_driver.f90 *.o -L ../../lapack-3.8.0/ -llapack -lblas -o msr1d 

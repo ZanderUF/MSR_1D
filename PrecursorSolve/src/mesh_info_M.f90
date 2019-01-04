@@ -29,6 +29,7 @@ module mesh_info_M
     integer :: Fuel_Outlet_End
     integer :: Fuel_Inlet_Start
     !---Heat exchanger
+    real(dp) :: Area_Heat_Exchanger
     integer :: Heat_Exchanger_Start 
     integer :: Heat_Exchanger_End 
    

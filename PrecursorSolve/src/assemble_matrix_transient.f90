@@ -25,10 +25,11 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     integer,intent(in) :: isotope
     integer,intent(in) :: delay_group
     integer,intent(in) :: n
+
 !---Local variables
-    integer :: i, j, ii, jj, nr,nc, ncl,length   
-    real(dp), dimension(3) :: H_times_soln_vec, beta_lambda_times_q_vec,&
-                                      W_left_times_prev_elem_soln_vec
+    integer :: i, j, length   
+    real(dp), dimension(3) :: H_times_soln_vec, beta_lambda_times_q_vec, &
+                              W_left_times_prev_elem_soln_vec
 
     elem_matrix_H = 0.0_dp 
 !---Calculate [U - lambda*A - W_r]
@@ -36,6 +37,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
         matmul(lamda_i_mat(isotope,delay_group)*elem_matrix_A,precursor_soln_prev(isotope,delay_group,n,:)) - &
         matmul(matrix_W_right_face,precursor_soln_prev(isotope,delay_group,n,:))
 
+    beta_lambda_times_q_vec = 0.0_dp
 !---Calculate Beta/Gen Time * {q}
     do i = 1, nodes_per_elem
         beta_lambda_times_q_vec(i) = power_amplitude_prev*&

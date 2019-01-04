@@ -136,6 +136,9 @@ implicit none
     velocity_soln_prev        = velocity_soln_new
     density_soln_prev         = density_soln_new
 
+    density_soln_ss = density_soln_new
+    temperature_soln_ss = temperature_soln_new
+
 !---Write precursor solution outfile
     call write_out_soln(soln_outfile_unit,num_elem,.TRUE.)
 

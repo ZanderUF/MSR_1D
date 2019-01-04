@@ -35,8 +35,10 @@ subroutine transient_backward_euler()
     max_nl_iter = 50 
     abs_max_nl_iter = 600 
     nl_iter_tolerance = 1E-12_dp
-    
+
+!---Parameters for slowing down the mass flow rate 
     time_constant = -0.2_dp
+!---'Event' start time, for adjusting the beta as a function of flow speed
     event_start_time = delta_t 
 
 !---Start time-dependent solve

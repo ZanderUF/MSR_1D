@@ -29,13 +29,7 @@ subroutine solve_precursor_euler(isotope,delay_group,n, nl_iter )
   
 !---    
     A_inv_times_RHS(:) = 0.0
-    !do i = 1, nodes_per_elem
-    !    do j = 1, nodes_per_elem
-    !        A_inv_times_RHS(i) = A_inv_times_RHS(i) + inverse_A_matrix(i,j)*&
-    !                             RHS_transient_final_vec(i)
-    !    end do
-    !end do
-
+    
     A_inv_times_RHS = matmul(inverse_A_matrix,RHS_transient_final_vec)
 
 !---Solve for new precursor at delta t
@@ -75,9 +69,13 @@ subroutine solve_precursor_euler(isotope,delay_group,n, nl_iter )
         end do
     end if
 
+!if(t0 > 4.0) then
+!    DEBUG = .TRUE.
+!end if
 !*************************************
     if (DEBUG .eqv. .TRUE.) then
     !---Write out solution for current element 
+                
         write(outfile_unit,fmt='(a,1I6,a,1I6)'),'Previous Solution | element --> ',&
         n, ' Group -->',delay_group
         do j=1,nodes_per_elem 
@@ -93,5 +91,7 @@ subroutine solve_precursor_euler(isotope,delay_group,n, nl_iter )
         end do   
         write(outfile_unit,fmt='(a)'), '********************************'
     end if
+
+DEBUG = .FALSE.
 
 end subroutine solve_precursor_euler 

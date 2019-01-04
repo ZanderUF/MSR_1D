@@ -96,7 +96,12 @@ implicit none
                     (global_coord(i,j) - global_coord(Heat_Exchanger_End,3) ) + &
                     inlet_temperature 
                     
-                    spatial_area_fcn(i,j)    = Area_Pipe
+                    !Area_Plenum = (Area_Core - Area_Pipe )/&
+                    !              (Fuel_Core_Start - Fuel_Inlet_Start)*&
+                    !              (i - Fuel_Inlet_Start) + &
+                    !              Area_Pipe                
+                    spatial_area_fcn(i,j)    = Area_Heat_Exchanger
+
                 !---Rest of the external piping
                 else
                     temperature_soln_new(i,j) = inlet_temperature

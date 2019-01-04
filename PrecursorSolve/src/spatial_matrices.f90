@@ -53,13 +53,8 @@ subroutine spatial_matrices (n, nl_iter)
     matrix_W_left_face  = 0.0_dp
     elem_matrix_U       = 0.0_dp
     elem_matrix_A       = 0.0_dp
-    elem_matrix_F       = 0.0_dp
     elem_vec_q          = 0.0_dp    
     elem_vol_int(n,:)   = 0.0_dp 
-
-    !if( (n==1) .and. (nl_iter == 1) .and. (t0 == 0.0)) then
-    !    elem_matrix_A       = 0.0_dp
-    !end if
 
 !---Integrate over Gauss pts 
     gaussintegration: do g = 1 , num_gaus_pts 
@@ -88,14 +83,12 @@ subroutine spatial_matrices (n, nl_iter)
             !---Only needed if we are changing length of elements
             elem_vol_int(n,i) = elem_vol_int(n,i) + cnst*shape_fcn(i)
             
-            elem_vec_q(i) = elem_vec_q(i)+ &
-                            cnst*shape_fcn(i)  
+            elem_vec_q(i) = elem_vec_q(i) + cnst*shape_fcn(i)  
+            
             do j = 1, nodes_per_elem
                 !---Determine A matrix - only needs to be done once
-                !if( (n == 1) .and. (nl_iter == 1) .and. (t0 == 0.0) ) then 
                     elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                      cnst*shape_fcn(i)*shape_fcn(j)
-                !end if
                    elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                     cnst*shape_fcn(j)*&
                                      global_der_shape_fcn(i)

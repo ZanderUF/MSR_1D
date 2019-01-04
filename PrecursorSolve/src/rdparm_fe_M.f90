@@ -88,7 +88,6 @@
            !--
            case('rmpb') 
               ramp_start_time = dread(i0,iret)  
-
            case('rmpe')
               ramp_end_time = dread(i0,iret)
            case('stpb')
@@ -103,7 +102,7 @@
               if( read_zag == 'yes' ) then
                   zag_flag = .TRUE.
               end if
-          !--Decide if reading power from file or not
+          !---Decide if reading power from file or not
           case('rdpw')
               read_pow_file = aread(i4, iret)
               if( read_pow_file == 'no ') then
@@ -137,6 +136,8 @@
               Area_Core = fread(i0,iret)
           case('apip') 
                Area_Pipe = fread(i0,iret)
+          case('ahex')
+                Area_Heat_Exchanger = fread(i0,iret)
          !---Define heat exchanger location
           case('hexs')
                Heat_Exchanger_Start = fread(i0,iret)     

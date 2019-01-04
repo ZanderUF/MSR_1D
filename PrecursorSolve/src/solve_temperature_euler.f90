@@ -59,6 +59,7 @@ implicit none
         temperature_eval = temperature_soln_prev(n,j)
         call density_corr(temperature_eval, density_eval) 
         call heat_capacity_corr(temperature_eval, heat_capacity_eval)
+        
         q_prime = total_power_initial*power_amplitude_prev*(&
                   spatial_power_frac_fcn(n,j)/spatial_area_fcn(n,j))
         elem_vec_q_temp(j) = elem_vec_q(j)*q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
@@ -73,7 +74,6 @@ implicit none
     do i = 1, nodes_per_elem
         Wr_times_T_vec(i) = interp_fcn_rhs(i)*velocity_soln_prev(n,2)*temperature_soln_prev(n,3)  
     end do
-    !Wr_times_T_vec = matmul(temperature_soln_prev(n,:),matrix_W_right_face)
 
 !---[W_l*T^k-1_e-1
     Wl_times_T_vec(:) = 0.0_dp
@@ -143,13 +143,25 @@ implicit none
     end do 
 
     Temperature_Reactivity_Feedback(n,:) = 0.0 
-    !---Calculate doppler feedback for current element
-    !Temperature_Reactivity_Feedback(n,j) = spatial_doppler_fcn(n,j)* &
-    !            ( temperature_soln_prev(n,j) - temperature_soln_starting(n,j) )
+    do j = 1, nodes_per_elem    
+        !---Calculate doppler feedback for current element
+        Temperature_Reactivity_Feedback(n,j) = spatial_doppler_fcn(n,j)/total_temperature_change* &
+                ( temperature_soln_prev(n,j) - temperature_soln_ss(n,j) )
+    end do
 
+!if(t0 > 7.0) then
 !    DEBUG = .TRUE.
+!end if
+
 if( DEBUG .eqv. .TRUE.) then
-      
+ 
+    write(outfile_unit,fmt='(a,1I6,a,1I6)'),'Change in Temperature, A^-1*RHS - node --> ',&
+        n
+        do j=1,nodes_per_elem 
+              write(outfile_unit,fmt='(f16.3)'), A_inv_times_rhs_vec(j) 
+        end do
+        write(outfile_unit,fmt='(a)'), ' '
+     
        write(outfile_unit,fmt='(a,4I6)'), 'nl iter ',nl_iter
        write(outfile_unit,fmt='(a,12es14.5)'),' time', t0
       

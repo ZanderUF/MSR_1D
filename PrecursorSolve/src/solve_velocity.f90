@@ -45,13 +45,20 @@ implicit none
         !---New velocity
         velocity_soln_new(n,j) = (mass_flow / &
                                  (spatial_area_fcn(n,j)*density_eval))
+       
+        if( t0 > 0.0) then
+            !---Evaluate feedback based on density change
+            Density_Reactivity_Feedback(n,j) = (spatial_expansion_fcn(n,j) / &
+                    (total_density_change)) * &
+                    ( 1.0_dp - density_soln_new(n,j)/density_soln_ss(n,j) )
+            
+            !print *,'density_soln_ss(n,j)  ' ,density_soln_ss(n,j)
+            !print *,'density_soln_new(n,j) ' ,density_soln_new(n,j)
+            !print *,' '
         
-        !---Evaluate feedback based on density change
-        !Density_Reactivity_Feedback(n,j) = (spatial_expansion_fcn(n,j) / &
-        !            (density_soln_starting(n,j)*total_density_change)) * &
-        !            ( density_soln_starting(n,j) - density_soln_new(n,j) )
-        
-        Density_Reactivity_Feedback(n,j) = 0.0
+        end if
+
+        !Density_Reactivity_Feedback(n,j) = 0.0
      end do
    
 end subroutine solve_velocity

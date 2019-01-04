@@ -143,20 +143,20 @@ subroutine solve_power_euler(nl_iter, current_time)
     total_temperature_feedback = 0.0_dp
     total_density_feedback = 0.0_dp
 
-    if(feedback_method == 1 ) then
+    if(feedback_method == 3 ) then
         !---Total_temperature feedback
-        total_temperature_feedback = sum(Temperature_Reactivity_Feedback)
-        total_density_feedback     = sum(Density_Reactivity_Feedback) 
+        do i = 1, num_elem
+            do j = 1, nodes_per_elem
+                total_temperature_feedback = total_temperature_feedback + &
+                                             vol_int(j)*Temperature_Reactivity_Feedback(i,j)
+                total_density_feedback     = total_density_feedback + & 
+                                             vol_int(j)*Density_Reactivity_Feedback(i,j)
+            end do
+        end do
     end if
     
+    reactivity_feedback = 0.0_dp 
     reactivity_feedback = total_temperature_feedback + total_density_feedback
-
-    !print *,' t0                    ', t0
-    !print *,' amp                   ', power_amplitude_prev
-    !print *,' total precursors fuel ', total_precursors_fuel
-    !print *,' total power           ', total_power
-    !print *,' reactivity_ feedback ', reactivity_feedback
-    !print *,' ' 
 
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler
