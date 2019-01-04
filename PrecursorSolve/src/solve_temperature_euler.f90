@@ -148,7 +148,7 @@ implicit none
         Temperature_Reactivity_Feedback(n,j) = spatial_doppler_fcn(n,j)/total_temperature_change* &
                 ( temperature_soln_prev(n,j) - temperature_soln_ss(n,j) )
     end do
-
+    
 !if(t0 > 7.0) then
 !    DEBUG = .TRUE.
 !end if
