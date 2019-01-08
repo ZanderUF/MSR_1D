@@ -11,9 +11,12 @@ module time_info_M
     real(dp)   delta_t        ! time step 
     real(dp)   tmax      ! max time 
     real(dp)   t_initial ! starting time
-    real(dp)  ramp_start_time
-    real(dp)  ramp_end_time
-    real(dp) step_start_time
-    real(dp) step_end_time
+    real(dp)   ramp_start_time
+    real(dp)   ramp_end_time
+    real(dp)   step_start_time
+    real(dp)  step_end_time
+!---Time constnat for flow slowdown
+    real(dp)  time_constant
+    real(dp) flow_reduction_percent
 
 end module time_info_M

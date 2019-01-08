@@ -62,6 +62,7 @@ implicit none
         
         q_prime = total_power_initial*power_amplitude_prev*(&
                   spatial_power_frac_fcn(n,j)/spatial_area_fcn(n,j))
+        
         elem_vec_q_temp(j) = elem_vec_q(j)*q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
     end do
 
@@ -72,7 +73,7 @@ implicit none
 !---[W_r*T^k-l]
     Wr_times_T_vec(:) = 0.0_dp
     do i = 1, nodes_per_elem
-        Wr_times_T_vec(i) = interp_fcn_rhs(i)*velocity_soln_prev(n,2)*temperature_soln_prev(n,3)  
+        Wr_times_T_vec(i) = interp_fcn_rhs(i)*velocity_soln_new(n,3)*temperature_soln_prev(n,3)  
     end do
 
 !---[W_l*T^k-1_e-1
@@ -80,16 +81,16 @@ implicit none
     !---First element
     if( n == 1 ) then
         do i = 1, nodes_per_elem
-            Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_prev(n,2)*&
-                                temperature_soln_prev(num_elem,3) 
+            Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_new(n,3)*&
+                                temperature_soln_new(num_elem,3) 
         end do
     end if
     
     !---All other elements 
     if( n > 1 ) then
         do i = 1, nodes_per_elem
-            Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_prev(n,2)*&
-                                temperature_soln_prev(n-1,3)
+            Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_new(n,3)*&
+                                temperature_soln_new(n-1,3)
         end do
     end if
 
@@ -141,6 +142,13 @@ implicit none
             temperature_soln_new(Heat_Exchanger_Start-1,1)
         end if
     end do 
+
+    !---Temperature remains constant after the heat exchanger.  I.e. no more lost heat
+    if( n > Heat_Exchanger_End) then
+        do j = 1, nodes_per_elem
+            temperature_soln_new(n,j) = temperature_soln_new(Heat_Exchanger_End,j) 
+        end do
+    end if
 
     Temperature_Reactivity_Feedback(n,:) = 0.0 
     do j = 1, nodes_per_elem    

@@ -132,10 +132,17 @@ implicit none
         if ( Heat_Exchanger_Start <= n  .and.  n < Heat_Exchanger_End) then
             temperature_soln_new(n,j) = (100.0_dp)/&
             (Heat_Exchanger_End - Heat_Exchanger_Start)* &
-            (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,j) ) - 100.0_dp + &
+            (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,3) ) - 100.0_dp + &
             temperature_soln_new(Heat_Exchanger_Start-1,1)
         end if
     end do 
+
+if( n > Heat_Exchanger_End) then
+        do j = 1, nodes_per_elem
+            temperature_soln_new(n,j) = temperature_soln_new(Heat_Exchanger_End,j) 
+        end do
+    end if
+
 
 if( DEBUG .eqv. .TRUE.) then
       

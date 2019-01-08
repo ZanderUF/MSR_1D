@@ -99,7 +99,7 @@ subroutine spatial_matrices (n, nl_iter)
    
     do i = 1, nodes_per_elem
         do j = 1, nodes_per_elem
-            elem_matrix_U(i,j) = velocity_soln_new(n,j)*elem_matrix_U(i,j) 
+            elem_matrix_U(i,j) = velocity_soln_prev(n,j)*elem_matrix_U(i,j) 
         end do
     end do
 

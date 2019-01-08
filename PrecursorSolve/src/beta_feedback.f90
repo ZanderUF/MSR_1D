@@ -12,12 +12,10 @@ subroutine beta_feedback
     implicit none
 
     integer  :: event_counter
-    real(dp) :: time_constant
     logical  :: event_occuring 
     real(dp) :: event_start_time, event_time,event_time_previous, t1
     
     
-    time_constant = -0.2_dp
     event_start_time = delta_t 
 
    !---Evaluate if
@@ -63,7 +61,7 @@ subroutine beta_feedback
     end if
 
     if(feedback_method == 3) then 
-        if(mass_flow > 0.8_dp*mass_flow_initial) then
+        if(mass_flow > flow_reduction_percent*mass_flow_initial) then
             mass_flow = mass_flow_initial*exp(time_constant*t0)
         end if
     end if

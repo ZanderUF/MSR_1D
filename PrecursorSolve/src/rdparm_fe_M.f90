@@ -143,7 +143,11 @@
                Heat_Exchanger_Start = fread(i0,iret)     
           case('hexe')
                Heat_Exchanger_End = fread(i0,iret)
-          
+          !--- Time constant for flow
+          case('tcns')
+                time_constant = fread(i0,iret)
+          case('fper')
+                flow_reduction_percent = fread(i0,iret)
           case('mflo')
               mass_flow=fread(i0,iret)
           case('tpow')

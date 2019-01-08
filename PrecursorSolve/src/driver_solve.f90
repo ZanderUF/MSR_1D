@@ -81,7 +81,7 @@ implicit none
              density_soln_starting(num_elem,nodes_per_elem), &
              temperature_soln_starting(num_elem,nodes_per_elem), &
              power_soln_starting(num_elem,nodes_per_elem), &
-             Density_Reactivity_Feedback(num_elem,nodes_per_elem), &
+             Density_Reactivity_Feedback(num_elem), &
              Temperature_Reactivity_Feedback(num_elem,nodes_per_elem),&
              density_soln_ss(num_elem,nodes_per_elem),&
              temperature_soln_ss(num_elem,nodes_per_elem) )

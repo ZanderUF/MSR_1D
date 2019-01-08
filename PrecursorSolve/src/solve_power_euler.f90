@@ -91,6 +91,8 @@ subroutine solve_power_euler(nl_iter, current_time)
         end if
     end if
     
+    !print *,' beta curre ',  gen_time*total_precursors_fuel/total_power, ' time',t0
+
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then
         if(step_start_time < t0 .and. t0 < step_end_time ) then
@@ -145,19 +147,25 @@ subroutine solve_power_euler(nl_iter, current_time)
 
     if(feedback_method == 3 ) then
         !---Total_temperature feedback
-        do i = 1, num_elem
+        do i = Fuel_Inlet_Start, Fuel_Outlet_End 
             do j = 1, nodes_per_elem
                 total_temperature_feedback = total_temperature_feedback + &
                                              vol_int(j)*Temperature_Reactivity_Feedback(i,j)
-                total_density_feedback     = total_density_feedback + & 
-                                             vol_int(j)*Density_Reactivity_Feedback(i,j)
+                !total_density_feedback     = total_density_feedback + & 
+                !                             vol_int(j)*Density_Reactivity_Feedback(i,j)
             end do
+            total_density_feedback = total_density_feedback + &
+                                     Density_Reactivity_Feedback(i)
         end do
     end if
     
+    !print *,'TOTAL dens     ', total_density_feedback, ' time ', t0
+    !print *,'SUM   dens     ', sum(Density_Reactivity_Feedback(:,2))
+
     reactivity_feedback = 0.0_dp 
     reactivity_feedback = total_temperature_feedback + total_density_feedback
-
+    reactivity_feedback = 0.0_dp 
+ 
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler
          power_amplitude_new = power_amplitude_prev + &

@@ -44,6 +44,7 @@ subroutine transient_euler()
             !---Vary beta with flow speed
             call beta_feedback 
            
+            
             !---Decide if we are doing backward or forward euler
             nl_iter_flag = .TRUE. 
             residual(:,:,:,:) = 0.0_dp
@@ -55,7 +56,10 @@ subroutine transient_euler()
                         !---Generate spatial matrices
                         call spatial_matrices(n,nl_iter)
                         call numerical_flux_matrices(n,nl_iter)
-                        
+                         if( mass_flow > 0.0) then
+                                call solve_velocity(n,nl_iter)
+                                call solve_temperature_euler(n,nl_iter)
+                        end if            
                         isotope_loop: do f = 1, num_isotopes
                             delay_loop: do g = 1, num_delay_group
                                 !---Assemble matrices solve elemental coefficients 
@@ -64,21 +68,9 @@ subroutine transient_euler()
                                 call solve_precursor_euler(f,g,n,nl_iter)
                             enddo delay_loop 
                         enddo isotope_loop 
-                      
-                        if( mass_flow > 0.0) then
-                            !if(feedback_method == 1 .OR. feedback_method == 3) then
-                                call solve_velocity(n,nl_iter)
-                                call solve_temperature_euler(n,nl_iter)
-                            !else
-                            !    call solve_velocity(n)    
-                            !end if
-                        end if
-                    
                     enddo elements_loop 
-            
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_euler(nl_iter,t0) 
-            
                 !---If doing forward Euler - no iteration
                     if(td_method_type == 0 ) then
                         nl_iter_flag = .FALSE. 
@@ -88,12 +80,13 @@ subroutine transient_euler()
                         call l2_norm(nl_iter, difference_counter, &
                                      L2_norm_prev,L2_norm_current)
                     end if
-                if ( nl_iter == 3) then
+                if ( nl_iter == 100) then
                     exit
                 end if
-
-                nl_iter = nl_iter + 1 
                 
+                nl_iter = nl_iter + 1 
+               
+                !---No nonlinear iterations
                 else
                     exit
                 end if
@@ -108,8 +101,9 @@ subroutine transient_euler()
                 density_soln_prev         = density_soln_new
 
             enddo nonlinearloop 
+            !print *,' nl iter ', nl_iter
+
             !***************************************************
-            
             !---Only automate time stepping
             if(td_method_type == 1) then
                 sum_residual = 0.0

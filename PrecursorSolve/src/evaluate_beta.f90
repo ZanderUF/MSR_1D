@@ -24,13 +24,12 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     real(dp) :: beta_1, beta_2, mass_flow_1, mass_flow_2, a,b,mid
     real(dp),dimension(num_isotopes,num_delay_group) :: beta_interp_current,& 
                       beta_change_all_current 
-    real(dp) :: current_time, number_half_lifes, time_constant
+    real(dp) :: current_time, number_half_lifes
     integer  :: i, g,f 
     real(dp), dimension(num_isotopes,num_delay_group) :: time_cutoff
     real(dp) :: Large_Lambda
     integer :: event_counter_last
      
-    time_constant = -0.2_dp
     number_half_lifes = log(2.0_dp) 
   
     !---Get cutoff time to stop looking at differences between 

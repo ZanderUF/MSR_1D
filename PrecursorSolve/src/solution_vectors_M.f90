@@ -37,7 +37,7 @@ module solution_vectors_M
     real(dp) , allocatable :: spatial_doppler_fcn(:,:)
     real(dp) , allocatable :: spatial_expansion_fcn(:,:)
 
-    real(dp) , allocatable :: Density_Reactivity_Feedback(:,:)
+    real(dp) , allocatable :: Density_Reactivity_Feedback(:)
     real(dp) , allocatable :: Temperature_Reactivity_Feedback(:,:)
 
     real(dp) , allocatable :: cur_elem_soln_vec(:,:)       ! current solution vector
