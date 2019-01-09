@@ -16,41 +16,51 @@ Begins with **read parm** and ends with **end parm**
 =========  ===========  ==========================================================
 Parameter  Value        Description
 =========  ===========  ==========================================================
-time       yes or no    Perform a time dependent calculation
-dbg        yes or no    Turn on DEBUG printing - prints a lot of stuff
-meth       integer      0 - forward Euler 1 - backward Euler       
-step       yes or no    Perform a step perturbation or not
-stpb       Double       Start time for step perturbation
-stpe       Double       End time for step perturbation
-rmpb       Double       Start time for ramp perturbation
-rmpe       Double       End time for ramp perturbation
-ramp       yes or no    Perform a ramp perturbation or not
-zag        yes or no    Perform a zig-zag perturbation or not
-feed       Integer      0 - (default) no feedback 1 - temperature 2 - instant beta
-rdpw       yes or no    Read power profile from a file
-del        Double       Indicate fixed time step size, ex: 1E-5
-tmax       Real         Indicate the total length of the simulation
-tin        Double       Beginning point of the perturbation 
-nem        Integer      Number of equal spaced elements in the model
-npe        Integer      Number of nodes per element 
-pipe       Integer      Number of elements in the outer circuit
-inlt       Integer      Starting element of the inlet plenum
-scor       Integer      Starting element of the main core region
-ecor       Integer      Final element of the main core region
-hexs       Integer      Heat exchanger starting element location
-hexe       Integer      Heat exchanger ending element location
-outl       Integer      Final element of the outlet plenum
-area       Real         Area of the fuel core [:math:`cm^2`] 
-apip       Real         Area of the piping [:math:'cm^2']
-mflow      Real         Mass flow rate [:math:`g/cm^3`]
-tpow       Real         Total axial power [:math:`n/s-cm`]
-nitr       Real         Set number of maximum nonlinear iterations 
-elem       Real         Element length [:math:`cm`]
-ndg        Integer      Number of delayed neutron groups
-nmat       Integer      Number of fissional materials
-gen        Real         Neutron generation time [:math:`s^-2`]
-reac       Real         Reactivity insertion for step and ramp
-save       Real         Interval to write out spatial solution files to
+TimeSolv   yes or no    Perform a time dependent calculation
+DebuggIt   yes or no    Turn on DEBUG printing - prints a lot of stuff
+ReadDig3   yes or no    Read DIF3D external file for power profile and such 
+TDMethod   integer      0 - forward Euler 1 - backward Euler       
+Feedback   Integer      0 - (default) no feedback 1 - temperature 2 - instant beta
+
+StepPert   yes or no    Perform a step perturbation or not
+StrtStep   Double       Start time for step perturbation
+EndStep    Double       End time for step perturbation
+RampPer    yes or no    Perform a ramp perturbation or not
+StrtRamp   Double       Start time for ramp perturbation
+EndRamp    Double       End time for ramp perturbation
+ZaggPert   yes or no    Perform a zig-zag perturbation or not
+Reactiv    Real         Reactivity insertion for step and ramp
+
+TimeStep   Double       Indicate fixed time step size, ex: 1E-5
+EndTime    Real         Indicate the total length of the simulation
+StrtTime   Double       Beginning point of the perturbation 
+
+ElemSize   Integer      Size of elements
+NumElems   Integer      Number of equal spaced elements in the model
+NumNodes   Integer      Number of nodes per element 
+
+FuelInlt   Integer      Starting element of the inlet plenum
+CoreStrt   Integer      Starting element of the main core region
+CoreEnd    Integer      Final element of the main core region
+FuelOutl   Integer      Final element of the outlet plenum
+StartHex   Integer      Heat exchanger starting element location
+EndHexch   Integer      Heat exchanger ending element location
+
+CoreArea   Real         Area of the fuel core [:math:`cm^2`] 
+PipArea    Real         Area of the piping [:math:`cm^2`]
+HexcArea   Real         Area of the heat exchanger  [:math:`cm^2`]
+
+TimeCons   Real         Time constant for mass flow rate reduction
+PerFlow    Real         Percent reduction in flow rate over 1/TimeCons  
+MassFlow   Real         Mass flow rate [:math:`g/cm^3`]
+TotalPow   Real         Total axial power [:math:`n/s-cm`]
+
+NlIters    Integer      Set number of maximum nonlinear iterations 
+
+NumDelay   Integer      Number of delayed neutron groups
+Material   Integer      Number of fissional materials
+GenTime    Real         Neutron generation time [:math:`s^-2`]
+SaveTime   Real         Interval to write out spatial solution files to
 =========  ===========  ==========================================================
 
 .. Delay Block::
