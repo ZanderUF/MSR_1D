@@ -35,6 +35,8 @@ subroutine solve_power_euler(nl_iter, current_time)
                rho_initial, step_time
     real(dp) :: first_zag, second_zag, third_zag, reactivity_zag
     real(dp) :: total_power
+    real(dp) :: average_temperature, total_temperature
+    real(dp) :: total_density,average_density
 
 !---Initialize to zero
     precursors_lambda_vec(:,:) = 0.0_dp
@@ -91,8 +93,6 @@ subroutine solve_power_euler(nl_iter, current_time)
         end if
     end if
     
-    !print *,' beta curre ',  gen_time*total_precursors_fuel/total_power, ' time',t0
-
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then
         if(step_start_time < t0 .and. t0 < step_end_time ) then
@@ -141,30 +141,58 @@ subroutine solve_power_euler(nl_iter, current_time)
         end if
     end if
 
+!---Calculate average temperature across the core    
+    total_temperature = 0.0_dp
+    total_density = 0.0_dp
+
+    do i = Fuel_Inlet_Start, Fuel_Outlet_End
+        do j = 1, nodes_per_elem
+            total_temperature = total_temperature + &
+                          vol_int(j)*temperature_soln_new(i,j)
+            total_density = total_density + &
+                            vol_int(j)*density_soln_prev(i,j)
+        end do
+    end do
+
+    average_temperature = total_temperature/(Fuel_Outlet_End - Fuel_Inlet_Start)
+    average_density     = total_density/(Fuel_Outlet_End - Fuel_Inlet_Start)
+
 !---Calculate temperature reactivity feedback
     total_temperature_feedback = 0.0_dp
-    total_density_feedback = 0.0_dp
+    total_density_feedback     = 0.0_dp
 
     if(feedback_method == 3 ) then
         !---Total_temperature feedback
-        do i = Fuel_Inlet_Start, Fuel_Outlet_End 
-            do j = 1, nodes_per_elem
-                total_temperature_feedback = total_temperature_feedback + &
-                                             vol_int(j)*Temperature_Reactivity_Feedback(i,j)
-                !total_density_feedback     = total_density_feedback + & 
-                !                             vol_int(j)*Density_Reactivity_Feedback(i,j)
-            end do
-            total_density_feedback = total_density_feedback + &
-                                     Density_Reactivity_Feedback(i)
-        end do
-    end if
+        !do i = Fuel_Inlet_Start, Fuel_Outlet_End 
+        !    Density_Reactivity_Feedback(i) = (spatial_expansion_fcn(i,2) / &
+        !                            0.01_dp) * &
+        !                           (density_soln_ss(i,2)/density_soln_prev(i,2) - 1.0_dp)
+        !    do j = 1, nodes_per_elem
+
+        !        total_temperature_feedback = total_temperature_feedback + &
+        !                                     vol_int(j)*Temperature_Reactivity_Feedback(i,j)
+        !    end do
+        !end do
+        !total_density_feedback = sum(Density_Reactivity_Feedback)
     
-    !print *,'TOTAL dens     ', total_density_feedback, ' time ', t0
-    !print *,'SUM   dens     ', sum(Density_Reactivity_Feedback(:,2))
+    !---Calculate reactivity change based on average
+    total_temperature_feedback = (total_doppler_read_in/total_temperature_change)*&
+                                 (average_temperature - average_temperature_ss)
+    total_density_feedback = (total_expansion_read_in/(total_density_change*2.5935_dp))*&
+                             (average_density_ss - average_density)                          
+    !print *,' total read in ', total_expansion_read_in
+    !print *,'total den change ', total_density_change
+
+    !print *,'Coef        ',(total_expansion_read_in/(total_density_change*2.5935_dp))
+    !print *,'density new ', average_density
+    !print *,'average     ',average_density_ss
+
+    end if
+   
 
     reactivity_feedback = 0.0_dp 
     reactivity_feedback = total_temperature_feedback + total_density_feedback
-    reactivity_feedback = 0.0_dp 
+    !reactivity_feedback = 0.0_dp 
  
 !---Power Solve
     if(td_method_type == 0) then ! Forward Euler

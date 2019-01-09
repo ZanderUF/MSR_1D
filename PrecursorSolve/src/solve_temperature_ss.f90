@@ -73,7 +73,7 @@ implicit none
             volume = volume + vol_int(j)*area_variation(i,j)
         end do
     end do
-    
+   
     q_prime = 2.9402959623723435E+08_dp/2.7853599169898033E+07_dp
 !---Loop over all nodes in element
     do j = 1, nodes_per_elem

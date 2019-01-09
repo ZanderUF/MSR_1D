@@ -96,17 +96,21 @@ allocate(beta_change_all_previous(num_isotopes,num_delay_group),&
 allocate(beta_correction_vec(num_isotopes,num_delay_group))
 allocate(residual(num_isotopes,num_delay_group,num_elem,nodes_per_elem))
 
-beta_change_all_previous(:,:) = 0.0_dp
-        beta_change(:,:) = 0.0_dp
+
+    beta_change_all_previous(:,:) = 0.0_dp
+    beta_change(:,:) = 0.0_dp
 !---Create 1D mesh
     call mesh_creation
-    
+
+!---Decide if we are reading external file created from DIF3D
     if(Read_DIF3D .eqv. .TRUE.) then
         call read_power
         call read_beta_flow
     end if
 
+!---Measure CPU time
     call cpu_time(start)
+
 !---Steady state solve for temperature 
     call steady_state
     

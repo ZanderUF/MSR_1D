@@ -63,6 +63,8 @@ module solution_vectors_M
     real(dp) :: Avg_Density_Initial
     real(dp) :: total_temperature_initial
     real(dp) :: Total_Density_Initial
+    real(dp) :: average_temperature_ss 
+    real(dp) :: average_density_ss
 
     real(dp) :: total_power_prev
     real(dp) :: total_power_initial

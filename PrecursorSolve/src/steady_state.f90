@@ -26,6 +26,7 @@ implicit none
     character(len=20) :: ss_file_name
 	real(dp) :: total_precursors_fuel, total_power
 	real(dp), dimension(num_isotopes,num_delay_group) :: precursors_lambda_vec
+    real(dp) :: total_density_ss, total_temperature_ss
 
 !---------------------------------------------------------------
 
@@ -81,7 +82,7 @@ implicit none
         temperature_soln_prev = temperature_soln_new
         velocity_soln_prev    = velocity_soln_new
 
-        call l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
+        !call l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
 
         nl_iter = nl_iter + 1
     
@@ -166,10 +167,27 @@ implicit none
         do j = 1, nodes_per_elem
             total_power = total_power + &
                           total_power_initial*spatial_power_frac_fcn(i,j)*vol_int(j)
+
         end do
     end do
-    print *,' total power', total_power
-    print *,'prec tot    ',sum(precursors_lambda_vec(1,:))
+
+!---Calculate average temperature across the core    
+    total_temperature_ss = 0.0_dp
+    total_density_ss = 0.0_dp
+    do i = Fuel_Inlet_Start, Fuel_Outlet_End
+        do j = 1, nodes_per_elem
+            total_temperature_ss = total_temperature_ss + &
+                          vol_int(j)*temperature_soln_ss(i,j)
+            total_density_ss = total_density_ss + &
+                                vol_int(j)*density_soln_new(i,j)
+        end do
+    end do
+
+    average_temperature_ss = total_temperature_ss/(Fuel_Outlet_End - Fuel_Inlet_Start)
+    average_density_ss = total_density_ss/(Fuel_Outlet_End - Fuel_Inlet_Start)
+
+    print *,' Average starting ', average_temperature_ss
+    print *,'Average starting density ', average_density_ss
 
 !---Calc new beta per delay group
     do f = 1, num_isotopes
@@ -188,7 +206,7 @@ implicit none
 	    write(outfile_unit,fmt='(a)'), ' '
         write(outfile_unit,fmt='(a,1I2)') 'Isotope #: ', f 
         
-        write(outfile_unit,fmt='(12f15.4,12f15.10)'), mass_flow , &
+        write(outfile_unit,fmt='(14f15.8,12f15.10)'), mass_flow , &
             (beta_initial_vec(f,g),g=1,num_delay_group)
 	end do
     write(outfile_unit,fmt='(a)'), ' '

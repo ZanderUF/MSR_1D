@@ -190,7 +190,7 @@ subroutine read_power
         end do
     end do
 
-    total_power_initial = total_power_check
+    !total_power_initial = total_power_check
     
     write(outfile_unit, fmt='(a)') '  '
 !---Check if projection from DIF3D to FE domain worked
@@ -203,9 +203,6 @@ subroutine read_power
         write(outfile_unit,fmt='(a)'), ' Input vol has not been read in and projected &
                                         properly'
     end if
-    
-    print *,' sum inp' , sum(dif3d_power_input), ' ' , total_power_check
-    print *,' total_power_frac_check', total_power_frac_check
     
     !---Check if projection from DIF3D to FE domain worked
     if( (total_power_check - sum(dif3d_power_input)) < 1E-8 ) then
