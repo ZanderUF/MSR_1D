@@ -35,7 +35,6 @@
          pn   = cread(8, iret)
          dum  = aread(i3, iret)
          duma = aread(i3,iret) 
-         print *,' pn ', pn 
          select case(pn)
          case default
                        

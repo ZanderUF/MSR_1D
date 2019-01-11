@@ -23,5 +23,7 @@ implicit none
     logical :: End_Event 
     logical :: BetaFeedback
     logical :: nl_iter_flag = .TRUE.
+    
+    logical :: temperature_converged = .FALSE.
 
 end module flags_M

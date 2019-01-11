@@ -28,8 +28,16 @@ module solution_vectors_M
     real(dp) , allocatable :: velocity_soln_prev(:,:) 
     real(dp) , allocatable :: density_soln_ss(:,:)
     real(dp) , allocatable :: temperature_soln_ss(:,:)
-    !---Spatially varying values read in from DIF3D    
+   
+    !---L2 norms
+    real(dp), allocatable :: L2_prev_precursors(:,:)
+    real(dp), allocatable :: L2_current_precursors(:,:)
+    real(dp), allocatable :: L2_diffs_precursors(:,:) 
     
+    real(dp) :: L2_current_temperature 
+    real(dp) :: L2_prev_temperature
+    real(dp) :: L2_diffs_temperature 
+    !---Spatially varying values read in from DIF3D    
     real(dp) , allocatable :: spatial_vol_fcn(:,:)
     real(dp) , allocatable :: spatial_area_fcn(:,:)
     real(dp) , allocatable :: spatial_power_fcn(:,:)

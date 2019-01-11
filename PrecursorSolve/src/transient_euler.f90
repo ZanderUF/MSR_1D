@@ -71,16 +71,16 @@ subroutine transient_euler()
                     enddo elements_loop 
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_euler(nl_iter,t0) 
+                
                 !---If doing forward Euler - no iteration
-                    if(td_method_type == 0 ) then
-                        nl_iter_flag = .FALSE. 
-                    else
-                        difference_counter = 0             
-                        !---Calculate the l2 norm
-                        call l2_norm(nl_iter, difference_counter, &
-                                     L2_norm_prev,L2_norm_current)
-                    end if
-                if ( nl_iter == 100) then
+                if(td_method_type == 0 ) then
+                    nl_iter_flag = .FALSE. 
+                else
+                    !---Calculate the l2 norms to determine convergence
+                    call l2_norm(nl_iter)
+                end if
+                
+                if ( nl_iter == max_nl_iter) then
                     exit
                 end if
                 
@@ -94,14 +94,15 @@ subroutine transient_euler()
                 !---Swap for next nonlinear iteration
                 precursor_soln_prev       = precursor_soln_new 
                 power_amplitude_prev      = power_amplitude_new
-                
                 power_soln_prev           = power_soln_new
                 temperature_soln_prev     = temperature_soln_new
                 velocity_soln_prev        = velocity_soln_new
                 density_soln_prev         = density_soln_new
 
             enddo nonlinearloop 
-            !print *,' nl iter ', nl_iter
+            
+            !---Reset convergence flag for temperature for next time step
+            temperature_converged = .FALSE.
 
             !***************************************************
             !---Only automate time stepping

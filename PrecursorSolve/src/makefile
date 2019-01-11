@@ -15,7 +15,8 @@ LIB    = -llapack -lblas
 
 EXE = msr1d
 ################################
-msr1d : assemble_matrix_ss.o \
+msr1d : allocate_arrays.o \
+      assemble_matrix_ss.o \
       assemble_matrix_transient.o \
       beta_feedback.o \
 	  common_unit.o \
@@ -61,6 +62,10 @@ msr1d : assemble_matrix_ss.o \
       write_periodic.o \
 	  y0trns_M.o 
 	$(F90) $(FFLAGS)  main_driver.f90 *.o -L $(LIBDIR)$(LIB) -o $(EXE) 
+
+allocate_arrays.o: allocate_arrays.f90  global_parameters_M.o flags_M.o datainput_fe_M.o \
+		material_info_M.o mesh_info_M.o solution_vectors_M.o time_info_M.o 
+	$(F90) $(FFLAGS) -c allocate_arrays.f90
 
 assemble_matrix_ss.o: assemble_matrix_ss.f90 global_parameters_M.o \
 		      flags_M.o material_info_M.o solution_vectors_M.o \

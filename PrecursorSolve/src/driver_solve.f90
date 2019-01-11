@@ -51,54 +51,24 @@ implicit none
     open (unit=nl_outfile_unit, file=nl_out_name,&
     	  status='unknown',form='formatted',position='asis')
 
+    write(nl_outfile_unit,fmt=('(a)'))'   Iteration |  || T^k - T^k-1 || || C1^k - C1^k-1 ||&
+                               || C2^k - C2^k-1 || || C3^k - C3^k-1 || || C3^k - C3^k-1 ||&
+                               || C2^k - C2^k-1 || || C3^k - C3^k-1 || || C3^k - C3^k-1 ||'
 !---Read in problem parameters here
     call datainput_fe(input_file)
 
+!---Write input variablesto the outfile 
     call write_out_parms()
-    
-!---Allocate solution vector and global matrices
-    allocate(precursor_soln_new(num_isotopes,num_delay_group,num_elem,nodes_per_elem),  &
-             power_soln_new(num_elem,nodes_per_elem), &
-             temperature_soln_new( num_elem,nodes_per_elem),  &
-             density_soln_new( num_elem,nodes_per_elem),  &
-             velocity_soln_new( num_elem,nodes_per_elem),  &
-             precursor_soln_prev(num_isotopes,num_delay_group,num_elem,nodes_per_elem), &
-             power_soln_prev(num_elem,nodes_per_elem), &
-             temperature_soln_prev( num_elem,nodes_per_elem), &
-             density_soln_prev( num_elem,nodes_per_elem),  &
-             velocity_soln_prev( num_elem,nodes_per_elem), &
-             spatial_vol_fcn(num_elem,nodes_per_elem), &
-             spatial_area_fcn(num_elem,nodes_per_elem),&
-             spatial_power_frac_fcn(num_elem,nodes_per_elem), &
-             spatial_power_fcn( num_elem, nodes_per_elem), &
-             spatial_doppler_fcn(num_elem, nodes_per_elem), &
-             spatial_expansion_fcn(num_elem, nodes_per_elem), &
-             elem_vec_q_final(num_isotopes,num_delay_group,nodes_per_elem),& 
-             elem_vol_int(num_elem,nodes_per_elem),&
-             precursor_soln_last_time(num_isotopes,num_delay_group,num_elem,nodes_per_elem),&
-             power_soln_last_time(num_elem,nodes_per_elem),& 
-             area_variation(num_elem,nodes_per_elem), & 
-             density_soln_starting(num_elem,nodes_per_elem), &
-             temperature_soln_starting(num_elem,nodes_per_elem), &
-             power_soln_starting(num_elem,nodes_per_elem), &
-             Density_Reactivity_Feedback(num_elem), &
-             Temperature_Reactivity_Feedback(num_elem,nodes_per_elem),&
-             density_soln_ss(num_elem,nodes_per_elem),&
-             temperature_soln_ss(num_elem,nodes_per_elem) )
+!---Allocate the arrays    
+    call allocate_arrays()
 
-allocate(beta_initial_vec(num_isotopes,num_delay_group))
-allocate(beta_j(num_isotopes,num_delay_group), &
-         beta_j_minus_1(num_isotopes,num_delay_group),&
-         beta_j_plus_1(num_isotopes,num_delay_group) )
-allocate(beta_change_all_previous(num_isotopes,num_delay_group),&
-         beta_change(num_isotopes,num_delay_group))
-
-allocate(beta_correction_vec(num_isotopes,num_delay_group))
-allocate(residual(num_isotopes,num_delay_group,num_elem,nodes_per_elem))
-
-
+!---Initialize some arays to zero
     beta_change_all_previous(:,:) = 0.0_dp
-    beta_change(:,:) = 0.0_dp
+    beta_change(:,:)              = 0.0_dp
+    L2_prev_precursors(:,:)       = 0.0_dp
+    L2_current_precursors(:,:)    = 0.0_dp
+    L2_diffs_precursors(:,:)      = 0.0_dp
+
 !---Create 1D mesh
     call mesh_creation
 

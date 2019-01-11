@@ -71,18 +71,17 @@ implicit none
                     call solve_precursor_ss(f,g,n,nl_iter)
                 enddo delay_loop!---Over delayed groups
             enddo isotope_loop !---Over isotopes
-        
         enddo elements_loop !---Over nodes
         
         !---This counted the convergence of each delayed group
         difference_counter = 0
         
+        call l2_norm(nl_iter)
+        
         !---Swap for for next iteration
         precursor_soln_prev   = precursor_soln_new
         temperature_soln_prev = temperature_soln_new
         velocity_soln_prev    = velocity_soln_new
-
-        !call l2_norm(nl_iter,difference_counter,L2_norm_prev,L2_norm_current)
 
         nl_iter = nl_iter + 1
     
@@ -122,7 +121,6 @@ implicit none
                                   spatial_power_frac_fcn(i,j)      
         end do
     end do
-    
 
     !---Set 'previous' to new
     power_amplitude_prev      = power_amplitude_new
