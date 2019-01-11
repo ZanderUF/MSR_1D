@@ -31,6 +31,8 @@ implicit none
     real(dp) :: volume, heat_capacity_eval, density_eval,& 
                 salt_mass, q_prime, length_core
     real(dp), dimension(3)   :: U_times_T_vec,Wr_times_T_vec,Wl_times_T_vec,A_inv_times_rhs_vec
+    real(dp)  :: temperature_reduction_intial
+
 !---Inversion routine parameters
     integer :: lda, info, lwork
     integer,  dimension(3)   :: ipiv
@@ -44,6 +46,13 @@ implicit none
     work   = 0.0
     lda    = length
     lwork  = length
+
+!---Temperature reduction over the heat exchanger 
+    if(t0 == 0.0) then
+        temperature_reduction        = 100.0_dp
+    end if
+
+    temperature_reduction_intial = 100.0_dp 
 
 !---Temperature SOLVE
     rhs_final_vec        = 0.0_dp
@@ -118,27 +127,23 @@ implicit none
         end do
     end if
 
-!---Inlet boundary conditions
-    !if( n == Fuel_Inlet_start) then 
-    !    do i = 1, nodes_per_elem
-    !        temperature_soln_new(n,i) = 850.0_dp   
-    !    end do 
-    !end if
-
-!---Boundary condition after heat exchanger
-    !if( n == Heat_Exchanger_End) then 
-    !    do i = 1, nodes_per_elem
-    !        temperature_soln_new(n,i) = 850.0_dp   
-    !    end do 
-    !end if
+!---Simulate heatexchanger overcooling scenario
+    if( t0 > 0.0) then
+        
+        if(feedback_method == 4) then
+            if( temperature_reduction < flow_reduction_percent*temperature_reduction_intial) then
+                temperature_reduction = temperature_reduction_intial*exp(time_constant*t0)
+            end if
+        end if
+    end if
 
 !---Fix delta T across heat exchanger
     do j = 1, nodes_per_elem    
         !---Start heat exchanger
         if ( Heat_Exchanger_Start <= n  .and.  n < Heat_Exchanger_End) then
-            temperature_soln_new(n,j) = (100.0_dp)/&
+            temperature_soln_new(n,j) = (temperature_reduction)/&
             (Heat_Exchanger_End - Heat_Exchanger_Start)* &
-            (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,j) ) - 100.0_dp + &
+            (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,j) ) - temperature_reduction + &
             temperature_soln_new(Heat_Exchanger_Start-1,1)
         end if
     end do 

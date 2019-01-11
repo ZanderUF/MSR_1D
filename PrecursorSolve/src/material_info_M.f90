@@ -36,4 +36,6 @@ implicit none
     real(dp), allocatable :: Beta_Fcn_Flow(:,:)
     integer :: number_entries_beta
 
+    real(dp) :: temperature_reduction
+
 end module material_info_M
