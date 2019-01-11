@@ -119,15 +119,13 @@ subroutine l2_norm(nl_iter)
         nl_iter_flag = .FALSE.
 
     !---Write to outfile
-        if(DEBUG == .TRUE.) then
+        if(DEBUG .eqv. .TRUE.) then
             do f = 1, num_isotopes
                 write(nl_outfile_unit,fmt=('(I6,8es14.5,8es14.5,8es14.5,8es14.5,&
                                      8es14.5,8es14.5,8es14.5)'))&
                 nl_iter,L2_current_precursors(1,1),L2_diffs_temperature,(L2_diffs_precursors(f,g), g=1,num_delay_group)
             end do
-        end do
+        end if
     end if 
-    
-
 
 end subroutine l2_norm
