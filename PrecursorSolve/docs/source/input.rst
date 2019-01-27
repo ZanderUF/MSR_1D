@@ -16,12 +16,43 @@ Begins with **read parm** and ends with **end parm**
 =========  ===========  ==========================================================
 Parameter  Value        Description
 =========  ===========  ==========================================================
-TimeSolv   yes or no    Perform a time dependent calculation
 DebuggIt   yes or no    Turn on DEBUG printing - prints a lot of stuff
-ReadDig3   yes or no    Read DIF3D external file for power profile and such 
-TDMethod   integer      0 - forward Euler 1 - backward Euler       
-Feedback   Integer      0 - (default) no feedback 1 - temperature 2 - instant beta
+ReadDif3   yes or no    Read DIF3D external file for power profile and such 
+NlIters    Integer      Set number of maximum nonlinear iterations 
+Material   Integer      Number of fissional materials
+NumDelay   Integer      Number of delayed neutron groups
+TotalPow   Real         Total axial power [:math:`n/s-cm`]
+=========  ===========  ==========================================================
 
+.. Time block::
+
+Time Block
+----------
+
+Begins with **read time** and ends with **end time**
+
+=========  ===========  ==========================================================
+Parameter  Value        Description
+=========  ===========  ==========================================================
+TDMethod   integer      0 - forward Euler 1 - backward Euler       
+TimeSolv   yes or no    Perform a time dependent calculation
+TimeStep   Double       Indicate fixed time step size, ex: 1E-5
+EndTime    Real         Indicate the total length of the simulation
+StrtTime   Double       Beginning point of the calculation 
+SaveTime   Real         Interval to write out spatial solution files to
+=========  ===========  ==========================================================
+
+.. Perturbation block::
+
+Perturbation Block
+------------------
+
+Begins with **read perturbation** and ends with **end perturbation**
+
+=========  ===========  ==========================================================
+Parameter  Value        Description
+=========  ===========  ==========================================================
+Feedback   Integer      0 - (default) no feedback 1 - temperature 2 - instant beta
 StepPert   yes or no    Perform a step perturbation or not
 StrtStep   Double       Start time for step perturbation
 EndStep    Double       End time for step perturbation
@@ -30,37 +61,34 @@ StrtRamp   Double       Start time for ramp perturbation
 EndRamp    Double       End time for ramp perturbation
 ZaggPert   yes or no    Perform a zig-zag perturbation or not
 Reactiv    Real         Reactivity insertion for step and ramp
+TimeCons   Real         Time constant for mass flow rate reduction
+PerFlow    Real         Percent reduction in flow rate over 1/TimeCons  
+MassFlow   Real         Mass flow rate [:math:`g/cm^3`]
+GenTime    Real         Neutron generation time [:math:`s^-2`]
+=========  ===========  ==========================================================
 
-TimeStep   Double       Indicate fixed time step size, ex: 1E-5
-EndTime    Real         Indicate the total length of the simulation
-StrtTime   Double       Beginning point of the perturbation 
+.. Mesh block::
 
+Mesh Block
+------------------
+
+Begins with **read mesh** and ends with **end mesh**
+
+=========  ===========  ==========================================================
+Parameter  Value        Description
+=========  ===========  ==========================================================
 ElemSize   Integer      Size of elements
 NumElems   Integer      Number of equal spaced elements in the model
 NumNodes   Integer      Number of nodes per element 
-
 FuelInlt   Integer      Starting element of the inlet plenum
 CoreStrt   Integer      Starting element of the main core region
 CoreEnd    Integer      Final element of the main core region
 FuelOutl   Integer      Final element of the outlet plenum
 StartHex   Integer      Heat exchanger starting element location
 EndHexch   Integer      Heat exchanger ending element location
-
 CoreArea   Real         Area of the fuel core [:math:`cm^2`] 
 PipArea    Real         Area of the piping [:math:`cm^2`]
 HexcArea   Real         Area of the heat exchanger  [:math:`cm^2`]
-
-TimeCons   Real         Time constant for mass flow rate reduction
-PerFlow    Real         Percent reduction in flow rate over 1/TimeCons  
-MassFlow   Real         Mass flow rate [:math:`g/cm^3`]
-TotalPow   Real         Total axial power [:math:`n/s-cm`]
-
-NlIters    Integer      Set number of maximum nonlinear iterations 
-
-NumDelay   Integer      Number of delayed neutron groups
-Material   Integer      Number of fissional materials
-GenTime    Real         Neutron generation time [:math:`s^-2`]
-SaveTime   Real         Interval to write out spatial solution files to
 =========  ===========  ==========================================================
 
 .. Delay Block::
@@ -85,36 +113,61 @@ Sample Input File
 
 .. code-block:: guess
 
-    This is a comment line
+    Heat Exchanger Overcooling Model of Chrloride type problem
     read parm
-       time=yes
-       step=no
-       ramp=no
-       zag=yes
-       del=1E-4
-       tmax=10
-       tin=0.0 
-       nem=10
-       npe=3
-       pipe=6
-       area=10000.0
-       apip=1000.0
-       mflow=5000.0
-       tpow=20
-       nitr=300
-       elem=1.0
-       ndg=6
-       nmat=1
-       gen=5E-4
-       reac=0.0
+       DebuggIt=no
+       ReadDif3=no
+       NumDelay=6
+       Material=1
+       NlIters=50
+       TotalPow=10
     end parm
+    
+    read time
+       TimeSolv=yes
+       TDMethod=1
+       TimeStep=1E-3
+       EndTime=20.0
+       StrtTime=0.0 
+       SaveTime=10.0
+    end time
+    
+    read pert
+       Feedback=0
+       StepPert=yes
+       RampPert=no
+       ZaggPert=no
+       StrtStep=0.0
+       EndStep=1.0
+       StrtRamp=0.0
+       EndRamp=0.0
+       Reactiv=0.003
+       TimeCons=0.0
+       PerFlow=0.0
+       MassFlow=0.0
+       GenTime=2.0E-5
+    end pert
+    
+    read mesh
+       ElemSize=1.0
+       NumElems=10
+       NumNodes=3
+       FuelInlt=1
+       CoreStrt=2
+       CoreEnd=9
+       FuelOutl=10
+       StartHex=1
+       EndHExch=1
+       CoreArea=7.49E4
+       PipeArea=7.49E4
+       HexcArea=100000
+    end mesh
     read delay
       mat=1
-    alam=0.0127 0.0317 0.115 0.311 1.4 3.87 end
-    beta=2.85E-4 1.5975E-3 1.41E-3 3.0525E-3 9.6E-4 1.95E-4  end
-    end delay
+      alam=0.0127 0.0317 0.115 0.311 1.4 3.87 end
+      beta=2.66E-4 1.491E-3 1.316E-3 2.849E-3 8.96E-4 1.82E-4  end
+    end delay.. Input File DIF3D Values::
 
-.. Input File DIF3D Values::
 
 Input file structure to read in from DIF3D
 ------------------------------------------
