@@ -1,9 +1,11 @@
    module datainput_fe_M
 
       USE free_form
-      USE rdparm_fe_M
-      USE rdmesh_M
-      USE rddelay_M
+      USE read_parm_M
+      USE read_time_M
+      USE read_perturbation_M
+      USE read_mesh_M
+      USE read_delay_M 
       USE global_parameters_M
       USE material_info_M
       USE mesh_info_M
@@ -31,7 +33,7 @@
       write(outfile_unit,fmt='(a)'),'READING input data from input_t'
 !-----Read data from input file.
       open(unit=5, file=input_file, status='old', position='asis') 
-      read (unit=5, fmt=900) title 
+      read(unit=5, fmt=900) title 
 !     
       iret = 0
       call scanon
@@ -39,16 +41,27 @@
       do while (iret<2)
           read_key = aread(4,iret)
           if (read_key == 'read' ) then
+              !---Read control parameters for the problem
               block_key = cread(4,iret)
               if( block_key == "parm" ) then
-                   call rdparm_fe 
-             elseif( block_key =='dela') then
+                   call read_parm 
+              !---Read time related data
+              elseif(block_key == "time") then
+                    call read_time
+              !---Read Perturbation related data
+              elseif(block_key == "pert") then
+                    call read_perturbation
+              !---Read mesh related data
+              elseif(block_key == "mesh") then
+                    call read_mesh
+              !---Read delayed neutron (precursor) data
+              elseif( block_key =='dela') then
                    allocate(lamda_i_mat(num_isotopes,num_delay_group), &
                             beta_i_mat(num_isotopes,num_delay_group))
-                   call rddelay
-               !elseif( block_key == 'mesh' ) then
-                   allocate(elem_lengths(num_elem))
-              !     call rdmesh ! read 1D mesh interval data in
+                   call read_delay
+              !elseif( block_key == 'mesh' ) then
+                  allocate(elem_lengths(num_elem))
+              !call rdmesh ! read 1D mesh interval data in
               endif  
           endif
           if(iret == 1) then

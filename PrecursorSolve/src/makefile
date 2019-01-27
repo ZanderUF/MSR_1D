@@ -40,9 +40,11 @@ msr1d : allocate_arrays.o \
       mesh_creation.o \
       mesh_info_M.o \
       numerical_flux_matrices.o \
-      rddelay_M.o \
-      rdmesh_M.o \
-      rdparm_fe_M.o \
+      read_delay_M.o \
+      read_parm_M.o \
+	  read_time_M.o\
+	  read_perturbation_M.o\
+	  read_mesh_M.o\
 	  read_beta_flow.o \
 	  read_power.o \
       solution_vectors_M.o \
@@ -141,15 +143,24 @@ material_info_M.o : material_info_M.f90
 mesh_info_M.o : mesh_info_M.f90 global_parameters_M.o
 	$(F90) $(FFLAGS) -c mesh_info_M.f90
 
-rdmesh_M.o : rdmesh_M.f90 free_form.o mesh_info_M.o global_parameters_M.o 
-	$(F90) $(FFLAGS) -c rdmesh_M.f90 
+read_delay_M.o : free_form.o global_parameters_M.o 
+	$(F90) $(FFLAGS) -c read_delay_M.f90 
 
-rddelay_M.o : rdmesh_M.f90 free_form.o global_parameters_M.o 
-	$(F90) $(FFLAGS) -c rddelay_M.f90 
-
-rdparm_fe_M.o : rdparm_fe_M.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
+read_parm_M.o : read_parm_M.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
 		material_info_M.o solution_vectors_M.o global_parameters_M.o        
-	$(F90) $(FFLAGS) -c rdparm_fe_M.f90
+	$(F90) $(FFLAGS) -c read_parm_M.f90
+
+read_time_M.o : read_time_M.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
+		material_info_M.o solution_vectors_M.o global_parameters_M.o        
+	$(F90) $(FFLAGS) -c read_time_M.f90
+
+read_mesh_M.o : read_mesh_M.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
+		material_info_M.o solution_vectors_M.o global_parameters_M.o        
+	$(F90) $(FFLAGS) -c read_mesh_M.f90
+
+read_perturbation_M.o : read_perturbation_M.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
+		material_info_M.o solution_vectors_M.o global_parameters_M.o        
+	$(F90) $(FFLAGS) -c read_perturbation_M.f90
 
 read_power.o : read_power.f90 free_form.o flags_M.o time_info_M.o mesh_info_M.o \
 		material_info_M.o solution_vectors_M.o global_parameters_M.o        
@@ -159,8 +170,8 @@ read_beta_flow.o : read_beta_flow.f90 free_form.o flags_M.o time_info_M.o mesh_i
 		material_info_M.o solution_vectors_M.o global_parameters_M.o        
 	$(F90) $(FFLAGS) -c read_beta_flow.f90
 
-datainput_fe_M.o: datainput_fe_M.f90 free_form.o rdparm_fe_M.o rddelay_M.o \
-		  mesh_info_M.o rdmesh_M.o global_parameters_M.o    
+datainput_fe_M.o: datainput_fe_M.f90 free_form.o read_parm_M.o read_time_M.o  read_delay_M.o \
+		  mesh_info_M.o read_perturbation_M.o read_mesh_M.o global_parameters_M.o    
 	$(F90) $(FFLAGS) -c datainput_fe_M.f90 
 
 spatial_matrices.o:  spatial_matrices.f90 global_parameters_M.o datainput_fe_M.o  

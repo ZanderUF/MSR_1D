@@ -51,13 +51,14 @@ subroutine write_periodic
     !---Write power amp out @ every time step
     if(t0 == 0.0) then
 	    write(power_outfile_unit, ('(a)')), &
-		'   Time (s)|     Power Amp|    Norm Power| &
-          Reactivity|       Beta|   Temp Rho|&
-         Density Rho|   Mass flow| Delta T Hex|'
+		'| Time (s)  | Power Amp | Norm Power| &
+          Reactivity |    Beta   | Temp Rho  | &
+          Density Rho| Mass flow |Delta T Hex|'
 	end if
 	
-    write(power_outfile_unit, ('(f15.8 ,es14.3,es14.3, f12.8,&
-                                 f15.12,f12.8,f12.8,f12.2,f12.2)')), &
+    write(power_outfile_unit, ('(f12.6 ,es12.5,es12.5, &
+                                f12.6,f12.6,f12.6,&
+                                f12.6,f12.2,f12.2)')), &
 	  t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
       reactivity, beta_correction,total_temperature_feedback,&
       total_density_feedback, mass_flow,temperature_reduction

@@ -122,13 +122,6 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                      !( beta_j_minus_1(f,g) - beta_initial_vec(f,g))*&
                      !beta_change_all_previous(f,g)
                 
-                    !print *,'beta_j-  ', beta_j_minus_1
-                    !print *,'beta_j   ', beta_j
-                    !print *,'event time prev ',event_time_previous
-                    !print *,'current time',current_time
-                    !print *,'prev time   ',event_time
-                    !print *,'beta change ', beta_change
-
                 else
                     beta_change(f,g)   = beta_change(f,g) + &
                      ( beta_j(f,g) - beta_initial_vec(f,g) )*&
@@ -153,7 +146,6 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     
 
     if(1==2) then !---Every event after the 'first'
-        !print *,' herhe'
         do f = 1, num_isotopes
             do g = 1, num_delay_group
                 
@@ -161,13 +153,6 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
 
                 Large_Lambda = lamda_i_mat(f,g)*number_half_lifes
                
-                !print *,'beta_j-  ', beta_j_minus_1
-                !print *,'beta_j   ', beta_j
-                !print *,'beta_j_1 ', beta_j_plus_1
-                !print *,'event time prev ',event_time_previous
-                !print *,'current time',current_time
-                !print *,'prev time   ',event_time
-                
                 beta_change_all_current(f,g) = &
                     (1.0_dp - exp(-Large_Lambda*(current_time - event_time)))
                 
@@ -193,10 +178,6 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                 !                           beta_change_all_current(f,g) + &
                 !                           beta_change_all_previous(f,g)
 
-                !print *,'beta change prev ',beta_change_all_previous 
-                !print *,'beta change curr ', beta_change_all_current 
-                !print *,'beta correction  ',beta_correction_vec
-                !print *, ' '
                 !---Keep a running sum of the changes 
                 !beta_change_all_previous(f,g) = &
                 !            beta_change_all_previous(f,g) + &
@@ -212,7 +193,6 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
 
     beta_correction = sum(beta_correction_vec)
 
-    !print *,'beta correction', beta_correction 
     !---Score an 'event'
 
 end subroutine evaluate_beta_change

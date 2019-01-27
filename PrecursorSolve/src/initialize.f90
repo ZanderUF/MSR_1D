@@ -142,13 +142,21 @@ implicit none
                 
                 power_soln_new(i,j)    = spatial_power_frac_fcn(i,j)*&
                                         power_amplitude_new
-                temperature_soln_new(i,j) = inlet_temperature 
-                temperature = temperature_soln_new(i,j)
+                
+                if(mass_flow > 0.0) then
+                    temperature_soln_new(i,j) = inlet_temperature 
+                    temperature = temperature_soln_new(i,j)
 
-                call density_corr(temperature,density)
-                velocity_soln_new(i,j) = mass_flow/(spatial_area_fcn(i,j)*&
+                    call density_corr(temperature,density)
+                    velocity_soln_new(i,j) = mass_flow/(spatial_area_fcn(i,j)*&
                                  density)
-       
+                !---If solid fuel cases
+                else
+                    temperature_soln_new(i,j) = 0.0
+                    density_soln_new(i,j)     = 0.0
+                    velocity_soln_new(i,j)    = 0.0
+                end if
+
             end do
         end do
     end if
@@ -157,7 +165,7 @@ implicit none
     temperature_soln_prev     = temperature_soln_new
     velocity_soln_prev        = velocity_soln_new
     density_soln_prev         = density_soln_new
-    !---Need to keep the original density to see how far off from original we are
+!---Need to keep the original density to see how far off from original we are
     density_soln_starting     = density_soln_new
     temperature_soln_starting = temperature_soln_new
     power_soln_prev           = power_soln_new

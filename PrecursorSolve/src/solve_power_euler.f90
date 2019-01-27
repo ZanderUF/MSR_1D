@@ -180,12 +180,6 @@ subroutine solve_power_euler(nl_iter, current_time)
                                  (average_temperature - average_temperature_ss)
     total_density_feedback = (total_expansion_read_in/(total_density_change*2.5935_dp))*&
                              (average_density_ss - average_density)                          
-    !print *,' total read in ', total_expansion_read_in
-    !print *,'total den change ', total_density_change
-
-    !print *,'Coef        ',(total_expansion_read_in/(total_density_change*2.5935_dp))
-    !print *,'density new ', average_density
-    !print *,'average     ',average_density_ss
 
     end if
    

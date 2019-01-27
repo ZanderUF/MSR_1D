@@ -60,9 +60,7 @@ implicit none
                     call solve_velocity(n,nl_iter)
                 !end if
             end if
-            !call solve_temperature_ss(n,nl_iter)
 
-            !call solve_velocity(n,nl_iter)
             !---Solve steady state system 
             isotope_loop: do f = 1, num_isotopes
                 delay_loop: do g = 1, num_delay_group
@@ -184,8 +182,6 @@ implicit none
     average_temperature_ss = total_temperature_ss/(Fuel_Outlet_End - Fuel_Inlet_Start)
     average_density_ss = total_density_ss/(Fuel_Outlet_End - Fuel_Inlet_Start)
 
-    print *,' Average starting ', average_temperature_ss
-    print *,'Average starting density ', average_density_ss
 
 !---Calc new beta per delay group
     do f = 1, num_isotopes

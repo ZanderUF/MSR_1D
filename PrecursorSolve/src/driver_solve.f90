@@ -32,7 +32,7 @@ implicit none
 !---Name the files to write out something sensible
 
     outfile_name                = 'outfile.txt'
-    steady_state_soln_file_name = 'ss_precursor_soln.txt'
+    !steady_state_soln_file_name = 'ss_precursor_soln.txt'
     last_time_file_name         = 'last_t_soln.txt'
     power_soln_file_name        = 'power_amp_soln.txt'
     input_file                  = 'input_t'
@@ -42,8 +42,8 @@ implicit none
 !---Open file for writing out debug information
     open (unit=outfile_unit, file=outfile_name,status='unknown',&
     	  form='formatted',position='asis')
-    open (unit=soln_outfile_unit, file=steady_state_soln_file_name,&
-    	  status='unknown',form='formatted',position='asis')
+    !open (unit=soln_outfile_unit, file=steady_state_soln_file_name,&
+    !  	  status='unknown',form='formatted',position='asis')
     open (unit=power_outfile_unit, file=power_soln_file_name,&
     	  status='unknown',form='formatted',position='asis')
     open (unit=beta_special_unit, file=beta_special_name,&
@@ -51,6 +51,7 @@ implicit none
     open (unit=nl_outfile_unit, file=nl_out_name,&
     	  status='unknown',form='formatted',position='asis')
 
+    !---File that keeps track of number of nonlinear iterations for each variable of interest
     write(nl_outfile_unit,fmt=('(a)'))'   Iteration |  || T^k - T^k-1 || || C1^k - C1^k-1 ||&
                                || C2^k - C2^k-1 || || C3^k - C3^k-1 || || C3^k - C3^k-1 ||&
                                || C2^k - C2^k-1 || || C3^k - C3^k-1 || || C3^k - C3^k-1 ||'
@@ -84,8 +85,6 @@ implicit none
 !---Steady state solve for temperature 
     call steady_state
     
-    print *, 'Finished Steady State'
-
 !---Time dependent calculation
     if(time_solve .eqv. .TRUE. ) then
         
@@ -97,8 +96,9 @@ implicit none
         if( td_method_type == 1) then
             write(outfile_unit, fmt=('(a)')) ' '
             write(outfile_unit, fmt=('(a)')) 'Performing backward Euler time integration'
-        end if    
-        
+        end if   
+
+        !---Go into the time dependent sequence 
         call transient_euler
     
     end if

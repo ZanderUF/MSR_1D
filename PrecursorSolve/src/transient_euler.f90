@@ -44,7 +44,6 @@ subroutine transient_euler()
             !---Vary beta with flow speed
             call beta_feedback 
            
-            
             !---Decide if we are doing backward or forward euler
             nl_iter_flag = .TRUE. 
             residual(:,:,:,:) = 0.0_dp
@@ -80,6 +79,7 @@ subroutine transient_euler()
                     call l2_norm(nl_iter)
                 end if
                 
+                !---Reached max # iterations
                 if ( nl_iter == max_nl_iter) then
                     exit
                 end if
