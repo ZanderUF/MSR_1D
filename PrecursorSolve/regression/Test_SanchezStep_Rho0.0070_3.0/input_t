@@ -1,0 +1,63 @@
+Heat Exchanger Overcooling Model of Chrloride type problem
+read parm
+   DebuggIt=no
+   ReadDif3=no
+   NumDelay=6
+   Material=1
+   NlIters=50
+   TotalPow=10
+end parm
+
+read time
+   TimeSolv=yes
+   TDMethod=1
+   TimeStep=1E-3
+   EndTime=2.0
+   StrtTime=0.0 
+
+   SaveTime=2.0
+end time
+
+read pert
+   
+   Feedback=0
+   StepPert=yes
+   RampPert=no
+   ZaggPert=no
+   StrtStep=0.0
+   EndStep=1.0
+
+   StrtRamp=0.0
+   EndRamp=0.0
+   
+   Reactiv=0.007
+    
+   TimeCons=0.0
+   PerFlow=0.0
+   MassFlow=0.0
+
+   GenTime=2.0E-5
+end pert
+
+read mesh
+   ElemSize=1.0
+   NumElems=10
+   NumNodes=3
+   
+   FuelInlt=1
+   CoreStrt=2
+   CoreEnd=9
+   FuelOutl=10
+   StartHex=1
+   EndHExch=1
+   
+   CoreArea=7.49E4
+   PipeArea=7.49E4
+   HexcArea=100000
+
+end mesh
+read delay
+  mat=1
+  alam=0.0127 0.0317 0.115 0.311 1.4 3.87 end
+  beta=2.66E-4 1.491E-3 1.316E-3 2.849E-3 8.96E-4 1.82E-4  end
+end delay
