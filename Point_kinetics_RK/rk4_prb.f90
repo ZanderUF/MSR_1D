@@ -159,7 +159,7 @@ subroutine rk4vec_test_f ( t, u, uprime )
 ! Power
   uprime(1) = ((rho - beta_tot)/gen_time)*u(1) + sum_lamda 
 ! Precursors
-  uprime(2:ndg+1) = (beta_i(1:ndg)/gen_time)*u(1) - lamda_i(1:ndg)*u(2:ndg+1)   
+  uprime(2:ndg+1) = (beta_i(1:ndg)/gen_time)*u(1) - lamda_i(1:ndg)*u(2:ndg+1) -     
 
 return
 end

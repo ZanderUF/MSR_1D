@@ -46,8 +46,12 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Input File Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#parameter-block">Parameter Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#time-block">Time Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#perturbation-block">Perturbation Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mesh-block">Mesh Block</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#delay-block">Delay Block</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sample-input-file">Sample Input File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-file-structure-to-read-in-from-dif3d">Input file structure to read in from DIF3D</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -96,9 +100,9 @@ The first line in the file is a comment, this should be something meaningful to 
 <p>Begins with <strong>read parm</strong> and ends with <strong>end parm</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="13%" />
-<col width="16%" />
-<col width="71%" />
+<col width="12%" />
+<col width="14%" />
+<col width="74%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Parameter</th>
@@ -107,101 +111,210 @@ The first line in the file is a comment, this should be something meaningful to 
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>time</td>
-<td>yes or no</td>
-<td>Perform a time dependent calculation</td>
-</tr>
-<tr class="row-odd"><td>dbg</td>
+<tr class="row-even"><td>DebuggIt</td>
 <td>yes or no</td>
 <td>Turn on DEBUG printing - prints a lot of stuff</td>
 </tr>
-<tr class="row-even"><td>meth</td>
-<td>integer</td>
-<td>0 - forward Euler 1 - backward Euler</td>
-</tr>
-<tr class="row-odd"><td>step</td>
+<tr class="row-odd"><td>ReadDig3</td>
 <td>yes or no</td>
-<td>Perform a step perturbation or not</td>
+<td>Read DIF3D external file for power profile and such</td>
 </tr>
-<tr class="row-even"><td>ramp</td>
-<td>yes or no</td>
-<td>Perform a ramp perturbation or not</td>
-</tr>
-<tr class="row-odd"><td>zag</td>
-<td>yes or no</td>
-<td>Perform a zig-zag perturbation or not</td>
-</tr>
-<tr class="row-even"><td>feed</td>
+<tr class="row-even"><td>NlIters</td>
 <td>Integer</td>
-<td>0 - (default) no feedback 1 - temperature</td>
-</tr>
-<tr class="row-odd"><td>del</td>
-<td>Double</td>
-<td>Indicate fixed time step size, ex: 1E-5</td>
-</tr>
-<tr class="row-even"><td>tmax</td>
-<td>Real</td>
-<td>Indicate the total length of the simulation</td>
-</tr>
-<tr class="row-odd"><td>tin</td>
-<td>Double</td>
-<td>Beginning point of the perturbation</td>
-</tr>
-<tr class="row-even"><td>nem</td>
-<td>Integer</td>
-<td>Number of equal spaced elements in the model</td>
-</tr>
-<tr class="row-odd"><td>npe</td>
-<td>Integer</td>
-<td>Number of nodes per element</td>
-</tr>
-<tr class="row-even"><td>pipe</td>
-<td>Integer</td>
-<td>Number of elements in the outer circuit</td>
-</tr>
-<tr class="row-odd"><td>area</td>
-<td>Real</td>
-<td>Area of the fuel core [<span class="math notranslate nohighlight">\(cm^2\)</span>]</td>
-</tr>
-<tr class="row-even"><td>apip</td>
-<td>Real</td>
-<td>Area of the piping [:math:’cm^2’]</td>
-</tr>
-<tr class="row-odd"><td>mflow</td>
-<td>Real</td>
-<td>Mass flow rate [<span class="math notranslate nohighlight">\(g/cm^3\)</span>]</td>
-</tr>
-<tr class="row-even"><td>tpow</td>
-<td>Real</td>
-<td>Total axial power [<span class="math notranslate nohighlight">\(n/s-cm\)</span>]</td>
-</tr>
-<tr class="row-odd"><td>nitr</td>
-<td>Real</td>
 <td>Set number of maximum nonlinear iterations</td>
 </tr>
-<tr class="row-even"><td>elem</td>
-<td>Real</td>
-<td>Element length [<span class="math notranslate nohighlight">\(cm\)</span>]</td>
-</tr>
-<tr class="row-odd"><td>ndg</td>
-<td>Integer</td>
-<td>Number of delayed neutron groups</td>
-</tr>
-<tr class="row-even"><td>nmat</td>
+<tr class="row-odd"><td>Material</td>
 <td>Integer</td>
 <td>Number of fissional materials</td>
 </tr>
-<tr class="row-odd"><td>gen</td>
-<td>Real</td>
-<td>Neutron generation time [<span class="math notranslate nohighlight">\(s^-2\)</span>]</td>
+<tr class="row-even"><td>NumDelay</td>
+<td>Integer</td>
+<td>Number of delayed neutron groups</td>
 </tr>
-<tr class="row-even"><td>reac</td>
+<tr class="row-odd"><td>TotalPow</td>
+<td>Real</td>
+<td>Total axial power [<span class="math notranslate nohighlight">\(n/s-cm\)</span>]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="time-block">
+<h2>Time Block<a class="headerlink" href="#time-block" title="Permalink to this headline">¶</a></h2>
+<p>Begins with <strong>read time</strong> and ends with <strong>end time</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="14%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>TDMethod</td>
+<td>integer</td>
+<td>0 - forward Euler 1 - backward Euler</td>
+</tr>
+<tr class="row-odd"><td>TimeSolv</td>
+<td>yes or no</td>
+<td>Perform a time dependent calculation</td>
+</tr>
+<tr class="row-even"><td>TimeStep</td>
+<td>Double</td>
+<td>Indicate fixed time step size, ex: 1E-5</td>
+</tr>
+<tr class="row-odd"><td>EndTime</td>
+<td>Real</td>
+<td>Indicate the total length of the simulation</td>
+</tr>
+<tr class="row-even"><td>StrtTime</td>
+<td>Double</td>
+<td>Beginning point of the calculation</td>
+</tr>
+<tr class="row-odd"><td>SaveTime</td>
+<td>Real</td>
+<td>Interval to write out spatial solution files to</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="perturbation-block">
+<h2>Perturbation Block<a class="headerlink" href="#perturbation-block" title="Permalink to this headline">¶</a></h2>
+<p>Begins with <strong>read perturbation</strong> and ends with <strong>end perturbation</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="14%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Feedback</td>
+<td>Integer</td>
+<td>0 - (default) no feedback 1 - temperature 2 - instant beta</td>
+</tr>
+<tr class="row-odd"><td>StepPert</td>
+<td>yes or no</td>
+<td>Perform a step perturbation or not</td>
+</tr>
+<tr class="row-even"><td>StrtStep</td>
+<td>Double</td>
+<td>Start time for step perturbation</td>
+</tr>
+<tr class="row-odd"><td>EndStep</td>
+<td>Double</td>
+<td>End time for step perturbation</td>
+</tr>
+<tr class="row-even"><td>RampPer</td>
+<td>yes or no</td>
+<td>Perform a ramp perturbation or not</td>
+</tr>
+<tr class="row-odd"><td>StrtRamp</td>
+<td>Double</td>
+<td>Start time for ramp perturbation</td>
+</tr>
+<tr class="row-even"><td>EndRamp</td>
+<td>Double</td>
+<td>End time for ramp perturbation</td>
+</tr>
+<tr class="row-odd"><td>ZaggPert</td>
+<td>yes or no</td>
+<td>Perform a zig-zag perturbation or not</td>
+</tr>
+<tr class="row-even"><td>Reactiv</td>
 <td>Real</td>
 <td>Reactivity insertion for step and ramp</td>
 </tr>
-<tr class="row-odd"><td>save</td>
+<tr class="row-odd"><td>TimeCons</td>
 <td>Real</td>
-<td>Interval to write out spatial solution files to</td>
+<td>Time constant for mass flow rate reduction</td>
+</tr>
+<tr class="row-even"><td>PerFlow</td>
+<td>Real</td>
+<td>Percent reduction in flow rate over 1/TimeCons</td>
+</tr>
+<tr class="row-odd"><td>MassFlow</td>
+<td>Real</td>
+<td>Mass flow rate [<span class="math notranslate nohighlight">\(g/cm^3\)</span>]</td>
+</tr>
+<tr class="row-even"><td>GenTime</td>
+<td>Real</td>
+<td>Neutron generation time [<span class="math notranslate nohighlight">\(s^-2\)</span>]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mesh-block">
+<h2>Mesh Block<a class="headerlink" href="#mesh-block" title="Permalink to this headline">¶</a></h2>
+<p>Begins with <strong>read mesh</strong> and ends with <strong>end mesh</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="14%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ElemSize</td>
+<td>Integer</td>
+<td>Size of elements</td>
+</tr>
+<tr class="row-odd"><td>NumElems</td>
+<td>Integer</td>
+<td>Number of equal spaced elements in the model</td>
+</tr>
+<tr class="row-even"><td>NumNodes</td>
+<td>Integer</td>
+<td>Number of nodes per element</td>
+</tr>
+<tr class="row-odd"><td>FuelInlt</td>
+<td>Integer</td>
+<td>Starting element of the inlet plenum</td>
+</tr>
+<tr class="row-even"><td>CoreStrt</td>
+<td>Integer</td>
+<td>Starting element of the main core region</td>
+</tr>
+<tr class="row-odd"><td>CoreEnd</td>
+<td>Integer</td>
+<td>Final element of the main core region</td>
+</tr>
+<tr class="row-even"><td>FuelOutl</td>
+<td>Integer</td>
+<td>Final element of the outlet plenum</td>
+</tr>
+<tr class="row-odd"><td>StartHex</td>
+<td>Integer</td>
+<td>Heat exchanger starting element location</td>
+</tr>
+<tr class="row-even"><td>EndHexch</td>
+<td>Integer</td>
+<td>Heat exchanger ending element location</td>
+</tr>
+<tr class="row-odd"><td>CoreArea</td>
+<td>Real</td>
+<td>Area of the fuel core [<span class="math notranslate nohighlight">\(cm^2\)</span>]</td>
+</tr>
+<tr class="row-even"><td>PipArea</td>
+<td>Real</td>
+<td>Area of the piping [<span class="math notranslate nohighlight">\(cm^2\)</span>]</td>
+</tr>
+<tr class="row-odd"><td>HexcArea</td>
+<td>Real</td>
+<td>Area of the heat exchanger  [<span class="math notranslate nohighlight">\(cm^2\)</span>]</td>
 </tr>
 </tbody>
 </table>
@@ -239,36 +352,143 @@ The first line in the file is a comment, this should be something meaningful to 
 </div>
 <div class="section" id="sample-input-file">
 <h2>Sample Input File<a class="headerlink" href="#sample-input-file" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>This is a comment line
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>Heat Exchanger Overcooling Model of Chrloride type problem
 read parm
-   time=yes
-   step=no
-   ramp=no
-   zag=yes
-   del=1E-4
-   tmax=10
-   tin=0.0
-   nem=10
-   npe=3
-   pipe=6
-   area=10000.0
-   apip=1000.0
-   mflow=5000.0
-   tpow=20
-   nitr=300
-   elem=1.0
-   ndg=6
-   nmat=1
-   gen=5E-4
-   reac=0.0
+   DebuggIt=no
+   ReadDif3=no
+   NumDelay=6
+   Material=1
+   NlIters=50
+   TotalPow=10
 end parm
+
+read time
+   TimeSolv=yes
+   TDMethod=1
+   TimeStep=1E-3
+   EndTime=20.0
+   StrtTime=0.0
+   SaveTime=10.0
+end time
+
+read pert
+   Feedback=0
+   StepPert=yes
+   RampPert=no
+   ZaggPert=no
+   StrtStep=0.0
+   EndStep=1.0
+   StrtRamp=0.0
+   EndRamp=0.0
+   Reactiv=0.003
+   TimeCons=0.0
+   PerFlow=0.0
+   MassFlow=0.0
+   GenTime=2.0E-5
+end pert
+
+read mesh
+   ElemSize=1.0
+   NumElems=10
+   NumNodes=3
+   FuelInlt=1
+   CoreStrt=2
+   CoreEnd=9
+   FuelOutl=10
+   StartHex=1
+   EndHExch=1
+   CoreArea=7.49E4
+   PipeArea=7.49E4
+   HexcArea=100000
+end mesh
 read delay
   mat=1
-alam=0.0127 0.0317 0.115 0.311 1.4 3.87 end
-beta=2.85E-4 1.5975E-3 1.41E-3 3.0525E-3 9.6E-4 1.95E-4  end
-end delay
+  alam=0.0127 0.0317 0.115 0.311 1.4 3.87 end
+  beta=2.66E-4 1.491E-3 1.316E-3 2.849E-3 8.96E-4 1.82E-4  end
+end delay.. Input File DIF3D Values::
 </pre></div>
 </div>
+</div>
+<div class="section" id="input-file-structure-to-read-in-from-dif3d">
+<h2>Input file structure to read in from DIF3D<a class="headerlink" href="#input-file-structure-to-read-in-from-dif3d" title="Permalink to this headline">¶</a></h2>
+<p>Values from DIF3D can be read in and projected onto the domain in the 1D problem
+Right now it reads in the power, power fraction, doppler reactivity worth, and density reactivity worth. These are all spatially dependent.  These values are integrated across the AREA specificed in the DIF3D problem.
+It will read in the values and project them up to that axial height.  For example:</p>
+<p>Z-Coord   Power     Frac Power    Doppler      Expansion
+10        0.00E+00  0.0+00        0            0
+20        1.85E+06  6.1-03        -3.31E-07   -1.02E-06
+30        3.08E+06  1.0-02        -1.01E-06   -5.11E-07</p>
+<p>This would project from locations 10 - 20 a power of 1.85E+06/(20-10).
+Similalrly, from 20 - 30 a power of 3.08E+06/(30-20)</p>
+<p>The file read in is assumed to be titled: dif3d_values.txt
+It assumes the file is read in as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="61%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Line</th>
+<th class="head">Value</th>
+<th class="head">Units</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>Total number of axially integrated values</td>
+<td>[integer value]</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>Spatially integrated power to be read in</td>
+<td>[Watts]</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>Spatially integrated fraction of power</td>
+<td>[Normalized by total]</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>Spatially integrated doppler worth</td>
+<td>[reactivity]</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>Total change in temperature for the perturbation</td>
+<td>[K]</td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>Spatially integrated density worth</td>
+<td>[reactivity]</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>Total change in density during perturbation</td>
+<td>[in percent]</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>Column wise values begin here.</td>
+<td>[]</td>
+</tr>
+<tr class="row-even"><td>C 1</td>
+<td>Axial z value from DIF3D</td>
+<td>[cm]</td>
+</tr>
+<tr class="row-odd"><td>C 2</td>
+<td>Power for that AREA</td>
+<td>[<span class="math notranslate nohighlight">\(Watt/cm^2\)</span>]</td>
+</tr>
+<tr class="row-even"><td>C 3</td>
+<td>Fractional power for that AREA</td>
+<td>[normalized by total]</td>
+</tr>
+<tr class="row-odd"><td>C 4</td>
+<td>Doppler reactivity worth</td>
+<td>[reactivity/<span class="math notranslate nohighlight">\(cm^2\)</span>]</td>
+</tr>
+<tr class="row-even"><td>C 5</td>
+<td>Density reactivity worth</td>
+<td>[reactivity/<span class="math notranslate nohighlight">\(cm^2\)</span>]</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
