@@ -1,6 +1,6 @@
 # MSR1D
-Modified point kinetics solver for MSR reactor kinetics calculations.  
+Modified point kinetics solver for MSR reactor transient calculations.  
 
-Goal is to test out high order in time discretization methods for solving these coupled set of equations
+Documentation can be found: [Click here for documentation](https://msr-1d.readthedocs.io/en/latest)
 
-Documentation can be found here: https://msr-1d.readthedocs.io/en/latest
+Basic regression tests are found under the [regression folder](PrecursorSolve/regression) and automatted using the python script BasicRegressionTests.py
