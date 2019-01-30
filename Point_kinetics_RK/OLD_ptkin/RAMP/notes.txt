@@ -1,3 +1,0 @@
-out_ramp_t_.0000_to_.1000_rho0.005
-This out put file means we did a ramp perturbation from 0.0 to 0.1 seconds
-starting at rho=0.0 to rho=0.005
