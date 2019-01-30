@@ -26,4 +26,4 @@ python BasicRegressionTests.py
 
 ## Utilities
 The utilities folder has utilized for automatting steady state calculations to tabuluate various parameters.
-Plotting of solution vectors is made possible with a series of pyhton scripts
+Plotting of solution vectors is made possible with a series of python scripts
