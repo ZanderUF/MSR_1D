@@ -20,9 +20,11 @@ def GetFuelDensity(Temperature):
 # Avagadros number
 AvagadroNum = 6.02214E-1 # because DIF3D assumes you are giving atom density in Atoms/CC*1E-24
 
+## specify at command line
+arglist = str(sys.argv)
 # Tunable values - enrichments
-EnrichmentCl37 = 0.99
-EnrichmentU235 = 0.16
+EnrichmentCl37 = 0.98
+EnrichmentU235 = 0.155
 
 # NaCl atomic masses
 # Order of array - Na23 Cl35 Cl37
@@ -41,49 +43,90 @@ Fraction_UCl3 = 1.0 - Fraction_NaCl
 NumFuelRegions = 1
 
 # Reflector Below core
-NumReflectorRegionsBelow = 3 
+NumReflectorRegionsBelow = 2 
 NumReflectorRegionsCore  = 1 
-NumReflectorRegionsAbove = 3
+NumReflectorRegionsAbove = 2
 
 #Number of shielding regions
-NumShieldRegionsAbove = 3
+NumShieldRegionsAbove = 4 
 NumShieldRegionsCore  = 1
-NumShieldRegionsBelow = 3
+NumShieldRegionsBelow = 4 
 
 #Number of vessel regions
-NumVesselRegionsAbove = 3  
+NumVesselRegionsAbove = 2  
 NumVesselRegionsCore  = 1
-NumVesselRegionsBelow = 3 
+NumVesselRegionsBelow = 2 
 
 #----------------------------------------------------------------------
 #Calculate fuel fraction for reflector below and above the core
-FractionSteel_ReflectorBelow = 0.9
-FractionFuel_ReflectorBelow  = 1.0 - FractionSteel_ReflectorBelow   
+# Below adjacent to reflector below active core
+#FractionFuel_ReflectorBelowOutside  = 0.0 
+#FractionSteel_ReflectorBelowOutside = 1.0 - FractionFuel_ReflectorBelowOutside 
+#
+## Below - immediately under active fuel region
+#FractionFuel_ReflectorBelowInside  = 0.483  
+#FractionSteel_ReflectorBelowInside = 1.0 - FractionFuel_ReflectorBelowInside 
+#
+#FracFuelBelowRefl=[]
+#FracSteelBelowRefl=[]
 
-# Calculate fuel fraction for reflector adjacent to core 
-FractionSteel_ReflectorCore   = 0.8  
-FractionFuel_ReflectorCore    = 1.0 - FractionSteel_ReflectorCore
+# R1 R2 R3 R4 R5
+ReflectorFracFuel  =[0.4230, 0.001,0.001,0.4230, 0.001]
+ReflectorFracSteel =[0.5773,0.999,0.999,0.5773,0.999]
 
-#Calculate fuel fraction for reflector below and above the core
-FractionSteel_ReflectorAbove = 0.9
-FractionFuel_ReflectorAbove  = 1.0 - FractionSteel_ReflectorAbove   
+#-----------------------------------------------------------#
+#FracFuelBelowRefl.append(FractionFuel_ReflectorBelowOutside)
+#FracFuelBelowRefl.append(FractionFuel_ReflectorBelowInside)
+#
+#FracSteelBelowRefl.append(FractionSteel_ReflectorBelowOutside)
+#FracSteelBelowRefl.append(FractionSteel_ReflectorBelowInside)
+#
+## Calculate fuel fraction for reflector adjacent to core 
+#FractionFuel_ReflectorCore    = 0.0 
+#FractionSteel_ReflectorCore   = 1.0 - FractionFuel_ReflectorCore   
+#
+##Calculate fuel fraction for reflector below and above the core
+#FractionFuel_ReflectorAboveOutside  = 0.483
+#FractionSteel_ReflectorAboveOutside = 1.0 - FractionFuel_ReflectorAboveOutside 
+#
+#FractionFuel_ReflectorAboveInside  = 0.0
+#FractionSteel_ReflectorAboveInside = 1.0 - FractionFuel_ReflectorAboveInside 
+#
+#FracFuelAboveRefl = []
+#FracFuelAboveRefl.append(FractionFuel_ReflectorAboveOutside)
+#FracFuelAboveRefl.append(FractionFuel_ReflectorAboveInside)
+#
+#FracSteelAboveRefl = []
+#FracSteelAboveRefl.append(FractionSteel_ReflectorAboveOutside)
+#FracSteelAboveRefl.append(FractionSteel_ReflectorAboveInside)
+
 
 #----------------------------------------------------------------------
 # Shield composition fractions below core
-FractionSteel_ShieldBelow = 0.8 
-FractionFuel_ShieldBelow  = 0.1
+FractionFuel_ShieldBelow  = 0.0
+FractionSteel_ShieldBelow = 0.85 
 FractionBoron_ShieldBelow = 1.0 - FractionSteel_ShieldBelow - FractionFuel_ShieldBelow
 
 # Shield composition fractions adjacent to core
-FractionSteel_ShieldCore = 0.8 
-FractionFuel_ShieldCore  = 0.1
+FractionFuel_ShieldCore  = 0.0
+FractionSteel_ShieldCore = 0.85 
 FractionBoron_ShieldCore = 1.0 - FractionSteel_ShieldCore - FractionFuel_ShieldCore
 
 # Shield composition fractions above 
-FractionSteel_ShieldAbove = 0.8 
-FractionFuel_ShieldAbove  = 0.1
+FractionFuel_ShieldAbove  = 0.0
+FractionSteel_ShieldAbove = 0.85 
 FractionBoron_ShieldAbove = 1.0 - FractionSteel_ShieldAbove - FractionFuel_ShieldAbove
 
+ShieldFracB4C  = [4.23E-01,6.70E-04,3.41E-04,1.79E-04,1.79E-04,1.79E-04,4.23E-01,6.70E-04,3.41E-04]
+ShieldFracFuel = [1.00E-01,1.00E-01,1.00E-01,1.00E-01,1.00E-01,1.00E-01,1.00E-01,1.00E-01,1.00E-01]
+ShieldFracSteel= [4.77E-01,8.99E-01,9.00E-01,9.00E-01,9.00E-01,9.00E-01,4.77E-01,8.99E-01,9.00E-01]
+# S1 S2 S3 S4 S5 S6 S7 S8 S9
+
+# Define temepratures above, in the core, and below for reflector and shield region
+
+TemperatureBelow = '    850.00'
+TemperatureCore  = '    900.00'
+TemperatureAbove = '    950.00'
 
 TotalNaCl_MolarMass = 0.0
 # Calculate total molar mass for the compound based on percent comps
@@ -178,10 +221,10 @@ for n in range(NumReflectorRegionsBelow):
     for i in range(len(ReflectorIsotopeNames)):
         # First do steel using fraction
         if i < SteelLength:
-            TempReflectorAtomDen.append(SteelAtomDensity[i]*FractionSteel_ReflectorBelow)
+            TempReflectorAtomDen.append(SteelAtomDensity[i]*ReflectorFracSteel[n])
         # Add fuel fraction
         elif i < SteelLength + FuelLength:  
-            TempReflectorAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength]*FractionFuel_ReflectorBelow)
+            TempReflectorAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength]*ReflectorFracFuel[n])
         # Extra isotopes
         else:
             TempReflectorAtomDen.append(1E-16)
@@ -199,9 +242,9 @@ for n in range(NumReflectorRegionsCore):
     for i in range(len(ReflectorIsotopeNames)):
         # First do steel using fraction
         if i < SteelLength:
-            TempReflectorAtomDen.append(SteelAtomDensity[i]*FractionSteel_ReflectorCore)
+            TempReflectorAtomDen.append(SteelAtomDensity[i]*ReflectorFracSteel[n+NumReflectorRegionsBelow])
         elif i < SteelLength + FuelLength:  
-            TempReflectorAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength]*FractionFuel_ReflectorCore)
+            TempReflectorAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength]*ReflectorFracFuel[n+NumReflectorRegionsBelow])
         else:
             TempReflectorAtomDen.append(1E-16)
         TempID.append(ReflectorID[i] + 'R' + str(n+1+NumReflectorRegionsBelow))
@@ -217,10 +260,10 @@ for n in range(NumReflectorRegionsAbove):
     for i in range(len(ReflectorIsotopeNames)):
         # First do steel using fraction
         if i < SteelLength:
-            TempReflectorAtomDen.append(SteelAtomDensity[i]*FractionSteel_ReflectorAbove)
+            TempReflectorAtomDen.append(SteelAtomDensity[i]*ReflectorFracSteel[n+NumReflectorRegionsCore+NumReflectorRegionsBelow])
         # Fuel
         elif i < SteelLength + FuelLength:
-            TempReflectorAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength]*FractionFuel_ReflectorAbove) 
+            TempReflectorAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength]*ReflectorFracFuel[n+NumReflectorRegionsCore+NumReflectorRegionsBelow]) 
         # Extra isotopes
         else:
             TempReflectorAtomDen.append(1E-16)
@@ -240,12 +283,12 @@ for n in range(NumShieldRegionsBelow):
     for i in range(len(ShieldIsotopeNames)):
         # Fraction of steel
         if i < SteelLength:
-            TempShieldAtomDen.append(SteelAtomDensity[i]*FractionSteel_ShieldBelow)
+            TempShieldAtomDen.append(SteelAtomDensity[i]*ShieldFracSteel[n])
         elif i < SteelLength + BoronLength:
-            TempShieldAtomDen.append(BoronAtomDensity[i-SteelLength]*FractionBoron_ShieldBelow)
+            TempShieldAtomDen.append(BoronAtomDensity[i-SteelLength]*ShieldFracB4C[n])
         # Fraction of boron carbide
         elif i < SteelLength + BoronLength + FuelLength:
-            TempShieldAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength - BoronLength]*FractionFuel_ShieldBelow)
+            TempShieldAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength - BoronLength]*ShieldFracFuel[n])
         # Fraction of Fuel
         else:
             TempShieldAtomDen.append(1E-16)
@@ -262,12 +305,12 @@ for n in range(NumShieldRegionsCore):
     for i in range(len(ShieldIsotopeNames)):
         # Fraction of steel
         if i < SteelLength:
-            TempShieldAtomDen.append(SteelAtomDensity[i]*FractionSteel_ShieldCore)
+            TempShieldAtomDen.append(SteelAtomDensity[i]*ShieldFracSteel[n+NumShieldRegionsBelow])
         elif i < SteelLength + BoronLength:
-            TempShieldAtomDen.append(BoronAtomDensity[i-SteelLength]*FractionBoron_ShieldCore)
+            TempShieldAtomDen.append(BoronAtomDensity[i-SteelLength]*ShieldFracB4C[n+NumShieldRegionsBelow])
         # Fraction of boron carbide
         elif i < SteelLength + BoronLength + FuelLength:
-            TempShieldAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength - BoronLength]*FractionFuel_ShieldCore)
+            TempShieldAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength - BoronLength]*ShieldFracFuel[n+NumShieldRegionsBelow])
         # Fraction of Fuel
         else:
             TempShieldAtomDen.append(1E-16)
@@ -284,12 +327,12 @@ for n in range(NumShieldRegionsAbove):
     for i in range(len(ShieldIsotopeNames)):
         # Fraction of steel
         if i < SteelLength:
-            TempShieldAtomDen.append(SteelAtomDensity[i]*FractionSteel_ShieldAbove)
+            TempShieldAtomDen.append(SteelAtomDensity[i]*ShieldFracSteel[n+NumShieldRegionsCore+NumShieldRegionsCore] )
         elif i < SteelLength + BoronLength:
-            TempShieldAtomDen.append(BoronAtomDensity[i-SteelLength]*FractionBoron_ShieldAbove)
+            TempShieldAtomDen.append(BoronAtomDensity[i-SteelLength]*ShieldFracB4C[n+NumShieldRegionsCore+NumShieldRegionsBelow])
         # Fraction of boron carbide
         elif i < SteelLength + BoronLength + FuelLength:
-            TempShieldAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength - BoronLength]*FractionFuel_ShieldAbove)
+            TempShieldAtomDen.append(AtomDensity_NaCl_UCl3[i-SteelLength - BoronLength]*ShieldFracFuel[n+NumShieldRegionsCore+NumShieldRegionsBelow])
         # Fraction of Fuel
         else:
             TempShieldAtomDen.append(1E-16)
@@ -307,7 +350,7 @@ for n in range(NumVesselRegionsBelow):
     for i in range(len(VesselIsotopeNames)):
         # Fraction of steel
         if i < SteelLength:
-            TempID.append(VesselID[i] + 'V' + str(n+1+NumVesselRegionsBelow+NumVesselRegionsCore))     
+            TempID.append(VesselID[i] + 'V' + str(n+1))     
             TempVesselAtomDen.append(SteelAtomDensity[i])
         i = i+1
     IDs_Vessel.append(TempID)
@@ -342,105 +385,193 @@ for n in range(NumVesselRegionsAbove):
     VesselAtomDen.append(TempVesselAtomDen)
     n = n+1
 
-TotalNumRegions = 12
+
+#--- Write material section of MC^2-3 file
 MaterialFileName = 'material_section_mcc.txt'
 os.system('rm ' + MaterialFileName) 
 
+output = open(MaterialFileName,"a")
+output.write('\$material\n')
+output.close()
 
-# Write material section of MC^2-3 file
+Dif3dFileName = 'middle_dif3d_file.txt'
+os.system('rm ' + Dif3dFileName)
+
+
+Alias_DIF3D_Fuel = '  UCL3  '
+
 #-----------------------------------------------------
-# Write out fuel compositions 
+#---Write out fuel compositions 
+
 TotalFuelRegions = NumFuelRegions 
 for i in range(TotalFuelRegions):
     
     output = open(MaterialFileName,"a")
+    output_dif3d = open(Dif3dFileName,"a")
     # for a given material
     
     output.write('! Fuel  Material ' + str(i+1)+ '\n') 
     CompositionIdentifier = 't_composition(:, '+ str(i+1) + ') ='
     output.write(CompositionIdentifier)
-    FinalLine = [] 
+    FinalLine  = [] 
+    Dif3d_Line = []
+   
     for j in range(len(CoreIsotopeNames)): 
-        if j < len(AtomDensity_NaCl_UCl3):
+        if j < len(CoreIsotopeNames):
+            Dif3d_Line.append('13   ' + Alias_DIF3D_Fuel + ' ' + IDs_Core[i][j] + ' ' + str('{:.5e}'.format(FuelSaltAtomDen[i][j]))  )
+
             FinalLine.append(CoreIsotopeNames[j] + ' ' + IDs_Core[i][j] + ' ' + str('{:.5e}'.format(FuelSaltAtomDen[i][j])) + '  900.00')
     
     output.write("\n".join(FinalLine))
-    
     output.write("\n")
     output.write("\n")
     output.close()
+    
+    output_dif3d.write("\n".join(Dif3d_Line))
+    output_dif3d.write("\n")
+    output_dif3d.write("\n")
+    output_dif3d.close()   
+    
     i = i+1
 
 # Reflector compositions
 
+Alias_Refl = 'REFLR'
 TotalReflectorRegions = NumReflectorRegionsBelow + NumReflectorRegionsCore + NumReflectorRegionsAbove 
 for i in range(TotalReflectorRegions):
     
     output = open(MaterialFileName,"a")
+    
+    output_dif3d = open(Dif3dFileName,"a")
     # for a given material
     output.write('! Reflector Material ' + str(i+1)+ '\n') 
     CompositionIdentifier = 't_composition(:, '+ str(i+1+TotalFuelRegions) + ') ='
     output.write(CompositionIdentifier)
 
     FinalLine = [] 
+    Dif3d_Line = [] 
+    
     for j in range(len(ReflectorIsotopeNames)): 
-        FinalLine.append(ReflectorIsotopeNames[j] + ' ' + IDs_Reflector[i][j] + ' ' + str('{:.5e}'.format(ReflectorAtomDen[i][j])) + '  900.00')
+        if i < NumReflectorRegionsBelow:
+            Dif3d_Line.append('13    ' + Alias_Refl+str(i+1)+ '  '  + IDs_Reflector[i][j] + ' ' + str('{:.5e}'.format(ReflectorAtomDen[i][j])) )         
+            FinalLine.append(ReflectorIsotopeNames[j] + ' ' + IDs_Reflector[i][j] + ' ' + str('{:.5e}'.format(ReflectorAtomDen[i][j])) +  TemperatureBelow)
+        elif i < NumReflectorRegionsCore + NumReflectorRegionsBelow:
+            Dif3d_Line.append('13    ' + Alias_Refl+str(i+1) + '  '  + IDs_Reflector[i][j] + ' ' + str('{:.5e}'.format(ReflectorAtomDen[i][j])) )
+            FinalLine.append(ReflectorIsotopeNames[j] + ' ' + IDs_Reflector[i][j] + ' ' + str('{:.5e}'.format(ReflectorAtomDen[i][j])) + TemperatureCore)
+        else:
+            Dif3d_Line.append('13    ' + Alias_Refl+str(i+1) + '  ' + IDs_Reflector[i][j] + ' ' + str('{:.5e}'.format(ReflectorAtomDen[i][j])) )
+            FinalLine.append(ReflectorIsotopeNames[j] + ' ' + IDs_Reflector[i][j] + ' ' + str('{:.5e}'.format(ReflectorAtomDen[i][j])) + TemperatureAbove)
     
     output.write("\n".join(FinalLine))
-    
     output.write("\n")
     output.write("\n")
     output.close()
+    
+    output_dif3d.write("\n".join(Dif3d_Line))
+    output_dif3d.write("\n")
+    output_dif3d.write("\n")
+    output_dif3d.close()   
+    
+    
     i = i+1
 
 # Shielding
 TotalShieldRegions = NumShieldRegionsBelow+NumShieldRegionsCore+NumShieldRegionsAbove
 
+Alias_Shield = 'SHLDS'
 for i in range(TotalShieldRegions):
     output = open(MaterialFileName,"a")
-   
+    output_dif3d = open(Dif3dFileName,"a")
+
     output.write('! Shield Material ' + str(i+1) + '\n')
     # for a given material
     CompositionIdentifier = 't_composition(:, '+ str(i+1+TotalReflectorRegions+TotalFuelRegions) + ') ='
     output.write(CompositionIdentifier)
 
-    FinalLine = [] 
-    for j in range(len(ShieldIsotopeNames)): 
-        FinalLine.append(ShieldIsotopeNames[j] + ' ' + IDs_Shield[i][j] + ' ' + str('{:.5e}'.format(ShieldAtomDen[i][j])) + '  900.00')
+    FinalLine  = [] 
+    Dif3d_Line = []
     
+    for j in range(len(ShieldIsotopeNames)): 
+        if i < NumShieldRegionsBelow:
+            Dif3d_Line.append('13   ' + Alias_Shield+ str(i+1) + '   ' + IDs_Shield[i][j] + ' ' + str('{:.5e}'.format(ShieldAtomDen[i][j])) )
+            FinalLine.append(ShieldIsotopeNames[j] + ' ' + IDs_Shield[i][j] + ' ' + str('{:.5e}'.format(ShieldAtomDen[i][j])) + TemperatureBelow)
+        elif i< NumShieldRegionsCore + NumShieldRegionsBelow:
+            Dif3d_Line.append('13   ' + Alias_Shield+ str(i+1) + '   ' + IDs_Shield[i][j] + ' ' + str('{:.5e}'.format(ShieldAtomDen[i][j])) )
+            FinalLine.append(ShieldIsotopeNames[j] + ' ' + IDs_Shield[i][j] + ' ' + str('{:.5e}'.format(ShieldAtomDen[i][j])) + TemperatureCore)
+        else:
+            Dif3d_Line.append('13   ' + Alias_Shield+ str(i+1) + '   ' + IDs_Shield[i][j] + ' ' + str('{:.5e}'.format(ShieldAtomDen[i][j])) )
+            FinalLine.append(ShieldIsotopeNames[j] + ' ' + IDs_Shield[i][j] + ' ' + str('{:.5e}'.format(ShieldAtomDen[i][j])) + TemperatureAbove)
+
     output.write("\n".join(FinalLine))
     
     output.write("\n")
     output.write("\n")
     output.close()
-    
+   
+    output_dif3d.write("\n".join(Dif3d_Line))
+    output_dif3d.write("\n")
+    output_dif3d.write("\n")
+    output_dif3d.close()   
+ 
     i = i+1
 
 # Vessel 
 TotalVesselRegions = NumVesselRegionsBelow + NumVesselRegionsCore + NumVesselRegionsAbove
-print VesselAtomDen
 
-print ' len v ', len(VesselAtomDen[0])
-print ' sdfa ' ,len(VesselIsotopeNames)
-print 'le id  ',len(IDs_Vessel[0])
+Alias_Vessel = 'VSSLV'
 
 for i in range(TotalVesselRegions):
     output = open(MaterialFileName,"a")
-   
-    output.write('! Vessel Material ' + str(i+1))
+    output_dif3d = open(Dif3dFileName,"a")
+
+    output.write('! Vessel Material ' + str(i+1) + '\n')
     # for a given material
     CompositionIdentifier = 't_composition(:, '+ str(i+1+TotalReflectorRegions+TotalFuelRegions+TotalShieldRegions) + ') ='
     output.write(CompositionIdentifier)
 
     FinalLine = [] 
+    Dif3d_Line = []
     for j in range(len(VesselIsotopeNames)): 
+        Dif3d_Line.append('13   ' + Alias_Vessel+str(i+1) + '  ' + IDs_Vessel[i][j] + ' ' + str('{:.5e}'.format(VesselAtomDen[i][j])) )
         FinalLine.append(VesselIsotopeNames[j] + ' ' + IDs_Vessel[i][j] + ' ' + str('{:.5e}'.format(VesselAtomDen[i][j])) + '  900.00')
     
     output.write("\n".join(FinalLine))
-    
     output.write("\n")
     output.write("\n")
     output.close()
     
+    output_dif3d.write("\n".join(Dif3d_Line))
+    output_dif3d.write("\n")
+    output_dif3d.write("\n")
+    output_dif3d.close()   
+
     i = i+1
+
+output = open(MaterialFileName,"a")
+output.write('/\n')
+output.write('EOF\n')
+output.close()
+
+#---------------------------------------------------
+# MCC file
+TopMccFile    = 'mcc_top' 
+MiddleMccFile = 'mcc_center_twodant' 
+BottomMccFile = 'mcc_bottom'
+
+FinalMccFile = 'MCC_twodant_' + 'Cl37_'+str(EnrichmentCl37) + '_U235_' + str(EnrichmentU235) 
+
+print 'Final MCC^2-3 file is: ', FinalMccFile
+
+os.system('cat ' + TopMccFile + ' ' + MaterialFileName + ' ' + MiddleMccFile + ' ' + MaterialFileName + ' ' + BottomMccFile + ' ' + ' > ' + FinalMccFile )
+
+#---------------------------------------------------
+# Dif3d file
+TopOfFile    = 'top_dif3d_file'
+BottomOfFile = 'bottom_dif3d_file' 
+
+FinalFileDif3d = 'Cl37_'+str(EnrichmentCl37) + '_U235_' + str(EnrichmentU235)  +'_dif3d.inp'
+
+print 'Final dif3d file written ', FinalFileDif3d
+
+os.system('cat ' + TopOfFile + ' ' + Dif3dFileName + ' ' + BottomOfFile + ' > ' + FinalFileDif3d)
 
