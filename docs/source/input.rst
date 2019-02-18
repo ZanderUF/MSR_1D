@@ -166,7 +166,9 @@ Sample Input File
       mat=1
       alam=0.0127 0.0317 0.115 0.311 1.4 3.87 end
       beta=2.66E-4 1.491E-3 1.316E-3 2.849E-3 8.96E-4 1.82E-4  end
-    end delay.. Input File DIF3D Values::
+    end delay
+    
+.. Input File DIF3D Values::
 
 
 Input file structure to read in from DIF3D
@@ -176,10 +178,13 @@ Values from DIF3D can be read in and projected onto the domain in the 1D problem
 Right now it reads in the power, power fraction, doppler reactivity worth, and density reactivity worth. These are all spatially dependent.  These values are integrated across the AREA specificed in the DIF3D problem. 
 It will read in the values and project them up to that axial height.  For example:
 
-Z-Coord   Power     Frac Power    Doppler      Expansion
-10        0.00E+00  0.0+00        0            0   
-20        1.85E+06  6.1-03        -3.31E-07   -1.02E-06
-30        3.08E+06  1.0-02        -1.01E-06   -5.11E-07
+ =======  =======  =======   ========  ==========    =========   ==========
+ Volume   Area     Z-Coord   Power     Frac Power    Doppler      Expansion
+ =======  =======  =======   ========  ==========    =========   ==========
+ 200      20       10        0.00E+00  0.0+00        0            0   
+ 200      20       20        1.85E+06  6.1-03        -3.31E-07   -1.02E-06
+ 200      20       30        3.08E+06  1.0-02        -1.01E-06   -5.11E-07
+ =======  =======  =======   ========  ==========    =========   ==========
 
 This would project from locations 10 - 20 a power of 1.85E+06/(20-10).
 Similalrly, from 20 - 30 a power of 3.08E+06/(30-20)
@@ -197,10 +202,12 @@ Line   Value                                            Units
 5      Total change in temperature for the perturbation [K]
 6      Spatially integrated density worth               [reactivity] 
 7      Total change in density during perturbation      [in percent]
-8      Column wise values begin here.                   [] 
+8      Column wise values begin here.                    
 C 1    Axial z value from DIF3D                         [cm] 
-C 2    Power for that AREA                              [:math:`Watt/cm^2`]
-C 3    Fractional power for that AREA                   [normalized by total]
-C 4    Doppler reactivity worth                         [reactivity/:math:`cm^2`]
-C 5    Density reactivity worth                         [reactivity/:math:`cm^2`]   
+C 2    Volume                                           [:math:`cm^3`] 
+C 3    Cross sectional area                             [:math:`cm^2`]
+C 4    Power for that AREA                              [:math:`Watt/cm^2`]
+C 5    Fractional power for that AREA                   [normalized by total]
+C 6    Doppler reactivity worth                         [reactivity/:math:`cm^2`]
+C 7    Density reactivity worth                         [reactivity/:math:`cm^2`]   
 ====== ================================================ =========================
