@@ -35,33 +35,39 @@ subroutine transient_euler()
         write(outfile_unit, fmt='(a)'), 'In backward Euler transient loop'
         
         timeloop: do!---Time loop 
-            
+           
+            !---Reset convergence criteria counters
             nl_iter = 1 
-            L2_norm_prev = 0.0
-            L2_norm_current = 0.0
-            difference_counter = 0
+            L2_norm_prev        = 0.0
+            L2_norm_current     = 0.0
+            difference_counter  = 0.0
           
-            !---Vary beta with flow speed
+            !---Interpolate beta as a function of flow speed
             call beta_feedback 
            
             !---Decide if we are doing backward or forward euler
             nl_iter_flag = .TRUE. 
-            residual(:,:,:,:) = 0.0_dp
-           
+            residual(:,:,:,:) = 0.0
+
+            !---Nonlinear iteration for implicit time stepping schemes 
             nonlinearloop: do  
                 if(nl_iter_flag .eqv. .TRUE.) then 
                     !---Create element matrices and assemble
                     elements_loop: do n = 1 , num_elem 
-                        !---Generate spatial matrices
+                        !---Generate spatial matrices 
                         call spatial_matrices(n,nl_iter)
+                        !---Generate numerical flux matrices for boundary of elements
                         call numerical_flux_matrices(n,nl_iter)
-                         if( mass_flow > 0.0) then
+                        !---If it is a stationary fuel test case do not need temperature 
+                        if( mass_flow > 0.0) then
                                 call solve_velocity(n,nl_iter)
                                 call solve_temperature_euler(n,nl_iter)
                         end if            
+                        !---Loop over all fissile isotopes
                         isotope_loop: do f = 1, num_isotopes
+                            !---Loop over precursor families
                             delay_loop: do g = 1, num_delay_group
-                                !---Assemble matrices solve elemental coefficients 
+                                !---Assemble matrices to solve for elemental coefficients 
                                 call assemble_matrix_transient(f,g,n) 
                                 !---Solve for the elemental solution
                                 call solve_precursor_euler(f,g,n,nl_iter)
@@ -75,23 +81,23 @@ subroutine transient_euler()
                 if(td_method_type == 0 ) then
                     nl_iter_flag = .FALSE. 
                 else
-                    !---Calculate the l2 norms to determine convergence
+                    !---Calculate the L2 norms to determine convergence on the time step
                     call l2_norm(nl_iter)
                 end if
                 
-                !---Reached max # iterations
+                !---Reached max # iterations exit and move to next time step
                 if ( nl_iter == max_nl_iter) then
                     exit
                 end if
                 
                 nl_iter = nl_iter + 1 
                
-                !---No nonlinear iterations
+                !---No nonlinear iterations for explicit cases
                 else
                     exit
                 end if
                
-                !---Swap for next nonlinear iteration
+                !---Swap solutions vectors for next nonlinear iteration
                 precursor_soln_prev       = precursor_soln_new 
                 power_amplitude_prev      = power_amplitude_new
                 power_soln_prev           = power_soln_new
@@ -105,7 +111,7 @@ subroutine transient_euler()
             temperature_converged = .FALSE.
 
             !***************************************************
-            !---Only automate time stepping
+            !---Only automate time stepping for implicit calculations
             if(td_method_type == 1) then
                 sum_residual = 0.0
                 do f = 1, num_isotopes 
@@ -122,14 +128,16 @@ subroutine transient_euler()
                     end do
                 end do
             end if
-           
-            !write(nl_outfile_unit, fmt='(es16.6 ,1I6,16es16.6,16es16.6,&
-            !                                16es16.6,16es16.6,16es16.6,16es16.6)'),&
-            !                                t0,nl_iter, (l2_residual(1,g), g=1,num_delay_group)
             
+            if(DEBUG .eqv. .TRUE.) then
+                !write(nl_outfile_unit, fmt='(es16.6 ,1I6,16es16.6,16es16.6,&
+                !                                16es16.6,16es16.6,16es16.6,16es16.6)'),&
+                !                                t0,nl_iter, (l2_residual(1,g), g=1,num_delay_group)
+            end if
+
             transient_save_flag = .TRUE.
             
-            !---Swap solutions for next time step 
+            !---Swap solution vectors for next time step 
             precursor_soln_prev       = precursor_soln_new 
             power_amplitude_prev      = power_amplitude_new
             precursor_soln_last_time  = precursor_soln_new
@@ -148,14 +156,14 @@ subroutine transient_euler()
             !---Write power, amplitude, reacitivty to file
             call write_periodic
 
-            !---Stop if we've exceeded TMAX.
+            !---Stop once we have reached end of desired simulation time.
             if ( tmax <= t0 ) then
                 exit
             end if
           
            !---Increment the time step
            t1 = t0 + delta_t
-
+           !---Reset starting time point
            t0 = t1
 
        enddo timeloop

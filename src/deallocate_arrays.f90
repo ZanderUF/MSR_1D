@@ -17,8 +17,8 @@ implicit none
 !---Local
 
 !---Allocate solution vector and global matrices
-    allocate(precursor_soln_new(num_isotopes,num_delay_group,num_elem,nodes_per_elem),  &
-             power_soln_new(num_elem,nodes_per_elem), &
+    deallocate(precursor_soln_new
+              power_soln_new      (num_elem,nodes_per_elem), &
              temperature_soln_new( num_elem,nodes_per_elem),  &
              density_soln_new( num_elem,nodes_per_elem),  &
              velocity_soln_new( num_elem,nodes_per_elem),  &

@@ -64,7 +64,7 @@ subroutine read_power
         read(power_file_unit,*) volume, area, axial_index,power_axial, &
                                 power_fraction,doppler_reactivity, &
                                 expansion_reactivity
-       
+
         dif3d_volume_input(i)         = volume
         dif3d_area_input(i)           = area
         dif3d_axial_input(i)          = axial_index
@@ -119,7 +119,8 @@ subroutine read_power
                do j = 1, nodes_per_elem
                    spatial_vol_fcn(i,j)  = abs(( (read_in_vol) / &
                                             (read_in_z - read_in_z_prev) ))
-                   spatial_area_fcn(i,j) = read_in_area 
+                   spatial_area_fcn(i,j) = read_in_area
+                    
                    !---Reading in the power fraction.  Can multiply by the 
                    !---Total power read in initially to get the total anywhere
                    spatial_power_fcn(i,j) = ( (read_in_pow) / &

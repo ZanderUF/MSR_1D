@@ -46,8 +46,6 @@ implicit none
         velocity_soln_new(n,j) = (mass_flow / &
                                  (spatial_area_fcn(n,j)*density_eval))
        
-        
-
         !Density_Reactivity_Feedback(n,j) = 0.0
      end do
   

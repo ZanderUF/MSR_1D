@@ -73,12 +73,13 @@ implicit none
             volume = volume + vol_int(j)*area_variation(i,j)
         end do
     end do
-   
-    q_prime = 2.9402959623723435E+08_dp/2.7853599169898033E+07_dp
+
+    !q_prime = 2.9402959623723435E+08_dp/2.7853599169898033E+07_dp
 !---Loop over all nodes in element
     do j = 1, nodes_per_elem
         
        temperature_eval = temperature_soln_prev(n,j)
+       
        call density_corr(temperature_eval, density_eval) 
        call heat_capacity_corr(temperature_eval, heat_capacity_eval)
        length_core = Fuel_Outlet_End - Fuel_Inlet_start
@@ -86,6 +87,7 @@ implicit none
        !q_prime = spatial_power_fcn(n,j)/spatial_area_fcn(n,j)
        q_prime = (total_power_initial*power_amplitude_prev*&
                   spatial_power_frac_fcn(n,j))/spatial_area_fcn(n,j)
+       
        elem_vec_q_temp(j) = elem_vec_q(j)*q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
         
     end do
@@ -143,7 +145,7 @@ if( n > Heat_Exchanger_End) then
         end do
     end if
 
-
+!DEBUG = .TRUE.
 if( DEBUG .eqv. .TRUE.) then
       
        write(outfile_unit,fmt='(a,4I6)'), 'nl iter ',nl_iter
@@ -186,5 +188,7 @@ if( DEBUG .eqv. .TRUE.) then
 
        write(outfile_unit,fmt='(a)'),'*****************************************'
     end if
+
+DEBUG = .FALSE.
 
 end subroutine solve_temperature_ss

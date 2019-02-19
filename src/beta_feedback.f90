@@ -15,7 +15,6 @@ subroutine beta_feedback
     logical  :: event_occuring 
     real(dp) :: event_start_time, event_time,event_time_previous, t1
     
-    
     event_start_time = delta_t 
 
    !---Evaluate if

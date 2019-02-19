@@ -1,11 +1,5 @@
-      module error_functions
-!     Module: $Source: /scale/scale6/src/scalelib/RCS/Error_functions_M.f90,v $
-!   Revision: $Revision: 1.10 $
-!     Author: $Author: LMPetrie $
-!       Date: $Date: 2008/02/12 15:15:39 $
-!      State: $State: Stab $
-!     Locker: $Locker:  $
-
+!---Imported from TDKENO - did not write
+    module error_functions
       use common_unit, only: html_output
 
       implicit none

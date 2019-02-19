@@ -25,12 +25,11 @@ implicit none
     character(len=20) :: power_soln_file_name
     character(len=7)  :: input_file
     character(len=20) :: beta_special_name
-    character(len=18) ::nl_out_name
+    character(len=18) :: nl_out_name
 
     real(dp) :: start, finish
 
-!---Name the files to write out something sensible
-
+!---Name the files that are written out
     outfile_name                = 'outfile.txt'
     !steady_state_soln_file_name = 'ss_precursor_soln.txt'
     last_time_file_name         = 'last_t_soln.txt'
@@ -42,8 +41,6 @@ implicit none
 !---Open file for writing out debug information
     open (unit=outfile_unit, file=outfile_name,status='unknown',&
     	  form='formatted',position='asis')
-    !open (unit=soln_outfile_unit, file=steady_state_soln_file_name,&
-    !  	  status='unknown',form='formatted',position='asis')
     open (unit=power_outfile_unit, file=power_soln_file_name,&
     	  status='unknown',form='formatted',position='asis')
     open (unit=beta_special_unit, file=beta_special_name,&
@@ -79,7 +76,7 @@ implicit none
         call read_beta_flow
     end if
 
-!---Measure CPU time
+!---Measure Wall clock time
     call cpu_time(start)
 
 !---Steady state solve for temperature 
@@ -125,9 +122,11 @@ implicit none
             power_soln_last_time, & 
             area_variation )
    
-!---Close units
+!---Close outfile unitsunits
    close(outfile_unit)
    close(soln_outfile_unit)
+   close(beta_special_unit)
+   close(nl_outfile_unit)
    close(power_outfile_unit)
 
 end subroutine driver_solve 

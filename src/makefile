@@ -10,7 +10,7 @@ F90 = gfortran
 #FFLAGS = -g -fbounds-check 
 
 FFLAGS = -g -fbounds-check 
-LIBDIR = ../../lapack-3.8.0/ 
+LIBDIR = ../lapack-3.8.0/ 
 LIB    = -llapack -lblas
 
 EXE = msr1d

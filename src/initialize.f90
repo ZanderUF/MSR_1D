@@ -46,7 +46,7 @@ implicit none
     
     !---Initial guesses 
     inlet_temperature  = 850.0_dp
-    outlet_temperature = 1000.0_dp
+    outlet_temperature = 950.0_dp
     
     !---Test if reading power profile from file or not
 
@@ -65,24 +65,25 @@ implicit none
                                   (Fuel_Core_Start - Fuel_Inlet_Start)*&
                                   (i - Fuel_Inlet_Start) + &
                                   Area_Pipe
-                    spatial_area_fcn(i,j) = Area_Plenum 
-                    
+                    !spatial_area_fcn(i,j) = Area_Plenum 
+                    spatial_area_fcn(i,j) = Area_Core
                     temperature_soln_new(i,j) = inlet_temperature    
                 !---Fuel main core
                 else if ( i <= Fuel_Core_End )   then
                     spatial_area_fcn(i,j) = Area_Core
                 !---linearly interpolate temperature rise over the core
+                    
                     temperature_soln_new(i,j) = &
                     (outlet_temperature - inlet_temperature)/&
                     (Fuel_Core_End - Fuel_Core_Start)* &
                     ( global_coord(i,j) - global_coord(Fuel_Core_End,3) ) + &
                     outlet_temperature
-                    
+
                 !---Fuel outlet plenum
                 else if ( i <= Fuel_Outlet_End ) then
-                    call Calculate_Plenum_Area(i,j,Area_Plenum)
-                    spatial_area_fcn(i,j) = Area_Plenum
-                    
+                    !call Calculate_Plenum_Area(i,j,Area_Plenum)
+                    !spatial_area_fcn(i,j) = Area_Plenum
+                    spatial_area_fcn(i,j) = Area_Core 
                     temperature_soln_new(i,j) = outlet_temperature 
                 !---End piping
                 else if (i <= Heat_Exchanger_Start) then
@@ -111,14 +112,14 @@ implicit none
                 
                 power_soln_new(i,j) = &
                            spatial_power_frac_fcn(i,j)*power_amplitude_new
-                temperature_soln_new(i,j) = inlet_temperature 
+               ! temperature_soln_new(i,j) = inlet_temperature 
                 temperature = temperature_soln_new(i,j)
                 
                 call density_corr(temperature,density)
                 density_soln_new(i,j) = density 
                 velocity_soln_new(i,j) = mass_flow/(spatial_area_fcn(i,j)*&
                                  density)
-
+            
             end do
         end do
     !----Test cases
