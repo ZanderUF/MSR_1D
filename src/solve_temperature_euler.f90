@@ -147,7 +147,7 @@ implicit none
 
     !---Simulate heatexchanger undercooling scenario
         if(feedback_method == 8) then
-            if( temperature_reduction < flow_reduction_percent*&
+            if( temperature_reduction >  flow_reduction_percent*&
                                         temperature_reduction_intial) then
                     temperature_reduction = temperature_reduction_intial - &
                 flow_reduction_percent*temperature_reduction_intial*(1.0 - exp(time_constant*t0))
