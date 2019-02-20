@@ -63,10 +63,20 @@ implicit none
 
 !---Calc 1/rho*C_p * q'''
     elem_vec_q_temp = 0.0
+
+    temperature_eval = 0.0
+    !---Get temperature over element 
+    do j = 1, nodes_per_elem 
+        !---valuate density based on temperature
+        temperature_eval = temperature_eval + vol_int(j)*temperature_soln_new(n,j)
+    end do
+
+!---Have density be flat over element
+    call density_corr(temperature_eval, density_eval)
+
 !---Loop over all nodes in element
     do j = 1, nodes_per_elem
-        temperature_eval = temperature_soln_prev(n,j)
-        call density_corr(temperature_eval, density_eval) 
+         
         call heat_capacity_corr(temperature_eval, heat_capacity_eval)
         
         q_prime = total_power_initial*power_amplitude_prev*(&
@@ -91,15 +101,15 @@ implicit none
     if( n == 1 ) then
         do i = 1, nodes_per_elem
             Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_new(n,3)*&
-                                temperature_soln_new(num_elem,3) 
+                                temperature_soln_prev(num_elem,3) 
         end do
     end if
     
-    !---All other elements 
+!---All other elements 
     if( n > 1 ) then
         do i = 1, nodes_per_elem
             Wl_times_T_vec(i) = interp_fcn_lhs(i)*velocity_soln_new(n,3)*&
-                                temperature_soln_new(n-1,3)
+                                temperature_soln_prev(n-1,3)
         end do
     end if
 
@@ -137,6 +147,8 @@ implicit none
         end if
     end if
 
+    
+
 !---Fix delta T across heat exchanger
     do j = 1, nodes_per_elem    
         !---Start heat exchanger
@@ -148,8 +160,14 @@ implicit none
         end if
     end do 
 
-    !---Temperature remains constant after the heat exchanger.  I.e. no more lost heat
-    if( n > Heat_Exchanger_End) then
+!---Temperature in intermediary piping
+    if( n > Fuel_Outlet_End .and. n < Heat_Exchanger_Start)  then
+        do j = 1, nodes_per_elem
+            temperature_soln_new(n,j) = temperature_soln_new(Fuel_Outlet_End,j)
+        end do
+    end if
+    !!---Temperature remains constant after the heat exchanger.  I.e. no more lost heat
+        if( n > Heat_Exchanger_End) then
         do j = 1, nodes_per_elem
             temperature_soln_new(n,j) = temperature_soln_new(Heat_Exchanger_End,j) 
         end do

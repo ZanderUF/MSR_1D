@@ -54,14 +54,14 @@ implicit none
     
     if( t0 > 0.0) then
             do j = 1, nodes_per_elem
-                element_ss_density = element_ss_density + vol_int(j)*density_soln_ss(n,j)
+              element_ss_density = element_ss_density + vol_int(j)*density_soln_ss(n,j)
               element_prev_density = element_prev_density + vol_int(j)*density_soln_prev(n,j)
             end do
 
             !---Evaluate feedback based on density change
             if( n > Fuel_Inlet_Start .and. n < Fuel_Outlet_End ) then
                 Density_Reactivity_Feedback(n) = (spatial_expansion_fcn(n,2) / &
-                    (0.01_dp)) * &
+                    (0.02_dp)) * &
                     (element_ss_density/element_prev_density - 1.0_dp)
 
             end if

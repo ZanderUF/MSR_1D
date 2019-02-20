@@ -73,23 +73,26 @@ implicit none
             volume = volume + vol_int(j)*area_variation(i,j)
         end do
     end do
+   
+    temperature_eval = 0.0
+    !---Get temperature over element 
+    do j = 1, nodes_per_elem 
+        !---valuate density based on temperature
+        temperature_eval = temperature_eval + vol_int(j)*temperature_soln_new(n,j)
+    end do
 
-    !q_prime = 2.9402959623723435E+08_dp/2.7853599169898033E+07_dp
+    call density_corr(temperature_eval, density_eval)
+
 !---Loop over all nodes in element
     do j = 1, nodes_per_elem
         
-       temperature_eval = temperature_soln_prev(n,j)
-       
-       call density_corr(temperature_eval, density_eval) 
        call heat_capacity_corr(temperature_eval, heat_capacity_eval)
        length_core = Fuel_Outlet_End - Fuel_Inlet_start
    
-       !q_prime = spatial_power_fcn(n,j)/spatial_area_fcn(n,j)
        q_prime = (total_power_initial*power_amplitude_prev*&
                   spatial_power_frac_fcn(n,j))/spatial_area_fcn(n,j)
        
        elem_vec_q_temp(j) = elem_vec_q(j)*q_prime*(1.0_dp/(density_eval*heat_capacity_eval))
-        
     end do
 !----Evaluate W*T_e-1
     do i = 1, nodes_per_elem
@@ -111,6 +114,7 @@ implicit none
     do i = 1, nodes_per_elem
         rhs_final_vec(i) = elem_vec_q_temp(i) + elem_vec_w_left(i)
     end do
+    
 
 !---Final calculation
     temperature_soln_new(n,:) = matmul(inverse_matrix, rhs_final_vec)
@@ -128,16 +132,29 @@ implicit none
         end do 
     end if
 
-!---Fix delta T across heat exchanger
+    
+    temperature_reduction = 100.0_dp
     do j = 1, nodes_per_elem    
         !---Start heat exchanger
         if ( Heat_Exchanger_Start <= n  .and.  n < Heat_Exchanger_End) then
-            temperature_soln_new(n,j) = (100.0_dp)/&
+            temperature_soln_new(n,j) = (temperature_reduction)/&
             (Heat_Exchanger_End - Heat_Exchanger_Start)* &
-            (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,3) ) - 100.0_dp + &
+            (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,j) ) - temperature_reduction + &
             temperature_soln_new(Heat_Exchanger_Start-1,1)
         end if
     end do 
+
+
+!---Fix delta T across heat exchanger
+    !do j = 1, nodes_per_elem    
+    !    !---Start heat exchanger
+    !    if ( Heat_Exchanger_Start <= n  .and.  n < Heat_Exchanger_End) then
+    !        temperature_soln_new(n,j) = (100.0_dp)/&
+    !        (Heat_Exchanger_End - Heat_Exchanger_Start)* &
+    !        (global_coord(Heat_Exchanger_End-1,3)  - global_coord(n,3) ) - 100.0_dp + &
+    !        temperature_soln_new(Heat_Exchanger_Start-1,1)
+    !    end if
+    !end do 
 
 if( n > Heat_Exchanger_End) then
         do j = 1, nodes_per_elem

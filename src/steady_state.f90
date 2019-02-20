@@ -27,6 +27,7 @@ implicit none
 	real(dp) :: total_precursors_fuel, total_power
 	real(dp), dimension(num_isotopes,num_delay_group) :: precursors_lambda_vec
     real(dp) :: total_density_ss, total_temperature_ss
+    real(dp) :: TransitTime
 
 !---------------------------------------------------------------
 
@@ -70,6 +71,8 @@ implicit none
                 enddo delay_loop!---Over delayed groups
             enddo isotope_loop !---Over isotopes
         enddo elements_loop !---Over nodes
+     
+         
         
         !---This counted the convergence of each delayed group
         difference_counter = 0
@@ -94,7 +97,14 @@ implicit none
         end if
     
     enddo nonlinearloop !---end nonlinear iteration loop
-  
+    
+    TransitTime = 0.0
+        do n = Fuel_Outlet_End, num_elem
+            TransitTime = TransitTime + 1.0_dp/velocity_soln_new(n,2)
+        end do
+
+    print *,' time spent out side of core',TransitTime
+
     !---Write out
     write(outfile_unit, fmt=('(a)') ) ' ' 
     write(outfile_unit, fmt=('(a, 100I4)')) 'Number of steady state nonlinear iterations: '&

@@ -39,7 +39,8 @@ subroutine heat_capacity_corr(T, heat_capacity)
     !b = 1.0634_dp
 
     !heat_capacity = 1.150
-    heat_capacity = 900.0
+    !heat_capacity = 900.0
+    heat_capacity = 0.90
     !heat_capacity = (a + b*T)/1000.0_dp
 
 end subroutine heat_capacity_corr

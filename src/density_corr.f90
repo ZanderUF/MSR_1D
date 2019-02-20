@@ -39,9 +39,8 @@ implicit none
     !b= -0.4571_dp
     
     !--Russian paper 1975
-    a =  3226.8_dp
-    b = -0.7247_dp
-    
+    a =  3860.4_dp
+    b = -0.8321_dp
+   
     density = (a + b*T)*0.001_dp
-    !density = 2.6 
 end
