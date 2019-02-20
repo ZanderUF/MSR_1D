@@ -137,17 +137,24 @@ implicit none
         end do
     end if
 
-!---Simulate heatexchanger overcooling scenario
     if( t0 > 0.0) then
-        
-        if(feedback_method == 4) then
-            if( temperature_reduction < flow_reduction_percent*temperature_reduction_intial) then
-                temperature_reduction = temperature_reduction_intial*exp(time_constant*t0)
+        if(feedback_method == 7) then
+            if( temperature_reduction > flow_reduction_percent*temperature_reduction_intial) then
+                temperature_reduction = temperature_reduction_intial  +&
+                flow_reduction_percent*temperature_reduction_intial*(1.0 - exp(time_constant*t0)) 
+            end if
+        end if
+
+    !---Simulate heatexchanger undercooling scenario
+        if(feedback_method == 8) then
+            if( temperature_reduction < flow_reduction_percent*&
+                                        temperature_reduction_intial) then
+                    temperature_reduction = temperature_reduction_intial - &
+                flow_reduction_percent*temperature_reduction_intial*(1.0 - exp(time_constant*t0))
+                
             end if
         end if
     end if
-
-    
 
 !---Fix delta T across heat exchanger
     do j = 1, nodes_per_elem    

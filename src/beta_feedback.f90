@@ -68,7 +68,7 @@ subroutine beta_feedback
         else 
         !---Increase the mass flow rate
             if(mass_flow < flow_reduction_percent*mass_flow_initial) then
-                mass_flow = mass_flow_initial*exp(time_constant*t0)
+                mass_flow =  mass_flow_initial + (flow_reduction_percent - 1.0)*mass_flow_initial*(1.0 -exp(time_constant*t0) )
             end if
         end if
     end if

@@ -27,7 +27,7 @@ implicit none
 	real(dp) :: total_precursors_fuel, total_power
 	real(dp), dimension(num_isotopes,num_delay_group) :: precursors_lambda_vec
     real(dp) :: total_density_ss, total_temperature_ss
-    real(dp) :: TransitTime
+    real(dp) :: TimeAcrossCore,TransitTime
 
 !---------------------------------------------------------------
 
@@ -72,8 +72,6 @@ implicit none
             enddo isotope_loop !---Over isotopes
         enddo elements_loop !---Over nodes
      
-         
-        
         !---This counted the convergence of each delayed group
         difference_counter = 0
         
@@ -97,13 +95,21 @@ implicit none
         end if
     
     enddo nonlinearloop !---end nonlinear iteration loop
+   
+!---Time across the core
+    TimeAcrossCore = 0.0
+    do n = Fuel_Core_Start, Fuel_Outlet_End
+        TimeAcrossCore = TimeAcrossCore + 1.0/velocity_soln_new(n,2)
+    end do
+    
+    print *,'Time across core ', TimeAcrossCore
     
     TransitTime = 0.0
-        do n = Fuel_Outlet_End, num_elem
-            TransitTime = TransitTime + 1.0_dp/velocity_soln_new(n,2)
-        end do
+    do n = Fuel_Outlet_End, num_elem
+        TransitTime = TransitTime + 1.0_dp/velocity_soln_new(n,2)
+    end do
 
-    print *,' time spent out side of core',TransitTime
+    print *,'Time spent out side of core',TransitTime
 
     !---Write out
     write(outfile_unit, fmt=('(a)') ) ' ' 
@@ -218,8 +224,8 @@ implicit none
     
    !---Write out to make tabulation of beta vs. flow speed easier 
     do f = 1, num_isotopes
-        write(beta_special_unit,fmt='(es12.6,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10)') &
-            mass_flow , (beta_initial_vec(f,g),g=1,num_delay_group),sum(beta_initial_vec)
+        write(beta_special_unit,fmt='(es12.6,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10, f7.2,f7.2)') &
+            mass_flow , (beta_initial_vec(f,g),g=1,num_delay_group),sum(beta_initial_vec),TransitTime, TimeAcrossCore
     end do
 
 !---Set steady state flag off 
