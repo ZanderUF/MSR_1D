@@ -60,6 +60,10 @@ subroutine transient_euler()
                         call numerical_flux_matrices(n,nl_iter)
                         !---If it is a stationary fuel test case do not need temperature 
                         if( mass_flow > 0.0) then
+                                if (feedback_method >=1) then
+                                    call solve_velocity(n,nl_iter)
+                                    call solve_temperature_euler(n,nl_iter)
+                                end if
                                 call solve_velocity(n,nl_iter)
                                 call solve_temperature_euler(n,nl_iter)
                         end if            

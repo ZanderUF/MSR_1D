@@ -56,10 +56,10 @@ implicit none
             
             !---Solve for temperature and velocity if feedback is enabled 
             if( mass_flow > 0.0 ) then
-                !if( feedback_method == 1 ) then 
+                if( feedback_method >= 1 ) then 
                     call solve_temperature_ss(n,nl_iter)
                     call solve_velocity(n,nl_iter)
-                !end if
+                end if
             end if
 
             !---Solve steady state system 
@@ -207,6 +207,10 @@ implicit none
     end do
 
     beta_correction = sum(beta_initial_vec)
+    
+    !if(Read_DIF3D .eqv. .FALSE.) then
+    !    beta_correction = sum(beta_i_mat(1,:))
+    !end if
 
 !---Write out the new beta info
 	write(outfile_unit,fmt='(a)'), ' '	

@@ -85,12 +85,13 @@ subroutine solve_power_euler(nl_iter, current_time)
                     lamda_i_mat(f,g)*precursors_lambda_vec(f,g)
         end do
     end do
-
+    
     !--- Need for benchmarks
     if(Read_DIF3D .eqv. .FALSE. ) then
         if(t0 == 0.0) then
             beta_correction = gen_time*total_precursors_fuel/total_power
         end if
+        !beta_correction = sum(beta_i_mat(1,:))
     end if
     
 !---STEP perturbation
