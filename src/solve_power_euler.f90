@@ -93,7 +93,8 @@ subroutine solve_power_euler(nl_iter, current_time)
         end if
         !beta_correction = sum(beta_i_mat(1,:))
     end if
-    
+    !beta_correction = gen_time*total_precursors_fuel/total_power
+
 !---STEP perturbation
     if(step_flag .eqv. .TRUE.) then
         if(step_start_time < t0 .and. t0 < step_end_time ) then

@@ -13,10 +13,10 @@ subroutine write_periodic
 
 !---Local
 
-    integer :: f,g,n,i,j,power_write_unit
+    integer           :: f,g,n,i,j,power_write_unit
     character(len=24) :: time_soln_name
     character(len=10) :: time_characters
-    real(kind=4) :: temp_time
+    real(kind=4)      :: temp_time
 
 !---Write solution to a file periodically
     if( modulo(t0,save_time_interval) < delta_t) then
@@ -53,14 +53,17 @@ subroutine write_periodic
 	    write(power_outfile_unit, ('(a)')), &
 		'| Time (s)  | Power Amp | Norm Power| &
           Reactivity |    Beta   | Temp Rho  | &
-          Density Rho| Mass flow |Delta T Hex|'
+          Density Rho| Mass flow |Delta T Hex| &
+          Avg. Temp  | Peak Temp |'
 	end if
 	
     write(power_outfile_unit, ('(f12.6 ,es12.5,es12.5, &
                                 f12.6,f12.6,f12.6,&
-                                f12.6,f12.2,f12.2)')), &
+                                f12.6,f12.2,f12.2,&
+                                f12.2,f12.2)')), &
 	  t0, power_amplitude_new, power_amplitude_new/power_amplitude_start,&
       reactivity, beta_correction,total_temperature_feedback,&
-      total_density_feedback, mass_flow,temperature_reduction
+      total_density_feedback, mass_flow,temperature_reduction,&
+      average_temperature, peak_temperature
 
 end subroutine write_periodic

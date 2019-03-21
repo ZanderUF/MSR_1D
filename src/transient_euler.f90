@@ -27,7 +27,8 @@ subroutine transient_euler()
     real(dp) :: t1
     integer  :: difference_counter
     real(dp) :: sum_residual
-   
+    real(dp) :: node_temperature, total_temperature
+
 !---Start time-dependent solve
     if ( time_solve .eqv. .TRUE. ) then
         
@@ -156,6 +157,27 @@ subroutine transient_euler()
                 velocity_soln_prev        = velocity_soln_new
                 density_soln_prev         = density_soln_new
             end if
+            
+            total_temperature = 0.0_dp
+            peak_temperature  = 0.0_dp
+
+            !---Calculate average temperature across core
+            do i = Fuel_Inlet_Start, Fuel_Outlet_End
+                node_temperature = 0.0_dp 
+                !---Get value over node
+                do j = 1, nodes_per_elem
+                    node_temperature = node_temperature + temperature_soln_prev(i,j)*vol_int(j)
+                end do
+                total_temperature = total_temperature + node_temperature
+                !---Find peak
+                if (peak_temperature < node_temperature) then
+                    peak_temperature = node_temperature
+                end if
+            end do
+
+            average_temperature = total_temperature/(Fuel_Outlet_End - Fuel_Inlet_Start)
+            
+            !---Find peak temperature across core
 
             !---Write power, amplitude, reacitivty to file
             call write_periodic

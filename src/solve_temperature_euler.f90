@@ -140,7 +140,7 @@ implicit none
     if( t0 > 0.0) then
         if(feedback_method == 7) then
             if( temperature_reduction > flow_reduction_percent*temperature_reduction_intial) then
-                temperature_reduction = temperature_reduction_intial  +&
+                temperature_reduction = temperature_reduction_intial  + &
                 flow_reduction_percent*temperature_reduction_intial*(1.0 - exp(time_constant*t0)) 
             end if
         end if

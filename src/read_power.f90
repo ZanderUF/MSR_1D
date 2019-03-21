@@ -47,7 +47,7 @@ subroutine read_power
     read(power_file_unit, *), total_temperature_change ! total delta T for perturbation
     read(power_file_unit, *), total_expansion_read_in ! Spatially integrated expansion
     read(power_file_unit, *), total_density_change ! Percent change
-    read(power_file_unit,*), title_line
+    read(power_file_unit,*),  title_line
 
 
     allocate(dif3d_volume_input(number_entries))
