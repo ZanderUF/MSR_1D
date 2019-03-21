@@ -35,7 +35,7 @@ subroutine solve_power_euler(nl_iter, current_time)
                rho_initial, step_time
     real(dp) :: first_zag, second_zag, third_zag, reactivity_zag
     real(dp) :: total_power
-    real(dp) :: average_temperature, total_temperature
+    real(dp) :: total_temperature
     real(dp) :: total_density,average_density
 
 !---Initialize to zero
@@ -175,7 +175,7 @@ subroutine solve_power_euler(nl_iter, current_time)
         !                                     vol_int(j)*Temperature_Reactivity_Feedback(i,j)
         !    end do
         !end do
-        !total_density_feedback = sum(Density_Reactivity_Feedback)
+        total_density_feedback = sum(Density_Reactivity_Feedback)
     
     !---Calculate reactivity change based on average
     total_temperature_feedback = (total_doppler_read_in/total_temperature_change)*&
