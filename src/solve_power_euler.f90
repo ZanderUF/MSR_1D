@@ -175,17 +175,19 @@ subroutine solve_power_euler(nl_iter, current_time)
         !                                     vol_int(j)*Temperature_Reactivity_Feedback(i,j)
         !    end do
         !end do
-        total_density_feedback = sum(Density_Reactivity_Feedback)
+        !total_density_feedback = sum(Density_Reactivity_Feedback)
     
     !---Calculate reactivity change based on average
     total_temperature_feedback = (total_doppler_read_in/total_temperature_change)*&
                                  (average_temperature - average_temperature_ss)
-    total_density_feedback = (total_expansion_read_in/(total_density_change*2.5935_dp))*&
+    total_density_feedback = (total_expansion_read_in/(total_density_change*3.112_dp))*&
                              (average_density_ss - average_density)                          
+
+    !total_density_feedback = (total_expansion_read_in/(total_density_change*2.5935_dp))*&
+    !                         (average_density_ss - average_density)                          
 
     end if
    
-
     reactivity_feedback = 0.0_dp 
     reactivity_feedback = total_temperature_feedback + total_density_feedback
     !reactivity_feedback = 0.0_dp 

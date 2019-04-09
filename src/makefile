@@ -11,7 +11,7 @@ F90 = gfortran
 
 FFLAGS = -g -fbounds-check 
 LIBDIR = ../lapack-3.8.0/ 
-LIB    = -llapack -lblas
+LIB    = -llapack -lrefblas
 
 EXE = msr1d
 ################################
