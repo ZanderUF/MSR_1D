@@ -23,7 +23,7 @@
 subroutine density_corr(T, density)
 
     USE global_parameters_M
-
+    USE Flags_M
 implicit none
 
 ! Dummy
@@ -43,4 +43,11 @@ implicit none
     b = -0.8321_dp
    
     density = (a + b*T)*0.001_dp
+
+    if ( MSRE_problem .eqv. .TRUE.) then
+
+        density = 2.306
+
+    end if
+
 end

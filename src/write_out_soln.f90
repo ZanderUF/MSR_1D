@@ -38,7 +38,7 @@ subroutine write_out_soln(file_unit,range_elem,transient_save)
 
 !---If writing to a new file for a given time step
     if(transient_save .eqv. .TRUE.) then 
-        if(mass_flow > 0.0 ) then
+        if(mass_flow >= 0.0 ) then
             !file_unit = 15
             time_precursor_name   = 'precursor_soln_at_time_step_'      
             time_temperature_name = 'temperature_soln_at_time_step_'

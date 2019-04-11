@@ -26,4 +26,5 @@ implicit none
     
     logical :: temperature_converged = .FALSE.
 
+    logical :: MSRE_problem = .FALSE.
 end module flags_M

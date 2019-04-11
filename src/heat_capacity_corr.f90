@@ -24,6 +24,7 @@
 subroutine heat_capacity_corr(T, heat_capacity)
 
     USE global_parameters_M
+    USE flags_M
 
     implicit none
 
@@ -41,6 +42,13 @@ subroutine heat_capacity_corr(T, heat_capacity)
     !heat_capacity = 1.150
     !heat_capacity = 900.0
     heat_capacity = 0.90
+    
+    if(MSRE_problem .eqv. .TRUE.) then
+
+        heat_capacity = 1.74
+
+    end if
+
     !heat_capacity = (a + b*T)/1000.0_dp
 
 end subroutine heat_capacity_corr

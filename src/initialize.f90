@@ -47,7 +47,11 @@ implicit none
     !---Initial guesses 
     inlet_temperature  = 850.0_dp
     outlet_temperature = 950.0_dp
-    
+    if(MSRE_problem .eqv. .TRUE.) then
+        inlet_temperature  = 908.0_dp
+        outlet_temperature = 935.78_dp
+    print *,' made it'
+    end if 
     !---Test if reading power profile from file or not
 
     if(Read_DIF3D .eqv. .TRUE.) then

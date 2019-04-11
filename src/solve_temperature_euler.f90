@@ -52,6 +52,12 @@ implicit none
         temperature_reduction        = 100.0_dp
     end if
 
+    if(MSRE_problem .eqv. .TRUE.) then
+        
+        temperature_reduction = 27.78
+
+    end if
+
     temperature_reduction_intial = 100.0_dp 
 
 !---Temperature SOLVE

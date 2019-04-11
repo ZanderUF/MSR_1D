@@ -21,7 +21,7 @@
 !-----------------------------------------------
       integer :: i0, i2, i3, i4, iret
       character(4) :: dum,duma,read_debug,& 
-        read_pow_file,read_dif3d_inp
+        read_msre_inp, read_pow_file,read_dif3d_inp
       character(8) :: pn
       
       write(outfile_unit,fmt='(a)'), 'Reading parms'
@@ -68,7 +68,14 @@
          !---Number of materials
          case('material')
              num_isotopes = iread(i0,iret)
-                 
+         case('msreprob')
+             read_msre_inp = aread(i4,iret)
+             if(read_msre_inp == 'no ') then
+                MSRE_problem = .FALSE.
+             end if
+             if(read_msre_inp == 'yes ') then
+                MSRE_problem = .TRUE.
+             end if        
         end select
 
       end do
