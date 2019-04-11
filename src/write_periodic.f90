@@ -29,7 +29,7 @@ subroutine write_periodic
     do i=1,NumTimeSteps
 
         write(power_outfile_unit, ('(f12.6 ,es12.5,es12.5, &
-                                     f12.6,f12.6,f12.6,&
+                                     f12.6,f12.6,f12.2,&
                                      f12.6,f12.2,f12.2,&
                                      f12.2,I4)')), &
             TimeAll(i),&

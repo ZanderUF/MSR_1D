@@ -9,7 +9,10 @@ F90 = gfortran
 
 #FFLAGS = -g -fbounds-check 
 
-FFLAGS = -g -fbounds-check 
+# Profiling
+#FFLAGS = -g -pg -fbounds-check
+
+FFLAGS = -g -O3 -fbounds-check 
 LIBDIR = ../lapack-3.8.0/ 
 LIB    = -llapack -lrefblas
 

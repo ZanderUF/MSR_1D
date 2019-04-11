@@ -31,8 +31,8 @@ subroutine transient_euler()
     integer  :: TimeIndex
 
 
-    open (unit=outfile_unit, file=outfile_name,status='unknown',&
-          form='formatted',position='asis')
+    !open (unit=outfile_unit, file=outfile_name,status='unknown',&
+    !      form='formatted',position='asis')
 
 !---Start time-dependent solve
     if ( time_solve .eqv. .TRUE. ) then
@@ -167,6 +167,11 @@ subroutine transient_euler()
 
             average_temperature = total_temperature/(Fuel_Outlet_End - Fuel_Inlet_Start)
             
+            !---Stop once we have reached end of desired simulation time.
+            if ( tmax <= t0 ) then
+                exit
+            end if
+          
             !---Write final values to large time arrays
             TimeAll(TimeIndex)              = t0 
             PowerAllTime(TimeIndex)         = power_amplitude_new  
@@ -177,13 +182,7 @@ subroutine transient_euler()
             TempHeatExchangerAll(TimeIndex) = temperature_reduction 
             AvgTempAll(TimeIndex)           = average_temperature 
             PeakTempAll(TimeIndex)          = peak_temperature
-            NonLinearIterAll(TimeIndex)     = nl_iter  
-            
-            !---Stop once we have reached end of desired simulation time.
-            if ( tmax <= t0 ) then
-                exit
-            end if
-          
+            NonLinearIterAll(TimeIndex)     = nl_iter 
            !---Increment the time step
            t1 = t0 + delta_t
            !---Reset starting time point
