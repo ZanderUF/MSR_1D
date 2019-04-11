@@ -28,13 +28,20 @@ subroutine transient_euler()
     integer  :: difference_counter
     real(dp) :: sum_residual
     real(dp) :: node_temperature, total_temperature
+    integer  :: TimeIndex
+
+
+    open (unit=outfile_unit, file=outfile_name,status='unknown',&
+          form='formatted',position='asis')
 
 !---Start time-dependent solve
     if ( time_solve .eqv. .TRUE. ) then
         
         write(outfile_unit, fmt='(a)'), ' ' 
-        write(outfile_unit, fmt='(a)'), 'In backward Euler transient loop'
-        
+        write(outfile_unit, fmt='(a)'), 'In transient loop'
+        !---
+        TimeIndex = 1
+
         timeloop: do!---Time loop 
            
             !---Reset convergence criteria counters
@@ -47,7 +54,7 @@ subroutine transient_euler()
             call beta_feedback 
            
             !---Decide if we are doing backward or forward euler
-            nl_iter_flag = .TRUE. 
+            nl_iter_flag      = .TRUE. 
             residual(:,:,:,:) = 0.0
 
             !---Nonlinear iteration for implicit time stepping schemes 
@@ -79,6 +86,7 @@ subroutine transient_euler()
                             enddo delay_loop 
                         enddo isotope_loop 
                     enddo elements_loop 
+                
                 !---Solve for total power after spatial sweep through precursors
                 call solve_power_euler(nl_iter,t0) 
                 
@@ -111,33 +119,15 @@ subroutine transient_euler()
                 density_soln_prev         = density_soln_new
 
             enddo nonlinearloop 
-            
+ 
             !---Reset convergence flag for temperature for next time step
             temperature_converged = .FALSE.
 
-            !***************************************************
-            !---Only automate time stepping for implicit calculations
-            if(td_method_type == 1) then
-                sum_residual = 0.0
-                do f = 1, num_isotopes 
-                    do g = 1, num_delay_group
-                        l2_residual(f,g) = sqrt( sum(residual(f,g,:,:)*&
-                                                     residual(f,g,:,:)))
-                        do i = 1, num_elem
-                           do j = 1, nodes_per_elem
-                                !sum_residual(f,g,i) = sum_residual(f,g,i) + & 
-                                !               residual(f,g,i,j)*vol_int(j)
-                           end do
-                        end do
-                    
-                    end do
-                end do
-            end if
-            
+            !---Write information about nonlinear iterations and residual 
             if(DEBUG .eqv. .TRUE.) then
-                !write(nl_outfile_unit, fmt='(es16.6 ,1I6,16es16.6,16es16.6,&
-                !                                16es16.6,16es16.6,16es16.6,16es16.6)'),&
-                !                                t0,nl_iter, (l2_residual(1,g), g=1,num_delay_group)
+                write(nl_outfile_unit, fmt='(es16.6 ,1I6,16es16.6,16es16.6,&
+                                             16es16.6,16es16.6,16es16.6,16es16.6)'),&
+                                             t0,nl_iter, (l2_residual(1,g), g=1,num_delay_group)
             end if
 
             transient_save_flag = .TRUE.
@@ -177,11 +167,18 @@ subroutine transient_euler()
 
             average_temperature = total_temperature/(Fuel_Outlet_End - Fuel_Inlet_Start)
             
-            !---Find peak temperature across core
-
-            !---Write power, amplitude, reacitivty to file
-            call write_periodic
-
+            !---Write final values to large time arrays
+            TimeAll(TimeIndex)              = t0 
+            PowerAllTime(TimeIndex)         = power_amplitude_new  
+            RhoInsertedAll(TimeIndex)       = reactivity
+            DopplerFeedbackAll(TimeIndex)   = total_temperature_feedback
+            DensityFeedbackAll(TimeIndex)   = total_density_feedback 
+            MassFlowAll(TimeIndex)          = mass_flow
+            TempHeatExchangerAll(TimeIndex) = temperature_reduction 
+            AvgTempAll(TimeIndex)           = average_temperature 
+            PeakTempAll(TimeIndex)          = peak_temperature
+            NonLinearIterAll(TimeIndex)     = nl_iter  
+            
             !---Stop once we have reached end of desired simulation time.
             if ( tmax <= t0 ) then
                 exit
@@ -191,9 +188,36 @@ subroutine transient_euler()
            t1 = t0 + delta_t
            !---Reset starting time point
            t0 = t1
-
+           
+           !---Index for keeping track of time steps
+           TimeIndex = TimeIndex + 1
+       
        enddo timeloop
 
+       !---Write power, amplitude, reacitivty to file
+       call write_periodic
+            
     end if !---End transient if
+
+!***************************************************
+! Currently not functioning 4/11/2019
+!---Only automate time stepping for implicit calculations
+if(td_method_type == 1) then
+    sum_residual = 0.0
+    do f = 1, num_isotopes 
+        do g = 1, num_delay_group
+            l2_residual(f,g) = sqrt( sum(residual(f,g,:,:)*&
+                                         residual(f,g,:,:)))
+            do i = 1, num_elem
+               do j = 1, nodes_per_elem
+                    !sum_residual(f,g,i) = sum_residual(f,g,i) + & 
+                    !               residual(f,g,i,j)*vol_int(j)
+               end do
+            end do
+        
+        end do
+    end do
+end if
+
 
 end subroutine transient_euler

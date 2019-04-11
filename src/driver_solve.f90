@@ -19,17 +19,10 @@ implicit none
 !---Local
     integer  ::  i,j, n  
     character(len=80) :: current_path
-    character(len=20) :: outfile_name
-    character(len=21) :: steady_state_soln_file_name
-    character(len=20) :: last_time_file_name
-    character(len=20) :: power_soln_file_name
-    character(len=7)  :: input_file
-    character(len=20) :: beta_special_name
-    character(len=18) :: nl_out_name
-
+    
     real(dp) :: start, finish
 
-!---Name the files that are written out
+    !!---Name the files that are written out
     outfile_name                = 'outfile.txt'
     !steady_state_soln_file_name = 'ss_precursor_soln.txt'
     last_time_file_name         = 'last_t_soln.txt'
@@ -40,13 +33,13 @@ implicit none
 
 !---Open file for writing out debug information
     open (unit=outfile_unit, file=outfile_name,status='unknown',&
-    	  form='formatted',position='asis')
+          form='formatted',position='asis')
     open (unit=power_outfile_unit, file=power_soln_file_name,&
-    	  status='unknown',form='formatted',position='asis')
+          status='unknown',form='formatted',position='asis')
     open (unit=beta_special_unit, file=beta_special_name,&
-    	  status='unknown',form='formatted',position='asis')
+          status='unknown',form='formatted',position='asis')
     open (unit=nl_outfile_unit, file=nl_out_name,&
-    	  status='unknown',form='formatted',position='asis')
+          status='unknown',form='formatted',position='asis')
 
     !---File that keeps track of number of nonlinear iterations for each variable of interest
     write(nl_outfile_unit,fmt=('(a)'))'   Iteration |  || T^k - T^k-1 || || C1^k - C1^k-1 ||&

@@ -40,7 +40,7 @@ subroutine solve_power_euler(nl_iter, current_time)
 
 !---Initialize to zero
     precursors_lambda_vec(:,:) = 0.0_dp
-    precursors_elem(:) = 0.0_dp
+    precursors_elem(:)         = 0.0_dp
 
 !---Calculate precursors in the fuel region per isotope and group
     do f = 1, num_isotopes

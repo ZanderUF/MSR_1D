@@ -240,5 +240,7 @@ implicit none
     write(outfile_unit, '(a)'), '*******************************'
     write(outfile_unit, '(a)'), 'End of Steady state solve'
     write(outfile_unit, '(a)'), '*******************************'
+    
+    close(outfile_unit)
 
 end subroutine steady_state

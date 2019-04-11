@@ -14,7 +14,21 @@ implicit none
 
 !---Dummy
 
-!---Local
+!---Calculate total number oftime steps in the problem
+    NumTimeSteps = tmax*(1.0_dp/delta_t)
+!---Allocate arrays that contain all time information
+    allocate(TimeAll(NumTimeSteps),&
+             PowerAllTime(NumTimeSteps),&
+             RhoInsertedAll(NumTimeSteps),&
+             DopplerFeedbackAll(NumTimeSteps),&
+             DensityFeedbackAll(NumTimeSteps),&
+             MassFlowAll(NumTimeSteps),&
+             TempHeatExchangerAll(NumTimeSteps),&
+             AvgTempAll(NumTimeSteps),& 
+             PeakTempAll(NumTimeSteps),&
+             NonLinearIterAll(NumTimeSteps)&
+             )
+         
 
 !---Allocate solution vector and global matrices
     allocate(precursor_soln_new(num_isotopes,num_delay_group,num_elem,nodes_per_elem),  &

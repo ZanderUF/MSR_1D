@@ -6,6 +6,17 @@ module solution_vectors_M
 
 !---real(dp)tion matrices - global
 
+    real(dp) , allocatable :: TimeAll(:)
+    real(dp) , allocatable :: PowerAllTime(:)
+    real(dp) , allocatable :: RhoInsertedAll(:)
+    real(dp) , allocatable :: DopplerFeedbackAll(:)
+    real(dp) , allocatable :: DensityFeedbackAll(:)
+    real(dp) , allocatable :: MassFlowAll(:)
+    real(dp) , allocatable :: TempHeatExchangerAll(:)
+    real(dp) , allocatable :: AvgTempAll(:)
+    real(dp) , allocatable :: PeakTempAll(:)
+    real(dp) , allocatable :: NonLinearIterAll(:)
+
     real(dp) , allocatable :: precursor_soln_last_time(:,:,:,:)
     real(dp) , allocatable :: power_soln_last_time(:,:)
 

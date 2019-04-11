@@ -11,7 +11,16 @@ module global_parameters_M
 
 !---File names
     character(60) :: file_name
+    character(len=20) :: outfile_name
+    character(len=21) :: steady_state_soln_file_name
+    character(len=20) :: last_time_file_name
+    character(len=20) :: power_soln_file_name
+    character(len=7)  :: input_file
+    character(len=20) :: beta_special_name
+    character(len=18) :: nl_out_name
 
+    
+    
 !---File units    
     integer :: outfile_unit = 15 
     integer :: soln_outfile_unit = 99
@@ -25,6 +34,9 @@ module global_parameters_M
     integer :: max_iter = 1 ! max num of nonlinear iterations to do
     integer :: max_nl_iter  ! numer of nonllinear iterations to do
     real(dp) :: tolerance = 0.001 ! prescribed tolerance
+!---
+    integer :: NumTimeSteps
+
 
 !---Math constants    
     real(dp) :: pi
