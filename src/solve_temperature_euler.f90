@@ -54,7 +54,7 @@ implicit none
 
     if(MSRE_problem .eqv. .TRUE.) then
         
-        temperature_reduction = 27.78
+        temperature_reduction = 27.78_dp
 
     end if
 
@@ -145,22 +145,27 @@ implicit none
 
     if( t0 > 0.0) then
         if(feedback_method == 7) then
-            if( temperature_reduction > flow_reduction_percent*temperature_reduction_intial) then
-                temperature_reduction = temperature_reduction_intial  + &
-                flow_reduction_percent*temperature_reduction_intial*(1.0 - exp(time_constant*t0)) 
-            end if
+            ! Heat exchanger overcooling scenario
+            temperature_reduction = temperature_reduction_intial + &
+                                    flow_reduction_percent*temperature_reduction_intial*&
+                                    (1.0 - exp(time_constant*t0)) 
+            !if( temperature_reduction > flow_reduction_percent*temperature_reduction_intial) then
+            !    temperature_reduction = temperature_reduction_intial  + &
+            !    flow_reduction_percent*temperature_reduction_intial*(1.0 - exp(time_constant*t0)) 
+            !end if
         end if
 
     !---Simulate heatexchanger undercooling scenario
         if(feedback_method == 8) then
-            if( temperature_reduction >  flow_reduction_percent*&
-                                        temperature_reduction_intial) then
-                temperature_reduction = temperature_reduction_intial*exp(time_constant*t0)
-                ! ORIGINAL
-            !        temperature_reduction = temperature_reduction_intial - &
-            !    flow_reduction_percent*temperature_reduction_intial*(1.0 - exp(time_constant*t0))
-                
-            end if
+            temperature_reduction = temperature_reduction_intial - &
+                                    flow_reduction_percent*temperature_reduction_intial*&
+                                    (1.0 - exp(time_constant*t0)) 
+            
+            !if( temperature_reduction >  flow_reduction_percent*&
+            !                            temperature_reduction_intial) then
+            !    temperature_reduction = temperature_reduction_intial*exp(time_constant*t0)
+            !    
+            !end if
         end if
     end if
 

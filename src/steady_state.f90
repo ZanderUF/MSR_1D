@@ -101,7 +101,7 @@ implicit none
     do n = Fuel_Core_Start, Fuel_Outlet_End
         TimeAcrossCore = TimeAcrossCore + 1.0/velocity_soln_new(n,2)
     end do
-    
+   
     print *,'Time across core ', TimeAcrossCore
     
     TransitTime = 0.0

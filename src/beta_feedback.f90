@@ -17,6 +17,28 @@ subroutine beta_feedback
     
     event_start_time = delta_t 
 
+!---Exponential reduction or increase in mass flow rate over time.
+
+    if(feedback_method == 3) then 
+        !---Slow down the mass flow rate
+            mass_flow = mass_flow_initial - flow_reduction_percent*mass_flow_initial*(1-exp(time_constant*t0))
+
+            !---Original
+            !if(mass_flow > flow_reduction_percent*mass_flow_initial) then
+            !    mass_flow = mass_flow_initial*exp(time_constant*t0)
+            !end if
+     end if
+
+     if(feedback_method == 4) then
+            !---Increase the mass flow rate
+            mass_flow = mass_flow_initial + flow_reduction_percent*mass_flow_initial*(1-exp(time_constant*t0)) 
+            
+            !if(mass_flow < flow_reduction_percent*mass_flow_initial) then
+            !    mass_flow =  mass_flow_initial + &
+            ! (flow_reduction_percent - 1.0)*mass_flow_initial*(1.0 -exp(time_constant*t0) )
+            !end if
+    end if
+
    !---Evaluate if
     if(feedback_method == 2 ) then
         !---Logic for evaluating beta over time
@@ -59,19 +81,5 @@ subroutine beta_feedback
         end if 
     end if
 
-    if(feedback_method == 3) then 
-        !---Slow down the mass flow rate
-        if(flow_reduction_percent < 1.0) then
-            
-            !if(mass_flow > flow_reduction_percent*mass_flow_initial) then
-            !    mass_flow = mass_flow_initial*exp(time_constant*t0)
-            !end if
-        else 
-        !---Increase the mass flow rate
-            if(mass_flow < flow_reduction_percent*mass_flow_initial) then
-                mass_flow =  mass_flow_initial + (flow_reduction_percent - 1.0)*mass_flow_initial*(1.0 -exp(time_constant*t0) )
-            end if
-        end if
-    end if
-
+    
 end subroutine beta_feedback
