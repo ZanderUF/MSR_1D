@@ -183,6 +183,14 @@ subroutine transient_euler()
             AvgTempAll(TimeIndex)           = average_temperature 
             PeakTempAll(TimeIndex)          = peak_temperature
             NonLinearIterAll(TimeIndex)     = nl_iter 
+          
+           ! write out solution vectors 
+           if( modulo(t0,save_time_interval) < delta_t) then
+                call write_out_soln(12, num_elem, transient_save_flag )
+                
+                transient_save_flag = .FALSE.
+            end if
+
            !---Increment the time step
            t1 = t0 + delta_t
            !---Reset starting time point
