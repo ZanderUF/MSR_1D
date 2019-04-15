@@ -48,10 +48,10 @@ subroutine write_periodic
     close(power_outfile_unit)
 
 !---Write solution to a file periodically
-    !if( modulo(t0,save_time_interval) < delta_t) then
-    !    call write_out_soln(12, num_elem, transient_save_flag )
+    if( modulo(t0,save_time_interval) < delta_t) then
+        call write_out_soln(12, num_elem, transient_save_flag )
     !    
-    !    transient_save_flag = .FALSE.
+        transient_save_flag = .FALSE.
     !    !---Write out power solution 
     !    power_write_unit = 17
     !    temp_time = t0 
@@ -75,7 +75,7 @@ subroutine write_periodic
 
     !    close(power_write_unit)
 
-    !end if !---End write out solution
+    end if !---End write out solution
     
 
 end subroutine write_periodic
