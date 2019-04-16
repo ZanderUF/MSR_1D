@@ -201,7 +201,7 @@ subroutine solve_power_euler(nl_iter, current_time)
                           + delta_t*(1.0_dp/total_spatial_fcn)*&
                           total_precursors_fuel
     end if
-
+   
     if(td_method_type == 1) then ! Backward Euler
         power_amplitude_new = power_amplitude_last_time + &
                           delta_t*(( reactivity + reactivity_feedback  &

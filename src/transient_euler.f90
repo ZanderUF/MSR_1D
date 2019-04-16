@@ -166,12 +166,8 @@ subroutine transient_euler()
             end do
 
             average_temperature = total_temperature/(Fuel_Outlet_End - Fuel_Inlet_Start)
-            
-            !---Stop once we have reached end of desired simulation time.
-            if ( tmax <= t0 ) then
-                exit
-            end if
-          
+           
+                      
             !---Write final values to large time arrays
             TimeAll(TimeIndex)              = t0 
             PowerAllTime(TimeIndex)         = power_amplitude_new  
@@ -191,6 +187,10 @@ subroutine transient_euler()
                 transient_save_flag = .FALSE.
             end if
 
+            !---Stop once we have reached end of desired simulation time.
+            if ( TimeIndex == NumTimeSteps ) then
+                exit
+            end if
            !---Increment the time step
            t1 = t0 + delta_t
            !---Reset starting time point

@@ -15,7 +15,7 @@ implicit none
 !---Dummy
 
 !---Calculate total number oftime steps in the problem
-    NumTimeSteps = tmax*(1.0_dp/delta_t)
+    NumTimeSteps = tmax*(1.0_dp/delta_t) 
 !---Allocate arrays that contain all time information
     allocate(TimeAll(NumTimeSteps),&
              PowerAllTime(NumTimeSteps),&
