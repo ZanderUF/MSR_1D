@@ -1,5 +1,5 @@
 # MSR1D
-Modified point kinetics solver for MSR reactor transient calculations. Uses a 1D discontinous Galerkin approach for discretizing the temperature and fluid dyanmics equations.  
+Modified point kinetics solver for MSR reactor transient calculations. Uses a 1D discontinous Galerkin approach for discretizing the temperature and fluid flow equations.  
 
 ## Building
 Requires LAPACK to be built.  See [lapack-3.8.0](lapack-3.8.0) for details on how to build
