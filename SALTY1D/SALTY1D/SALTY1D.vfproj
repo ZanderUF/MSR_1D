@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{FF0CD357-2CA9-474E-8D6F-00B7770DADF4}">
+	<Platforms>
+		<Platform Name="Win32"/>
+		<Platform Name="x64"/></Platforms>
+	<Configurations>
+		<Configuration Name="Debug|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Debug|x64">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" AdditionalLibraryDirectories="$(TargetName)\lib" GenerateDebugInformation="true" SubSystem="subSystemConsole" AdditionalDependencies="..\..\lib\LAPACK.lib ..\..\lib\BLAS.lib"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|x64">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd;h;inc"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<Filter Name="fson">
+		<File RelativePath="..\..\src\fson\fson.f90"/>
+		<File RelativePath="..\..\src\fson\fson_path_m.f90"/>
+		<File RelativePath="..\..\src\fson\fson_string_m.f90"/>
+		<File RelativePath="..\..\src\fson\fson_value_m.f90"/></Filter>
+		<Filter Name="readInput">
+		<File RelativePath=".\ReadParms.f90"/></Filter>
+		<File RelativePath="..\..\src\allocate_arrays.f90"/>
+		<File RelativePath="..\..\src\assemble_matrix_ss.f90"/>
+		<File RelativePath="..\..\src\assemble_matrix_transient.f90"/>
+		<File RelativePath="..\..\src\beta_feedback.f90"/>
+		<File RelativePath="..\..\src\common_unit.f90"/>
+		<File RelativePath="..\..\src\cond_corr.f90"/>
+		<File RelativePath="..\..\src\datainput_fe_M.f90"/>
+		<File RelativePath="..\..\src\deallocate_arrays.f90"/>
+		<File RelativePath="..\..\src\density_corr.f90"/>
+		<File RelativePath="..\..\src\density_corr_msfr.f90"/>
+		<File RelativePath="..\..\src\driver_solve.f90"/>
+		<File RelativePath="..\..\src\element_matrices_M.f90"/>
+		<File RelativePath="..\..\src\error_functions.f90"/>
+		<File RelativePath="..\..\src\evaluate_beta.f90"/>
+		<File RelativePath="..\..\src\flags_M.f90"/>
+		<File RelativePath="..\..\src\free_form_C.f90"/>
+		<File RelativePath="..\..\src\gauss_integration_M.f90"/>
+		<File RelativePath="..\..\src\global_parameters_M.f90"/>
+		<File RelativePath="..\..\src\heat_capacity_corr.f90"/>
+		<File RelativePath="..\..\src\initialize.f90"/>
+		<File RelativePath="..\..\src\inter_shape_fcns.f90"/>
+		<File RelativePath="..\..\src\l2_norm.f90"/>
+		<File RelativePath="..\..\src\main_driver.f90"/>
+		<File RelativePath="..\..\src\material_info_M.f90"/>
+		<File RelativePath="..\..\src\mesh_creation.f90"/>
+		<File RelativePath="..\..\src\mesh_info_M.f90"/>
+		<File RelativePath="..\..\src\numerical_flux_matrices.f90"/>
+		<File RelativePath="..\..\src\parameters_fe_M.f90"/>
+		<File RelativePath="..\..\src\reactivity_feedback.f90"/>
+		<File RelativePath="..\..\src\read_beta_flow.f90"/>
+		<File RelativePath="..\..\src\read_delay_M.f90"/>
+		<File RelativePath="..\..\src\read_mesh_M.f90"/>
+		<File RelativePath="..\..\src\read_parm_M.f90"/>
+		<File RelativePath="..\..\src\read_perturbation_M.f90"/>
+		<File RelativePath="..\..\src\read_power.f90"/>
+		<File RelativePath="..\..\src\read_time_M.f90"/>
+		<File RelativePath="..\..\src\solution_vectors_M.f90"/>
+		<File RelativePath="..\..\src\solve_power_backward_euler.f90"/>
+		<File RelativePath="..\..\src\solve_power_euler.f90"/>
+		<File RelativePath="..\..\src\solve_precursor_backward_euler.f90"/>
+		<File RelativePath="..\..\src\solve_precursor_euler.f90"/>
+		<File RelativePath="..\..\src\solve_precursor_ss.f90"/>
+		<File RelativePath="..\..\src\solve_temperature_euler.f90"/>
+		<File RelativePath="..\..\src\solve_temperature_ss.f90"/>
+		<File RelativePath="..\..\src\solve_velocity.f90"/>
+		<File RelativePath="..\..\src\spatial_matrices.f90"/>
+		<File RelativePath="..\..\src\steady_state.f90"/>
+		<File RelativePath="..\..\src\time_info_M.f90"/>
+		<File RelativePath="..\..\src\transient_euler.f90"/>
+		<File RelativePath="..\..\src\vast_kind_param.f90"/>
+		<File RelativePath="..\..\src\write_input_parms.f90"/>
+		<File RelativePath="..\..\src\write_matrix.f90"/>
+		<File RelativePath="..\..\src\write_out_soln.f90"/>
+		<File RelativePath="..\..\src\write_out_ss_soln.f90"/>
+		<File RelativePath="..\..\src\write_periodic.f90"/>
+		<File RelativePath="..\..\src\y0trns_M.f90"/></Filter></Files>
+	<Globals/></VisualStudioProject>
