@@ -53,7 +53,10 @@
 		<File RelativePath="..\..\src\fson\fson_path_m.f90"/>
 		<File RelativePath="..\..\src\fson\fson_string_m.f90"/>
 		<File RelativePath="..\..\src\fson\fson_value_m.f90"/></Filter>
-		<Filter Name="readInput">
+		<Filter Name="DelayData">
+		<File RelativePath=".\Mod_DelayPrecursorData.f90"/>
+		<File RelativePath=".\Mod_GlobalConstants.f90"/></Filter>
+		<Filter Name="ReadInput">
 		<File RelativePath=".\ReadParms.f90"/></Filter>
 		<File RelativePath="..\..\src\allocate_arrays.f90"/>
 		<File RelativePath="..\..\src\assemble_matrix_ss.f90"/>
