@@ -57,7 +57,7 @@
 		<File RelativePath=".\Mod_DelayPrecursorData.f90"/>
 		<File RelativePath=".\Mod_GlobalConstants.f90"/></Filter>
 		<Filter Name="ReadInput">
-		<File RelativePath=".\ReadParms.f90"/></Filter>
+		<File RelativePath=".\ReadData.f90"/></Filter>
 		<File RelativePath="..\..\src\allocate_arrays.f90"/>
 		<File RelativePath="..\..\src\assemble_matrix_ss.f90"/>
 		<File RelativePath="..\..\src\assemble_matrix_transient.f90"/>

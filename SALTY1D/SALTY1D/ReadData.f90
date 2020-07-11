@@ -2,7 +2,7 @@
 !> @details
 !!
 !--------------------------------------------------------------------------
-module Mod_readParms
+module Mod_ReadData
     
     use fson
     use fson_value_m
@@ -52,12 +52,9 @@ module Mod_readParms
         
     end subroutine readParms
     !--------------------------------------------------------------------------
-    !> @details
+    !> @details Reads delayed neutron precursor data
     !!
-    !> @param[in]
-    !> @param[out]
-    !> @return
-    !! @todo
+    !> @param[in] debugInp (optional) will print some debug info
     !--------------------------------------------------------------------------
     subroutine readDelay(debugInp)
         !---Dummy variables
@@ -109,5 +106,38 @@ module Mod_readParms
         end do
         
     end subroutine readDelay
+    !--------------------------------------------------------------------------
+    !> @details
+    !!
+    !> @param[in]
+    !> @param[out]
+    !> @return
+    !! @todo
+    !--------------------------------------------------------------------------
+    subroutine readMesh
     
-end module Mod_readParms
+        !---Local Variables
+        type(fson_value), pointer :: json_data, item
+        integer :: i,j
+        
+        json_data => fson_parse("salty_mesh_data.json")
+    
+        call fson_get(json_data, "finite_element_parms.number", num_elem)
+        call fson_get(json_data, "finite_element_parms.nodes_per_elem", nodes_per_elem)
+        call fson_get(json_data, "finite_element_parms.elem_size", elem_size)
+
+        call fson_get(json_data, "core_positions.fuel_inlet_start", Fuel_Inlet_Start)
+        call fson_get(json_data, "core_positions.core_start", Fuel_Core_Start)
+        call fson_get(json_data, "core_positions.core_end", Fuel_Core_End)
+        call fson_get(json_data, "core_positions.fuel_outlet_end",  Fuel_Outlet_End)
+
+        call fson_get(json_data, "heat_exchanger_position.start", Heat_Exchanger_Start)
+        call fson_get(json_data, "heat_exchanger_position.end", Heat_Exchanger_End)
+        
+        call fson_get(json_data, "cross_sectional_areas.core", Area_Core)
+        call fson_get(json_data, "cross_sectional_areas.pipe", Area_Pipe)
+        call fson_get(json_data, "cross_sectional_areas.heat_exe", Area_Heat_Exchanger)
+        
+    end subroutine readMesh
+    
+end module Mod_ReadData
