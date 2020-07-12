@@ -45,6 +45,7 @@ subroutine numerical_flux_matrices (n, nl_iter)
                 !---rhs of previous element
                  matrix_W_right_face(i,j) = velocity_soln_prev(n,i)*&
                                             interp_fcn_rhs(i)*interp_fcn_rhs(j)  
+                 
                  matrix_W_left_face(i,j)  = velocity_soln_prev(n,i)*&
                                             interp_fcn_lhs(i)*interp_fcn_lhs(j)
             else!---First element case, need to connect with end element 

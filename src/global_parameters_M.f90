@@ -7,8 +7,9 @@ module global_parameters_M
     implicit none
 
 !---Define floats 
-    integer, parameter:: dp=kind(0.d0)
-
+    integer, parameter :: dp=kind(0.d0) !---double precision
+    integer, parameter :: sp=kind(1.0)  !--- single precision
+    
 !---File names
     character(60) :: file_name
     character(len=20) :: outfile_name

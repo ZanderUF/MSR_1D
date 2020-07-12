@@ -1,3 +1,4 @@
+
 !*****************************************************************************80
 !
 !  Sets up the elemental matrices 
@@ -89,6 +90,7 @@ subroutine spatial_matrices (n, nl_iter)
                 !---Determine A matrix - only needs to be done once
                     elem_matrix_A(i,j) = elem_matrix_A(i,j) + &
                                      cnst*shape_fcn(i)*shape_fcn(j)
+                    
                    elem_matrix_U(i,j) = elem_matrix_U(i,j) + &
                                     cnst*shape_fcn(j)*&
                                      global_der_shape_fcn(i)

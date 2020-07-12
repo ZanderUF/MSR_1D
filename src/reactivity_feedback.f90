@@ -27,7 +27,7 @@ subroutine temperature_feedback(n, nl_iter, current_time, Temp_Reactivity_Feedba
 !---Local
     real(dp) :: Temperature_Coefficient_Reactivity
     real(dp) :: avg_temperature_current
-    real(dp) :: Total_Density_Current, total_temperature_current
+    real(dp) :: total_temperature_current
     real(dp) :: fuel_elem_len
     integer  :: i, j
 
@@ -57,7 +57,7 @@ end subroutine temperature_feedback
 !---Calculate density feedback <==> fuel expansion
 !
 !
-subroutine density_feedback( n, j, current_time, Density_Reactivity_Feedback )
+subroutine density_feedback( n, j, current_time, Den_Feedback )
 
     USE global_parameters_M
     USE solution_vectors_M
@@ -69,13 +69,14 @@ subroutine density_feedback( n, j, current_time, Density_Reactivity_Feedback )
     integer, intent(in)   :: n
     integer, intent(in)   :: j 
     integer, intent(in)   :: current_time 
-    real(dp), intent(out) :: Density_Reactivity_Feedback 
+    real(dp), intent(inout) :: Den_Feedback 
     
 !---Local
     real(dp) :: Temperature_Coefficient_Reactivity
     real(dp) :: Density_Coefficient_Reactivity
-    integer  :: i
-      
+    integer  :: i  
+    real(dp) :: Total_Density_Current
+    
     !---Density Coeffecien
     Density_Coefficient_Reactivity = 2.94877E-3_dp/&
                     (0.99_dp*Avg_Density_Initial)  
@@ -83,7 +84,7 @@ subroutine density_feedback( n, j, current_time, Density_Reactivity_Feedback )
     !---Initialize
     total_density_current = 0.0
     
-    Density_Reactivity_Feedback = Density_Coefficient_Reactivity * &
-                               (Avg_Density_Current - Avg_Density_Initial)
+    !Den_Feedback = Density_Coefficient_Reactivity * &
+    !                           (Avg_Density_Current - Avg_Density_Initial)
                             
 end subroutine density_feedback

@@ -31,9 +31,6 @@ subroutine transient_euler()
     integer  :: TimeIndex
 
 
-    !open (unit=outfile_unit, file=outfile_name,status='unknown',&
-    !      form='formatted',position='asis')
-
 !---Start time-dependent solve
     if ( time_solve .eqv. .TRUE. ) then
         

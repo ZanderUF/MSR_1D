@@ -50,7 +50,6 @@ implicit none
     if(MSRE_problem .eqv. .TRUE.) then
         inlet_temperature  = 908.0_dp
         outlet_temperature = 935.78_dp
-    print *,' made it'
     end if 
     !---Test if reading power profile from file or not
 

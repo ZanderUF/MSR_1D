@@ -19,7 +19,8 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     USE solution_vectors_M
     USE mesh_info_M
     USE time_info_M 
-
+    Use parameters_fe
+    
     implicit none
 !---Dummy variables
     integer,intent(in) :: isotope
@@ -28,8 +29,9 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
 
 !---Local variables
     integer :: i, j, length   
-    real(dp), dimension(3) :: H_times_soln_vec, beta_lambda_times_q_vec, &
+    real(dp), dimension(3) ::  beta_lambda_times_q_vec, &
                               W_left_times_prev_elem_soln_vec
+    ! H_times_soln_vec,
 
     elem_matrix_H = 0.0_dp 
 !---Calculate [U - lambda*A - W_r]

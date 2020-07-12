@@ -11,7 +11,9 @@ subroutine driver_solve ( )
     USE material_info_M
     USE time_info_M
     USE solution_vectors_M
-
+    !---New
+    use Mod_ReadData
+    
 implicit none
 
 !---Dummy
@@ -46,8 +48,16 @@ implicit none
                                || C2^k - C2^k-1 || || C3^k - C3^k-1 || || C3^k - C3^k-1 ||&
                                || C2^k - C2^k-1 || || C3^k - C3^k-1 || || C3^k - C3^k-1 ||'
 !---Read in problem parameters here
-    call datainput_fe(input_file)
-
+    !call datainput_fe(input_file)
+    
+    call readParms
+    call readDelay
+    call readMesh
+    call readPerturbation
+    call readTime
+    
+    stop
+    
 !---Write input variablesto the outfile 
     call write_out_parms()
 !---Allocate the arrays    
@@ -65,8 +75,8 @@ implicit none
 
 !---Decide if we are reading external file created from DIF3D
     if(Read_DIF3D .eqv. .TRUE.) then
-        call read_power
-        call read_beta_flow
+        !call read_power
+        !call read_beta_flow
     end if
 
 !---Measure Wall clock time
