@@ -1,0 +1,27 @@
+{
+	"feedback_method": 2,
+	"step_pert":
+	{
+		"on": true,
+		"start_time": 0.5,
+		"end_time": 5,
+		"reactivity_insert": 0.0005
+	},
+	"ramp_pert":
+	{
+		"on": false,
+		"start_time": 0.0,
+		"end_time": 0.0,
+		"reactivity_insert": 0.00
+	},
+	"zag_pert":
+	{
+		"on":false
+	},
+	"flow_reduction":
+	{
+		"on" : false,
+		"time_const": 0.05,
+		"flow_reduction": 0.50
+	}
+}

@@ -1,0 +1,25 @@
+{
+	"finite_element_parms":
+	{
+		"number": 100,
+		"nodes_per_elem": 3,
+		"elem_size": 1.0
+	},
+	"core_positions":
+	{
+		"fuel_inlet_start": 2,
+		"core_start": 10,
+		"core_end": 20, 
+		"fuel_outlet_end": 40
+	},
+	"heat_exchanger_position":
+	{
+		"start": 50,
+		"end": 60
+	},
+	"cross_sectional_areas":
+	{
+		"core": 1500,
+		"pipe": 50,
+		"heat_exe": 700
+	}

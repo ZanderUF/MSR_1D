@@ -43,6 +43,7 @@ module Mod_DelayPrecursorData
         !---Local variables
         integer :: i, j
         
+        write(unit_num, *) "Fissile Isotope:", self % isotopeName
         do i = 1, size(self % decayConst)
             
             write(unit_num, '(a, i2)')  "Group ", i
@@ -50,7 +51,8 @@ module Mod_DelayPrecursorData
             write(unit_num, '(a, f7.5)') "Delayed fraction (Beta_i): ", self % groupBeta(i)
             
         end do
-    
+        write(unit_num, '(a)') '--------------------------------------------------------------------------------'  
+
     end subroutine writeOutDelay
     
 end module Mod_DelayPrecursorData

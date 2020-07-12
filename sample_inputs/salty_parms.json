@@ -1,0 +1,12 @@
+{
+
+	"total_power_initial": 100,
+	"mass_flow_rate": 15000,
+	"gen_time": 1E-7,
+	"numerical":
+	{
+		"max_nonlinear_iterations": 50
+	},
+	"debug": false,
+	"read_dif3d": false
+}

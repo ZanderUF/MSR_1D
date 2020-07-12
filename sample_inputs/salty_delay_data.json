@@ -1,0 +1,78 @@
+{
+	"precursor_data":
+	[
+		{
+		"fissile_mat": "u235",
+		"group_wise_delay_data":
+			[
+				{
+				"group": 1,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 2,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 3,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 4,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 5,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},				
+				{
+				"group": 6,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				}
+			]
+		},
+		{
+		"fissile_mat": "pu239",
+		"group_wise_delay_data":
+			[
+				{
+				"group": 1,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 2,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 3,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 4,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},
+				{
+				"group": 5,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				},				
+				{
+				"group": 6,
+				"decay_const": 0.01,
+				"delayed_frac": 1E-5
+				}
+			]
+		}
+	]
+
+}

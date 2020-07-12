@@ -1,0 +1,13 @@
+{
+	"transient_mode": true,
+	"time_integration_method": "backward",	
+	"simulation_time":
+	{
+		"min_time_step": 1E-6,
+		"max_time_step": 1E-2,
+		"start": 0.0,
+		"end": 10.0,
+		"save_interval": 1.0
+	}
+
+}
