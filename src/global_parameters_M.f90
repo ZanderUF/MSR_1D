@@ -9,27 +9,6 @@ module global_parameters_M
 !---Define floats 
     integer, parameter :: dp=kind(0.d0) !---double precision
     integer, parameter :: sp=kind(1.0)  !--- single precision
-    
-!---File names
-    character(60) :: file_name
-    character(len=20) :: outfile_name
-    character(len=21) :: steady_state_soln_file_name
-    character(len=20) :: last_time_file_name
-    character(len=20) :: power_soln_file_name
-    character(len=7)  :: input_file
-    character(len=20) :: beta_special_name
-    character(len=18) :: nl_out_name
-
-    
-    
-!---File units    
-    integer :: outfile_unit = 15 
-    integer :: soln_outfile_unit = 99
-    integer :: soln_last_t_unit = 66
-    integer :: power_outfile_unit = 20
-    integer :: power_file_unit = 12 
-    integer :: beta_special_unit = 64
-    integer :: nl_outfile_unit = 78
 
 !---Nonlinear variables
     integer :: max_iter = 1 ! max num of nonlinear iterations to do
@@ -37,7 +16,6 @@ module global_parameters_M
     real(dp) :: tolerance = 0.001 ! prescribed tolerance
 !---
     integer :: NumTimeSteps
-
 
 !---Math constants    
     real(dp) :: pi

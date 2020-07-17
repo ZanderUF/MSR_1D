@@ -16,7 +16,8 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     USE material_info_M
     USE flags_M
     USE element_matrices_M
-
+    use Mod_GlobalConstants
+    
     implicit none
 
 !---Dummy
@@ -47,7 +48,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
                 do j = 1, nodes_per_elem
                    !---Precursors*lambda
                    precursors_elem(i) = precursors_elem(i) + &
-                        lamda_i_mat(f,g)*&
+                        allPrecursorData(f) % decayConst(g)*&
                         vol_int(j)*&
                         precursor_soln_prev(f,g,i,j)
 
@@ -80,7 +81,7 @@ subroutine solve_power_backward_euler(nl_iter, current_time)
     do f = 1, num_isotopes
         do g = 1, num_delay_group
             total_precursors_fuel = total_precursors_fuel + &
-                    lamda_i_mat(f,g)*precursors_lambda_vec(f,g)
+                    allPrecursorData(f) % decayConst(g)*precursors_lambda_vec(f,g)
         end do
     end do
 

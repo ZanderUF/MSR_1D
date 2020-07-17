@@ -11,6 +11,7 @@ subroutine write_out_ss_soln(file_unit,range_elem,transient_save)
     USE mesh_info_M
     USE material_info_M
     USE time_info_M
+    use Mod_GlobalConstants
 
     implicit none
 

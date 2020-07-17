@@ -15,6 +15,8 @@ subroutine solve_temperature_euler(n,nl_iter)
     USE solution_vectors_M
     USE element_matrices_M
 
+    use Mod_SetupOutputFiles
+    
 implicit none
 
 !---Dummy

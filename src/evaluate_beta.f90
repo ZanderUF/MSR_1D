@@ -13,6 +13,8 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     USE element_matrices_M
     USE time_info_M
 
+    use Mod_GlobalConstants
+    
     implicit none
 
     !---Dummy
@@ -36,7 +38,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
     !   beta values.  10*half_life of each group.  
     do f = 1, num_isotopes
         do g = 1, num_delay_group
-            time_cutoff(f,g) = 10.0*(log(2.0_dp)/lamda_i_mat(f,g))
+            time_cutoff(f,g) = 10.0*(log(2.0_dp)/allPrecursorData(f) % decayConst(g))
         end do
     end do
      
@@ -108,7 +110,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                 
                 beta_j(f,g)         = beta_interp_current(f,g) 
                 
-                Large_Lambda = lamda_i_mat(f,g)*number_half_lifes
+                Large_Lambda = allPrecursorData(f) % decayConst(g)*number_half_lifes
                
                 beta_change_all_current(f,g) = &
                     (1.0_dp - exp(-Large_Lambda*(current_time - event_time)))
@@ -151,7 +153,7 @@ subroutine evaluate_beta_change(event_time, event_time_previous, &
                 
                 beta_j(f,g) = beta_interp_current(f,g)
 
-                Large_Lambda = lamda_i_mat(f,g)*number_half_lifes
+                Large_Lambda = allPrecursorData(f) % decayConst(g)*number_half_lifes
                
                 beta_change_all_current(f,g) = &
                     (1.0_dp - exp(-Large_Lambda*(current_time - event_time)))

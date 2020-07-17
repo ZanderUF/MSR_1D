@@ -4,7 +4,6 @@ subroutine deallocate_arrays ( )
 
     USE flags_M
     USE global_parameters_M
-    USE datainput_fe_M
     USE mesh_info_M
     USE material_info_M
     USE time_info_M

@@ -10,13 +10,11 @@ subroutine write_out_parms()
      USE material_info_M
      USE solution_vectors_M
      USE flags_M
-
+     use Mod_SetupOutputFiles
+    
     implicit none
 
 !---
-    if(DEBUG .eqv. .TRUE.) then
-        write(outfile_unit, fmt='(a)'), 'In DEBUG mode, going to print out every matrix'
-    end if
 
 !---Start PARM block
     write(outfile_unit, fmt='(a)'), 'Writing PARM block input specifications'

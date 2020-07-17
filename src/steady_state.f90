@@ -13,6 +13,10 @@ subroutine steady_state()
     USE material_info_M
     USE element_matrices_M
 
+    use Mod_GlobalConstants
+    use Mod_SetupOutputFiles
+    use Mod_WriteSoln
+    
 implicit none
 
 !---Dummy
@@ -152,8 +156,14 @@ implicit none
     density_soln_ss = density_soln_new
     temperature_soln_ss = temperature_soln_new
 
+    
 !---Write precursor solution outfile
-    call write_out_soln(soln_outfile_unit,num_elem,.TRUE.)
+    call WriteHeader(precUnitNumSS,        precursorSolnFileSS)      
+    call WriteHeader(temperatureUnitNumSS, temperatureSolnFileSS)
+    call WriteHeader(velocityUnitNumSS,    velocitySolnFileSS)
+    call WriteHeader(densityUnitNumSS ,   densitySolnFileSS)   
+    
+   
 
 !---Calculate new beta for this mass flow
 !---Calculate total precursor concentration*lamda over system
@@ -164,7 +174,7 @@ implicit none
                 do j = 1, nodes_per_elem
                    !---Precursors*lambda
                    precursors_lambda_vec(f,g) = precursors_lambda_vec(f,g) + &
-                                      lamda_i_mat(f,g)*&
+                                      allPrecursorData(f) % decayConst(g)*&
                                       vol_int(j)*&
                                       precursor_soln_prev(f,g,i,j)
                 end do
@@ -207,10 +217,6 @@ implicit none
     end do
 
     beta_correction = sum(beta_initial_vec)
-    
-    !if(Read_DIF3D .eqv. .FALSE.) then
-    !    beta_correction = sum(beta_i_mat(1,:))
-    !end if
 
 !---Write out the new beta info
 	write(outfile_unit,fmt='(a)'), ' '	
@@ -231,7 +237,9 @@ implicit none
         write(beta_special_unit,fmt='(es12.6,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10,f14.10, f7.2,f7.2)') &
             mass_flow , (beta_initial_vec(f,g),g=1,num_delay_group),sum(beta_initial_vec),TransitTime, TimeAcrossCore
     end do
-
+    
+    print *, "flowing beta", sum(beta_initial_vec)    
+    print *, "starting static beta: ", sum(allPrecursorData(1).groupBeta)
 !---Set steady state flag off 
     steady_state_flag = .FALSE.
 

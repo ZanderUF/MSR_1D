@@ -17,6 +17,8 @@ subroutine mesh_creation ( )
    USE mesh_info_M
    USE flags_M
 
+   use Mod_SetupOutputFiles
+   
    implicit none
 
 !---Dummy
@@ -27,6 +29,8 @@ subroutine mesh_creation ( )
 !---allocate arrays
     allocate( conn_matrix(num_elem, nodes_per_elem) , &
               global_coord(num_elem,nodes_per_elem) )  
+    allocate(elem_lengths(num_elem))
+    
 !---setup connectivity matrix
     do i=1, num_elem
         do j=1,nodes_per_elem

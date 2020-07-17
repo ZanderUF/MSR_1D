@@ -8,7 +8,8 @@ subroutine write_periodic
     USE time_info_M
     USE mesh_info_M
     USE material_info_M
-
+    use Mod_SetupOutputFiles
+    
     implicit none
 
 !---Local

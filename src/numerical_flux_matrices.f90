@@ -22,6 +22,8 @@ subroutine numerical_flux_matrices (n, nl_iter)
     USE mesh_info_M
     USE solution_vectors_M
 
+    use Mod_SetupOutputFiles
+    
     implicit none
 
 !---Dummy variables

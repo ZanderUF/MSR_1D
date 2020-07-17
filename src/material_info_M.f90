@@ -8,7 +8,6 @@ module material_info_M
 implicit none
 
 !---Point kinetics parameters 
-    real(dp)               :: Long_Decay_Constant
     real(dp), allocatable  :: lamda_i_mat(:,:)
     real(dp), allocatable  :: beta_i_mat(:,:)
     real(dp), allocatable  :: beta_initial_vec(:,:)

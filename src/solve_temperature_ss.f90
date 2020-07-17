@@ -14,7 +14,8 @@ subroutine solve_temperature_ss(n,nl_iter)
     USE global_parameters_M
     USE solution_vectors_M
     USE element_matrices_M
-
+    use Mod_SetupOutputFiles
+    
 implicit none
 
 !---Dummy

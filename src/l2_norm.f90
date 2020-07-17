@@ -11,6 +11,7 @@ subroutine l2_norm(nl_iter)
     USE mesh_info_M
     USE material_info_M
     
+    use Mod_SetupOutputFiles
     
     implicit none
    

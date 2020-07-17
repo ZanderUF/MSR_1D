@@ -21,6 +21,9 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     USE time_info_M 
     Use parameters_fe
     
+    use Mod_GlobalConstants
+    use Mod_SetupOutputFiles
+    
     implicit none
 !---Dummy variables
     integer,intent(in) :: isotope
@@ -36,7 +39,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     elem_matrix_H = 0.0_dp 
 !---Calculate [U - lambda*A - W_r]
     H_times_soln_vec = matmul(elem_matrix_U,precursor_soln_prev(isotope,delay_group,n,:)) - &
-        matmul(lamda_i_mat(isotope,delay_group)*elem_matrix_A,precursor_soln_prev(isotope,delay_group,n,:)) - &
+        matmul(allPrecursorData(isotope) % decayConst(delay_group)*elem_matrix_A,precursor_soln_prev(isotope,delay_group,n,:)) - &
         matmul(matrix_W_right_face,precursor_soln_prev(isotope,delay_group,n,:))
 
     beta_lambda_times_q_vec = 0.0_dp
@@ -44,7 +47,7 @@ subroutine assemble_matrix_transient (isotope,delay_group,n)
     do i = 1, nodes_per_elem
         beta_lambda_times_q_vec(i) = power_amplitude_prev*&
                                     total_power_initial*spatial_power_frac_fcn(n,i)*&
-                           (beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_q(i) 
+                           (allPrecursorData(isotope) % groupBeta(delay_group)/gen_time)*elem_vec_q(i) 
     end do
 
     W_left_times_prev_elem_soln_vec = 0.0_dp

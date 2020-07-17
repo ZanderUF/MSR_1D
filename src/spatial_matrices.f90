@@ -27,6 +27,8 @@ subroutine spatial_matrices (n, nl_iter)
     USE time_info_M
     USE solution_vectors_M
 
+    use Mod_SetupOutputFiles
+    
     implicit none
 
 !---Dummy variables

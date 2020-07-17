@@ -20,7 +20,10 @@ subroutine assemble_matrix_ss (isotope,delay_group,n,nl_iter)
     USE mesh_info_M
     USE global_parameters_M
     USE solution_vectors_M
-
+    use Mod_GlobalConstants
+    
+    use Mod_SetupOutputFiles
+    
     implicit none
 
 !---Dummy variables
@@ -51,7 +54,7 @@ subroutine assemble_matrix_ss (isotope,delay_group,n,nl_iter)
         !---Calculate q vector
         !if(nl_iter == 1) then
             elem_vec_q_final(isotope,delay_group,i) = &
-                 total_power_initial*spatial_power_frac_fcn(n,i)*(beta_i_mat(isotope,delay_group)/gen_time)*elem_vec_q(i) 
+                 total_power_initial*spatial_power_frac_fcn(n,i)*(allPrecursorData(isotope) % groupBeta(delay_group)/gen_time)*elem_vec_q(i) 
         !end if
 
         do j = 1, nodes_per_elem
@@ -67,7 +70,7 @@ subroutine assemble_matrix_ss (isotope,delay_group,n,nl_iter)
 
             end if
             elem_matrix_G(i,j) = -elem_matrix_U(i,j) + &
-                       (lamda_i_mat(isotope,delay_group))*elem_matrix_A(i,j) + &
+                       (allPrecursorData(isotope) % decayConst(delay_group))*elem_matrix_A(i,j) + &
                        matrix_W_right_face(i,j)
         end do
     end do   
