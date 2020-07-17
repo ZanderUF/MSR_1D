@@ -106,12 +106,13 @@ module Mod_ReadData
             
         end do
         
+        num_delay_group = num_groups
         
-        do i = 1, num_isotopes
-        
-            call AllPrecursorData(i) % writeOutDelay(667)
-            
-        end do
+        if(present(debugInp)) then
+            do i = 1, num_isotopes
+                call AllPrecursorData(i) % writeOutDelay(667)
+            end do
+        end if
         
     end subroutine readDelay
     !--------------------------------------------------------------------------
@@ -175,10 +176,13 @@ module Mod_ReadData
         call fson_get(json_data, "step_pert.reactivity_insert", reactivity_input)
         
         call fson_get(json_data, "ramp_pert.on", ramp_flag)
-        call fson_get(json_data, "ramp_pert.start_time", ramp_start_time)
-        call fson_get(json_data, "ramp_pert.end_time", ramp_end_time) 
-        call fson_get(json_data, "ramp_pert.reactivity_insert",  reactivity_input)
-
+        
+        if(ramp_flag == .TRUE.) then
+            call fson_get(json_data, "ramp_pert.start_time", ramp_start_time)
+            call fson_get(json_data, "ramp_pert.end_time", ramp_end_time) 
+            call fson_get(json_data, "ramp_pert.reactivity_insert",  reactivity_input)
+        end if
+        
         call fson_get(json_data, "zag_pert.on", zag_flag)    
 
         call fson_get(json_data, "flow_reduction.on", flow_perturbation)
