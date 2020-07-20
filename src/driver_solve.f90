@@ -65,10 +65,10 @@ implicit none
 !---Time dependent calculation
     if(time_solve .eqv. .TRUE. ) then
         
-        call WriteHeader(precUnitNum,         precursorSolnFile)      
-        call WriteHeader(temperatureUnitNum, temperatureSolnFile) 
-        call WriteHeader(velocityUnitNum,     velocitySolnFile)  
-        call WriteHeader(densityUnitNum,     densitySolnFile)   
+        call WriteHeader(precursorSolnFile)      
+        call WriteHeader(temperatureSolnFile) 
+        call WriteHeader(velocitySolnFile)  
+        call WriteHeader(densitySolnFile)   
     
         if( td_method_type == 0) then
             write(outfile_unit, fmt=('(a)')) ' '

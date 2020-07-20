@@ -16,6 +16,7 @@ subroutine transient_euler()
     USE material_info_M
     USE element_matrices_M
     use Mod_SetupOutputFiles
+    use Mod_WriteSoln
     
     implicit none
 
@@ -180,7 +181,13 @@ subroutine transient_euler()
           
            ! write out solution vectors 
            if( modulo(t0,save_time_interval) < delta_t) then
-                call write_out_soln(12, num_elem, transient_save_flag )
+                !call write_out_soln(12, num_elem, transient_save_flag )
+                
+                
+                call Write3DSolutionVector(precursorSolnFile   ,t0 , precursor_soln_new)
+                call Write1DSolutionVector(temperatureSolnFile ,t0 , temperature_soln_new )
+                call Write1DSolutionVector(velocitySolnFile    ,t0 , velocity_soln_new )
+                call Write1DSolutionVector(densitySolnFile     ,t0 , density_soln_new)
                 
                 transient_save_flag = .FALSE.
             end if

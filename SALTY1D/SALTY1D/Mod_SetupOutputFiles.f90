@@ -28,23 +28,10 @@ module Mod_SetupOutputFiles
     
     
     !---File units    
-    integer :: outfile_unit       = 15 
-    integer :: soln_outfile_unit  = 99
-    integer :: soln_last_t_unit   = 66
-    integer :: power_outfile_unit = 13
-    integer :: power_file_unit    = 12 
-    integer :: beta_special_unit  = 64
-    integer :: nl_outfile_unit    = 78
-    
-    integer :: precUnitNumSS        = 30
-    integer :: temperatureUnitNumSS = 31
-    integer :: velocityUnitNumSS    = 32
-    integer :: densityUnitNumSS     = 33
-    
-    integer :: precUnitNum          = 40
-    integer :: temperatureUnitNum   = 41
-    integer :: velocityUnitNum      = 42
-    integer :: densityUnitNum       = 43
+    integer :: outfile_unit = 10
+    integer :: power_outfile_unit = 11
+    integer :: beta_special_unit = 12
+    integer :: nl_outfile_unit = 13
     
     contains
     
@@ -66,7 +53,6 @@ module Mod_SetupOutputFiles
         
         !---Folder structure
 
-        
         
         !---Name the files that are written out
         outfile_name                = 'outfile.txt'
@@ -101,10 +87,10 @@ module Mod_SetupOutputFiles
         velocitySolnFileSS    = 'velocitySolnSS'
         densitySolnFileSS     = 'densitySolnSS'
         
-        call openBinary(precUnitNumSS, precursorSolnFileSS)
-        call openBinary(temperatureUnitNumSS, temperatureSolnFileSS)
-        call openBinary(velocityUnitNumSS, velocitySolnFileSS) 
-        call openBinary(densityUnitNumSS, densitySolnFileSS)
+        call openBinary(precursorSolnFileSS)
+        call openBinary(temperatureSolnFileSS)
+        call openBinary(velocitySolnFileSS) 
+        call openBinary(densitySolnFileSS)
         
         !---Transient mode only
         if(time_solve == .TRUE.) then
@@ -114,10 +100,10 @@ module Mod_SetupOutputFiles
             velocitySolnFile    = 'velocitySoln'
             densitySolnFile     = 'densitySoln'
         
-            call openBinary(precUnitNum, precursorSolnFile)
-            call openBinary(temperatureUnitNum, temperatureSolnFile)
-            call openBinary(velocityUnitNum, velocitySolnFile) 
-            call openBinary(densityUnitNum, densitySolnFile)
+            call openBinary(precursorSolnFile)
+            call openBinary(temperatureSolnFile)
+            call openBinary(velocitySolnFile) 
+            call openBinary(densitySolnFile)
         end if
         
     end subroutine SetupOutputFiles
@@ -129,15 +115,17 @@ module Mod_SetupOutputFiles
     !> @param[out]
     !! @todo
     !--------------------------------------------------------------------------  
-    subroutine openBinary(unitNum, name)
+    subroutine openBinary(name)
     
         !---Dummy
-        integer, intent(in) :: unitNum
         character(20), intent(inout) :: name
         
         !---Local        
+        integer :: unitNum
+
+        unitNum = 55
         
-        open(unit = unitNum, file = outputFolder//trim(name)//'.bin', status = 'unknown', form ='binary', position='asis') 
+        open(unit = unitNum, file = outputFolder//trim(name)//'.bin', status = 'replace ', form ='binary', position='asis') 
 
         close(unitNum)
     

@@ -158,13 +158,17 @@ implicit none
 
     
 !---Write precursor solution outfile
-    call WriteHeader(precUnitNumSS,        precursorSolnFileSS)      
-    call WriteHeader(temperatureUnitNumSS, temperatureSolnFileSS)
-    call WriteHeader(velocityUnitNumSS,    velocitySolnFileSS)
-    call WriteHeader(densityUnitNumSS ,   densitySolnFileSS)   
+    call WriteHeader(precursorSolnFileSS)      
+    call WriteHeader(temperatureSolnFileSS)
+    call WriteHeader(velocitySolnFileSS)
+    call WriteHeader(densitySolnFileSS)   
     
-   
-
+    
+    call Write3DSolutionVector(precursorSolnFileSS   ,0.0_dp , precursor_soln_new)
+    call Write1DSolutionVector(temperatureSolnFileSS ,0.0_dp , temperature_soln_new)
+    call Write1DSolutionVector(velocitySolnFileSS    ,0.0_dp , velocity_soln_new)
+    call Write1DSolutionVector(densitySolnFile       ,0.0_dp , density_soln_new)
+                
 !---Calculate new beta for this mass flow
 !---Calculate total precursor concentration*lamda over system
     precursors_lambda_vec(:,:) = 0.0_dp
